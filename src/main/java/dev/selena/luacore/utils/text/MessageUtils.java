@@ -42,12 +42,6 @@ public class MessageUtils extends ContentUtils {
     }
 
 
-    public static String placeholders(String content) {
-        //TODO placeholders
-        return "";
-
-    }
-
 
     public static void sender(CommandSender sender, Object... content) {
         sender.sendMessage(colorArray(content));
