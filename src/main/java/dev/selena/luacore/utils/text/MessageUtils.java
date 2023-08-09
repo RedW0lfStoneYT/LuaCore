@@ -17,6 +17,11 @@ public class MessageUtils extends ContentUtils {
             .serializeNulls()
             .create();
 
+
+    /**
+     * Dumps a Java class to console, can be used for most.
+     * @param cls The Class instance you want to dump to console
+     */
     public static void json_dump(Object cls) {
         if (!debug)
             return;
@@ -24,15 +29,29 @@ public class MessageUtils extends ContentUtils {
         consoleSend("\n" + gson.toJson(JsonParser.parseString(classGson)));
     }
 
+    /**
+     * Sends a message to console
+     * @param content The content you want to send to console
+     */
     public static void consoleSend(Object content) {
         LuaCore.getPlugin().getLogger().info(color(content.toString()));
     }
 
+    /**
+     * Sends a message to the selected player
+     * @param player Player you want to message
+     * @param content Message content you want to send to the player
+     */
     public static void playerSend(Player player, Object... content) {
         player.sendMessage(colorArray(content));
     }
 
 
+    /**
+     * Colors an array using hex coloring
+     * @param content The array content
+     * @return The colored array
+     */
     public static String[] colorArray(Object[] content) {
         String[] lines = new String[content.length];
         for (int i = 0; i < content.length; i++) {
@@ -42,12 +61,20 @@ public class MessageUtils extends ContentUtils {
     }
 
 
-
+    /**
+     * Sends a message to a command sender
+     * @param sender The command sender
+     * @param content The message content
+     */
     public static void sender(CommandSender sender, Object... content) {
         sender.sendMessage(colorArray(content));
     }
 
 
+    /**
+     * Sends a message to all online players
+     * @param message Message content.
+     */
     public static void announce(Object ... message) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             playerSend(player, message);
