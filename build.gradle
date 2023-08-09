@@ -1,0 +1,86 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'maven-publish'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+apply plugin: 'java'
+defaultTasks('build')
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        name = "CodeMC"
+        url = uri("https://repo.codemc.io/repository/maven-public/")
+    }
+    maven {
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
+}
+
+dependencies {
+    implementation 'org.luaj:luaj-jse:3.0.1'
+    compileOnly 'org.spigotmc:spigot:1.20.1-R0.1-SNAPSHOT'
+    implementation('com.google.code.gson:gson:2.10.1')
+    implementation("com.google.guava:guava:31.1-jre")
+    compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
+    implementation("de.tr7zw:item-nbt-api:2.11.3")
+}
+
+build {
+    dependsOn shadowJar
+}
+
+shadowJar {
+
+    dependsOn(jar)
+    if (System.getenv("BUILD_NUMBER") == null) {
+        archiveName = rootProject.name + "-" + version + ".jar"
+    } else {
+        archiveName = rootProject.name + "-" + version + "-b" + System.getenv("BUILD_NUMBER") + ".jar"
+    }
+
+    dependencies {
+        include(dependency('com.google.code.gson:gson'))
+        include(dependency('de.tr7zw:item-nbt-api'))
+        include(dependency('com.google.guava:guava'))
+        include(dependency('org.luaj:luaj-jse'))
+    }
+    relocate "com.google", "dev.selena.libs"
+    relocate "de.tr7zw.changeme", "dev.selena.libs"
+    relocate "org.luaj", "dev.selena.libs"
+
+    zip64 true
+    subprojects.each { subproject ->
+        from subproject.sourceSets.main.output.classesDirs
+        from subproject.sourceSets.main.output.resourcesDir
+    }
+
+    configurations = [project.configurations.getByName("runtimeClasspath")]
+}
+
+publishing {
+
+    repositories {
+        maven {
+            name = "Public"
+            url = "https://repo.jadeisacutie.com/releases"
+            credentials(PasswordCredentials)
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            groupId = group
+            artifactId = rootProject.name
+            version = version
+
+        }
+    }
+}
