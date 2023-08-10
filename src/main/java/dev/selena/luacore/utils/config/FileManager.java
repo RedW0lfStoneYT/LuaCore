@@ -1,6 +1,7 @@
 package dev.selena.luacore.utils.config;
 
 import dev.selena.luacore.LuaCore;
+import org.luaj.vm2.compiler.LuaC;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,20 +16,38 @@ public class FileManager {
         FileManager.instance = this;
     }
 
-
+    /**
+     * Returns the specified file
+     * @param parent The parent folder
+     * @param file File name
+     * @return The file you requested
+     */
     public static File file(String parent, String file) {
 
-        return new File(folderPath(parent) + file);
+        return new File(parent, file);
     }
 
+    /**
+     * Returns a folder from your Plugins data folder
+     * @param path Folder name inside the data folder
+     * @return A string path of the requested folder
+     */
     public static String folderPath(String path) {
-        File file = new File("plugins" + File.separator + LuaCore.getPlugin().getName(), path);
+        File file = new File(LuaCore.getPlugin().getDataFolder(), path);
         if (!file.exists())
             file.mkdirs();
         return file.getPath() + File.separator;
     }
 
 
+    /**
+     * Uses the GSON ConfigLoader class to map the config json to the specified class
+     * @see ConfigLoader
+     * @param clazz The class type you want it to be mapped to
+     * @param file The file you are mapping from
+     * @return Class T mapped with the data from the Json file
+     * @param <T>
+     */
     public static <T> T loadFile(Class<T> clazz, File file) {
         try {
             return ConfigLoader.loadConfig(clazz, file);
@@ -42,7 +61,10 @@ public class FileManager {
     }
 
 
-
+    /**
+     * Used for getting the instance of this class
+     * @return FileManager instance
+     */
     public static FileManager get() {
         return instance;
     }

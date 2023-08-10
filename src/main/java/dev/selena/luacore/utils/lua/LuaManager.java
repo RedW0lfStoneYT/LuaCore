@@ -1,6 +1,7 @@
 package dev.selena.luacore.utils.lua;
 
 import dev.selena.luacore.LuaCore;
+import dev.selena.luacore.utils.text.MessageUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.luaj.vm2.Globals;
@@ -25,11 +26,17 @@ public class LuaManager {
     private static final Globals globals = JsePlatform.standardGlobals();
 
 
+    /**
+     * Used to run a lua script
+     * @param function The name of the function you want to run
+     * @param scriptPath The path to the folder your script is in
+     * @param scriptName The name of the script (Without .lua on the end)
+     * @param player Used to parse in a player argument
+     * @param level Used for custom enchants plugin, can be used for anything else
+     * @param event Used for event specific stuff inside the lua script
+     * @return True if the function exists in the Lua file
+     */
     public static boolean runScript(String function, String scriptPath, String scriptName, Player player, int level, Event event) {
-        // Create a Lua globals environment
-        String path = new File(".").getPath();
-        globals.set("PotionEffectType", CoerceJavaToLua.coerce(org.bukkit.potion.PotionEffectType.class));
-        globals.set("Material", CoerceJavaToLua.coerce(org.bukkit.Material.class));
 
         // Load the Lua script from file
         String scriptFilePath = new File(LuaCore.getPlugin().getDataFolder() + "/" + scriptPath, scriptName + ".lua").getPath();
@@ -38,7 +45,7 @@ public class LuaManager {
         globals.get("package").set("path", globals.get("package").get("path").tojstring() + ";" + scriptDirectory + "?.lua;" + scriptDirectory + "?/?.lua;" + scriptDirectory + "utils/?.lua");
         LuaValue chunk = globals.loadfile(scriptFilePath);
         chunk.call();
-        if (!isFunctionExists(scriptFilePath, function))
+        if (!doesFunctionExists(scriptFilePath, function))
             return false;
 
         // Get the run function from the globals environment
@@ -57,37 +64,87 @@ public class LuaManager {
         return true;
     }
 
-    public static Globals getGlobals() {
 
-        return globals;
-    }
-
+    /**
+     * Used for calling a Lua script from Java Code,
+     * In this situation Script path is just the plugins Data Folder
+     * @param function The name of the function you want to run
+     * @param scriptName The name of the Script (Without .lua)
+     * @param player Used for parsing in player arguments
+     * @param level Used for custom enchants but can be used for anything else
+     * @return True if the function exists
+     */
     public static boolean runScript(String function, String scriptName, Player player, int level) {
-        return runScript(function, "Enchants", scriptName, player, level, null);
+        return runScript(function, "", scriptName, player, level, null);
     }
 
+    /**
+     * Used for calling a Lua script from Java Code,
+     * In this situation Script path is just the plugins Data Folder.
+     * This one runs the "run" function
+     * @see LuaManager#runScript(String, String, String, Player, int, Event) If you want full control
+     * @param scriptName The name of the Script (Without .lua)
+     * @param player Used for parsing in player arguments
+     * @param level Used for custom enchants but can be used for anything else
+     * @return True if the function exists
+     */
     public static boolean runScript(String scriptName, Player player, int level) {
 
         return runScript("run", scriptName, player, level);
     }
 
 
+    /**
+     * Used for almost full control of running custom functions from the lua
+     * script
+     * @param function The name of the function you want to run
+     * @param path The folder path that the script is in
+     * @param scriptName The name of the script (Without .lua)
+     * @param player Used for parsing in player arguments
+     * @param level Used in custom enchants but can be used for any int
+     * @return True if the function exists
+     */
     public static boolean runScript(String function, String path, String scriptName, Player player, int level) {
         return runScript(function, path, scriptName, player, level, null);
     }
 
 
+    /**
+     * Used for running events using the "event" function in the lua script
+     * @param scriptName The name of the script you want to run
+     * @param player Used for parsing in player arguments
+     * @param level Used in custom enchants but can be used for any int
+     * @param event The Event that is causing this function to be called
+     *              Used for handling events in your lua script
+     * @return True if the "event" function exists
+     */
     public static boolean runEvent(String scriptName, Player player, int level, Event event) {
 
-        return runScript("event", "Enchants", scriptName, player, level, event);
+        return runScript("event", "", scriptName, player, level, event);
     }
 
+    /**
+     * Used for running events using the "event" function in the lua script
+     * @param scriptPath The path to the script
+     * @param scriptName The name of the script you want to run
+     * @param player Used for parsing in player arguments
+     * @param level Used in custom enchants but can be used for any int
+     * @param event The Event that is causing this function to be called
+     *              Used for handling events in your lua script
+     * @return True if the "event" function exists
+     */
     public static boolean runEvent(String scriptPath, String scriptName, Player player, int level, Event event) {
 
         return runScript("event", scriptPath, scriptName, player, level, event);
     }
 
-    private static boolean isFunctionExists(String luaScriptPath, String functionName) {
+    /**
+     * Used for checking if a lua function exists without trying to run the lua
+     * @param luaScriptPath The path to the script
+     * @param functionName The name of the script
+     * @return True if the function exists
+     */
+    private static boolean doesFunctionExists(String luaScriptPath, String functionName) {
         // Create a Lua globals environment
         Globals globals = JsePlatform.standardGlobals();
 
@@ -108,7 +165,10 @@ public class LuaManager {
     }
 
 
-
+    /**
+     * Used for loading a folder from the Resources folder
+     * @param folderName The name of the folder
+     */
     public static void loadResourceFolder(String folderName) {
         System.out.println(folderName);
         File tempDir = new File(LuaCore.getPlugin().getDataFolder(), folderName);
@@ -153,10 +213,10 @@ public class LuaManager {
             for (File file : folderContent) {
                 if (file.isFile()) {
                     // Process the file
-                    System.out.println("Found file: " + file.getName());
+                    MessageUtils.consoleSend("Found file: " + file.getName());
                 } else if (file.isDirectory()) {
                     // Process the subdirectory
-                    System.out.println("Found subdirectory: " + file.getName());
+                    MessageUtils.consoleSend("Found subdirectory: " + file.getName());
                 }
             }
         }
