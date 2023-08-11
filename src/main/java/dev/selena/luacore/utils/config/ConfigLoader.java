@@ -10,6 +10,9 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 
+/**
+ * Config loader used to load and save json config files
+ */
 public class ConfigLoader {
     private static final Gson gson = new GsonBuilder()
             .disableHtmlEscaping()

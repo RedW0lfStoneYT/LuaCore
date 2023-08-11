@@ -4,7 +4,7 @@ plugins {
     id 'maven-publish'
 }
 
-group 'org.example'
+group 'dev.selena.lua'
 version '1.0-SNAPSHOT'
 apply plugin: 'java'
 defaultTasks('build')
@@ -32,6 +32,11 @@ dependencies {
 
 build {
     dependsOn shadowJar
+}
+
+javadoc {
+    source = sourceSets.main.allJava
+    destinationDir = file("../docs/LuaCore")
 }
 
 shadowJar {
@@ -67,7 +72,7 @@ publishing {
     repositories {
         maven {
             name = "Public"
-            url = "https://repo.jadeisacutie.com/releases"
+            url = "https://repo.selenadevelopment.com/releases"
             credentials(PasswordCredentials)
             authentication {
                 basic(BasicAuthentication)

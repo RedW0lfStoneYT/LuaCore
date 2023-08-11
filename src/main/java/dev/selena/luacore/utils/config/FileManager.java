@@ -7,6 +7,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
+/**
+ * Internally used file manager for loading, creating, and saving files
+ */
 public class FileManager {
 
 
