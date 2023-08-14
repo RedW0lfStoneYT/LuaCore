@@ -290,7 +290,7 @@ public class ItemBuilder {
         NBTItem nbtItem = new NBTItem(item);
 
         if (!stackable)
-            nbtItem.setString("UNSTACKABLE", UUID.randomUUID().toString());
+            nbtItem.setUUID("UNSTACKABLE", UUID.randomUUID());
 
         if (stringNBT != null && !stringNBT.isEmpty())
             for (String key : stringNBT.keySet()) {

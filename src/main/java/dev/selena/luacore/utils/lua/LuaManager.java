@@ -167,10 +167,12 @@ public class LuaManager {
 
     /**
      * Used for loading a folder from the Resources folder
-     * @param folderName The name of the folder
+     * Note its best to add all the resource files into sub folders
+     * @param folderName The start path for loading the files
      */
     public static void loadResourceFolder(String folderName) {
-        System.out.println(folderName);
+        if (LuaCore.isVerbose())
+            MessageUtils.consoleSend(folderName);
         File tempDir = new File(LuaCore.getPlugin().getDataFolder(), folderName);
         if (!tempDir.exists() && !tempDir.mkdirs()) {
             return;
@@ -191,6 +193,9 @@ public class LuaManager {
             Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
                 JarEntry entry = entries.nextElement();
+                if (entry.isDirectory() && entry.getName().startsWith(folderName)) {
+                    new File(tempDir, entry.getName().substring(folderName.length())).mkdirs();
+                }
                 if (!entry.isDirectory() && entry.getName().startsWith(folderName)) {
                     String fileName = entry.getName().substring(folderName.length());
                     try (InputStream fileStream = jarFile.getInputStream(entry)) {
@@ -202,6 +207,7 @@ public class LuaManager {
 
                     }
                 }
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -212,14 +218,15 @@ public class LuaManager {
         if (folderContent != null) {
             for (File file : folderContent) {
                 if (file.isFile()) {
-                    // Process the file
-                    MessageUtils.consoleSend("Found file: " + file.getName());
+                    if (LuaCore.isVerbose())
+                        MessageUtils.consoleSend("Found file: " + file.getName());
                 } else if (file.isDirectory()) {
-                    // Process the subdirectory
-                    MessageUtils.consoleSend("Found subdirectory: " + file.getName());
+                    if (LuaCore.isVerbose())
+                        MessageUtils.consoleSend("Found subdirectory: " + file.getName());
                 }
             }
         }
 
     }
+
 }

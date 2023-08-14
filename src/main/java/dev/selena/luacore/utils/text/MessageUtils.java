@@ -7,6 +7,9 @@ import dev.selena.luacore.LuaCore;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.luaj.vm2.Lua;
+
+import java.util.logging.Level;
 
 public class MessageUtils extends ContentUtils {
 
@@ -35,6 +38,14 @@ public class MessageUtils extends ContentUtils {
      */
     public static void consoleSend(Object content) {
         LuaCore.getPlugin().getLogger().info(color(content.toString()));
+    }
+
+    public static void consoleWarn(Object content) {
+        LuaCore.getPlugin().getLogger().warning(content.toString());
+    }
+
+    public static void consoleError(Object content) {
+        LuaCore.getPlugin().getLogger().log(Level.SEVERE, content.toString());
     }
 
     /**

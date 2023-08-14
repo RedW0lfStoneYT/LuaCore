@@ -28,6 +28,7 @@ dependencies {
     implementation("com.google.guava:guava:31.1-jre")
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
     implementation("de.tr7zw:item-nbt-api:2.11.3")
+    implementation 'io.github.classgraph:classgraph:4.8.162'
 }
 
 build {
@@ -36,7 +37,7 @@ build {
 
 javadoc {
     source = sourceSets.main.allJava
-    destinationDir = file("../docs/LuaCore")
+    destinationDir = file("/var/www/docs/LuaCore")
 }
 
 shadowJar {
@@ -53,10 +54,12 @@ shadowJar {
         include(dependency('de.tr7zw:item-nbt-api'))
         include(dependency('com.google.guava:guava'))
         include(dependency('org.luaj:luaj-jse'))
+        include(dependency('io.github.classgraph:classgraph'))
     }
     relocate "com.google", "dev.selena.libs"
     relocate "de.tr7zw.changeme", "dev.selena.libs"
     relocate "org.luaj", "dev.selena.libs"
+    relocate "io.github", "dev.selena.libs"
 
     zip64 true
     subprojects.each { subproject ->
