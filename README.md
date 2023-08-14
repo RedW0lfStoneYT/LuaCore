@@ -9,6 +9,6 @@ please refer to the wiki once its up for how to use.
 Be sure to add the following to your onEnable() method
 `LuaCore.setPlugin(this);`
 
-Wiki will be coming soon, working on [JDocs](https://docs.selenadevelopment.com) atm 
+Wiki will be coming soon, working on [JDocs](docs.selenadevelopment.com/luacore) atm 
 
 
