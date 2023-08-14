@@ -125,6 +125,19 @@ public class LuaManager {
 
     /**
      * Used for running events using the "event" function in the lua script
+     * @param scriptName The name of the script you want to run
+     * @param player Used for parsing in player arguments
+     * @param event The Event that is causing this function to be called
+     *              Used for handling events in your lua script
+     * @return True if the "event" function exists
+     */
+    public static boolean runEvent(String scriptName, Player player, Event event) {
+
+        return runScript("event", "", scriptName, player, 0, event);
+    }
+
+    /**
+     * Used for running events using the "event" function in the lua script
      * @param scriptPath The path to the script
      * @param scriptName The name of the script you want to run
      * @param player Used for parsing in player arguments
