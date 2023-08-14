@@ -41,6 +41,7 @@ javadoc {
 }
 
 shadowJar {
+
     dependsOn(jar)
     if (System.getenv("BUILD_NUMBER") == null) {
         archiveName = rootProject.name + "-" + version + ".jar"
