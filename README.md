@@ -7,7 +7,7 @@ please refer to the wiki once its up for how to use.
 [View Repo for how to add](https://repo.selenadevelopment.com/#/releases)
 
 Be sure to add the following to your onEnable() method
-`new LuaCore(this)`
+`LuaCore.setPlugin(this);`
 
 Wiki will be coming soon, working on [JDocs](https://docs.selenadevelopment.com) atm 
 
