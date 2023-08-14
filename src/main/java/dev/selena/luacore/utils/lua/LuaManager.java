@@ -30,7 +30,7 @@ public class LuaManager {
      * Used to run a lua script
      * @param function The name of the function you want to run
      * @param scriptPath The path to the folder your script is in
-     * @param scriptName The name of the script (Without .lua on the end)
+     * @param scriptName The name of the script
      * @param player Used to parse in a player argument
      * @param level Used for custom enchants plugin, can be used for anything else
      * @param event Used for event specific stuff inside the lua script
@@ -38,8 +38,9 @@ public class LuaManager {
      */
     public static boolean runScript(String function, String scriptPath, String scriptName, Player player, int level, Event event) {
 
+        scriptName = scriptName.endsWith(".lua") ? scriptName : scriptName + ".lua";
         // Load the Lua script from file
-        String scriptFilePath = new File(LuaCore.getPlugin().getDataFolder() + "/" + scriptPath, scriptName + ".lua").getPath();
+        String scriptFilePath = new File(LuaCore.getPlugin().getDataFolder() + "/" + scriptPath, scriptName).getPath();
 
         String scriptDirectory = LuaCore.getPlugin().getDataFolder() + scriptPath + "/";
         globals.get("package").set("path", globals.get("package").get("path").tojstring() + ";" + scriptDirectory + "?.lua;" + scriptDirectory + "?/?.lua;" + scriptDirectory + "utils/?.lua");
@@ -69,7 +70,7 @@ public class LuaManager {
      * Used for calling a Lua script from Java Code,
      * In this situation Script path is just the plugins Data Folder
      * @param function The name of the function you want to run
-     * @param scriptName The name of the Script (Without .lua)
+     * @param scriptName The name of the Script
      * @param player Used for parsing in player arguments
      * @param level Used for custom enchants but can be used for anything else
      * @return True if the function exists
@@ -83,7 +84,7 @@ public class LuaManager {
      * In this situation Script path is just the plugins Data Folder.
      * This one runs the "run" function
      * @see LuaManager#runScript(String, String, String, Player, int, Event) If you want full control
-     * @param scriptName The name of the Script (Without .lua)
+     * @param scriptName The name of the Script
      * @param player Used for parsing in player arguments
      * @param level Used for custom enchants but can be used for anything else
      * @return True if the function exists
@@ -99,7 +100,7 @@ public class LuaManager {
      * script
      * @param function The name of the function you want to run
      * @param path The folder path that the script is in
-     * @param scriptName The name of the script (Without .lua)
+     * @param scriptName The name of the script
      * @param player Used for parsing in player arguments
      * @param level Used in custom enchants but can be used for any int
      * @return True if the function exists
