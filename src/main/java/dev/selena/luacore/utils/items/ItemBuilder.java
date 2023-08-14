@@ -83,7 +83,7 @@ public class ItemBuilder {
      * @return This instance to continue the building
      * @see #setLore(List)
      */
-    public ItemBuilder setLore(String[] lore) {
+    public ItemBuilder setLore(String ... lore) {
         this.lore = lore;
         return this;
     }
@@ -92,7 +92,7 @@ public class ItemBuilder {
      * Used for setting the lore using List
      * @param lore The List you want to set the lore to
      * @return This instance to continue the building
-     * @see #setLore(String[])
+     * @see #setLore(String...) 
      */
     public ItemBuilder setLore(List<String> lore) {
         this.lore = lore.toArray(new String[0]);
