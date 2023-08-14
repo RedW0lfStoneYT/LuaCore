@@ -40,10 +40,18 @@ public class MessageUtils extends ContentUtils {
         LuaCore.getPlugin().getLogger().info(color(content.toString()));
     }
 
+    /**
+     * Used for sending a warning to the console
+     * @param content The warning message you want to send
+     */
     public static void consoleWarn(Object content) {
         LuaCore.getPlugin().getLogger().warning(content.toString());
     }
 
+    /**
+     * Used for sending an error to the console
+     * @param content The error message you want to send
+     */
     public static void consoleError(Object content) {
         LuaCore.getPlugin().getLogger().log(Level.SEVERE, content.toString());
     }
