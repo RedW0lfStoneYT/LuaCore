@@ -11,4 +11,6 @@ Be sure to add the following to your onEnable() method
 
 Wiki will be coming soon, working on [JDocs](docs.selenadevelopment.com/luacore) atm 
 
+You can view the example project used in the wiki examples [here](https://github.com/RedW0lfStoneYT/LuaCoreExample)
+
 
