@@ -93,8 +93,13 @@ public class ContentUtils {
         return component;
     }
 
+    /**
+     * Used for making the first Letter of the String caps
+     * @param content The String you want to start with caps
+     * @return The formatted string
+     */
     public static String capsFirst(String content) {
-        return WordUtils.capitalize(content.replace("_", " "));
+        return WordUtils.capitalize(content.replace("_", " ").toLowerCase());
     }
 
 
