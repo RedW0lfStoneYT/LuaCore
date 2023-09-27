@@ -96,7 +96,7 @@ public class ContentUtils {
     /**
      * Used for making the first Letter of the String caps
      * @param content The String you want to start with caps
-     * @return The formatted string
+     * @return The formatted string content
      */
     public static String capsFirst(String content) {
         return WordUtils.capitalize(content.replace("_", " ").toLowerCase());
