@@ -13,7 +13,6 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven {
-        name = "CodeMC"
         url = uri("https://repo.codemc.io/repository/maven-public/")
     }
     maven {
