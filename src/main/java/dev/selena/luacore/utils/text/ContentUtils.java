@@ -6,6 +6,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 
 import java.util.regex.Matcher;
@@ -90,6 +91,10 @@ public class ContentUtils {
             i++;
         }
         return component;
+    }
+
+    public static String capsFirst(String content) {
+        return WordUtils.capitalize(content.replace("_", " "));
     }
 
 
