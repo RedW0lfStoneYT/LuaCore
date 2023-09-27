@@ -49,7 +49,7 @@ public class FileManager {
      * @param clazz The class type you want it to be mapped to
      * @param file The file you are mapping from
      * @return Class T mapped with the data from the Json file
-     * @param <T>
+     * @param <T> Class type
      */
     public static <T> T loadFile(Class<T> clazz, File file) {
         try {

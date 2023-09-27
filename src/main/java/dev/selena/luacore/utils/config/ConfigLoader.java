@@ -34,11 +34,9 @@ public class ConfigLoader {
             try (PrintWriter out = new PrintWriter(file)) {
                 out.println(json);
             }
-        } else { //File exists, load from file
-            return gson.fromJson(new String(Files.readAllBytes(file.toPath())), cls);
         }
+        return gson.fromJson(new String(Files.readAllBytes(file.toPath())), cls);
 
-        return null;
     }
 
 

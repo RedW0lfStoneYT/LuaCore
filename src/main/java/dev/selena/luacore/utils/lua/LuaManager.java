@@ -1,7 +1,7 @@
 package dev.selena.luacore.utils.lua;
 
 import dev.selena.luacore.LuaCore;
-import dev.selena.luacore.utils.text.MessageUtils;
+import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.luaj.vm2.Globals;
@@ -186,7 +186,7 @@ public class LuaManager {
      */
     public static void loadResourceFolder(String folderName) {
         if (LuaCore.isVerbose())
-            MessageUtils.consoleSend(folderName);
+            LuaMessageUtils.consoleSend(folderName);
         File tempDir = new File(LuaCore.getPlugin().getDataFolder(), folderName);
         if (!tempDir.exists() && !tempDir.mkdirs()) {
             return;
@@ -233,10 +233,10 @@ public class LuaManager {
             for (File file : folderContent) {
                 if (file.isFile()) {
                     if (LuaCore.isVerbose())
-                        MessageUtils.consoleSend("Found file: " + file.getName());
+                        LuaMessageUtils.consoleSend("Found file: " + file.getName());
                 } else if (file.isDirectory()) {
                     if (LuaCore.isVerbose())
-                        MessageUtils.consoleSend("Found subdirectory: " + file.getName());
+                        LuaMessageUtils.consoleSend("Found subdirectory: " + file.getName());
                 }
             }
         }

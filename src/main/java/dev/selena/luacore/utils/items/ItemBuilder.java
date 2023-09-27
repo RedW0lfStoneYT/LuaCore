@@ -4,7 +4,6 @@ import de.tr7zw.changeme.nbtapi.NBTCompound;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import dev.selena.luacore.LuaCore;
 import dev.selena.luacore.utils.text.ContentUtils;
-import dev.selena.luacore.utils.text.MessageUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;

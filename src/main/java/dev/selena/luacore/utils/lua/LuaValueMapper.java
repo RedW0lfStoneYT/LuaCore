@@ -1,19 +1,15 @@
 package dev.selena.luacore.utils.lua;
 
 import dev.selena.luacore.LuaCore;
-import dev.selena.luacore.utils.text.MessageUtils;
-import net.kyori.adventure.text.format.NamedTextColor;
+import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.Material;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
-import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Objects;
 
 /**
  * Used for mapping Lua values to a class
@@ -66,7 +62,7 @@ public class LuaValueMapper {
 
                 } catch (NoSuchFieldException e) {
                     if (LuaCore.isVerbose())
-                        MessageUtils.consoleWarn("Skipping field: " + fieldName + ", Due to there being no field in the class");
+                        LuaMessageUtils.consoleWarn("Skipping field: " + fieldName + ", Due to there being no field in the class");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

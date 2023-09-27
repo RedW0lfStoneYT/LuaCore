@@ -7,11 +7,10 @@ import dev.selena.luacore.LuaCore;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.luaj.vm2.Lua;
 
 import java.util.logging.Level;
 
-public class MessageUtils extends ContentUtils {
+public class LuaMessageUtils extends ContentUtils {
 
     private static final boolean debug = true;
     private static final Gson gson = new GsonBuilder()
