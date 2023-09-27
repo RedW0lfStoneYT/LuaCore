@@ -27,7 +27,7 @@ public class FileManager {
      */
     public static File file(String parent, String file) {
 
-        return new File(parent, file);
+        return new File(folderPath(parent), file);
     }
 
     /**
