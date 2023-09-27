@@ -1,5 +1,6 @@
 # LuaCore
 A Core for adding Lua to 1.20 plugins (Not a plugin it self just an API)
+[Last successful build](https://dev.selenadevelopment.com/job/LuaCore%20jdocs/lastSuccessfulBuild/)
 
 This API uses [LuaJava](https://github.com/luaj/luaj) to run Lua scripts in your Minecraft Spigot plugin, there is also a GSON config loader built in.
 please refer to the wiki once its up for how to use.
