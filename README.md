@@ -1,4 +1,5 @@
-![Latest Build](https://dev.selenadevelopment.com/job/LuaCore%20jdocs/badge/icon?subject=Latest%20Build)
+![Latest Build](https://dev.selenadevelopment.com/job/LuaCore/badge/icon?subject=Latest%20Build)
+![Latest version](https://repo.selenadevelopment.com/api/badge/latest/releases/dev/selena/lua/LuaCore?name=LuaCore)
 # LuaCore
 A Core for adding Lua to 1.20 plugins (Not a plugin it self just an API)
 
