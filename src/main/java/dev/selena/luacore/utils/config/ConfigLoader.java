@@ -44,7 +44,7 @@ public class ConfigLoader {
      * Saves a config object to the specified file in JSON format
      *
      * @param config The object to be saved
-     * @param file   The file to which the object is saved
+     * @param file The file to which the object is saved
      */
     @SuppressWarnings("all")
     public static void saveConfig(Object config, File file) throws IOException {
