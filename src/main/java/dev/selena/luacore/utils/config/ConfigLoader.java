@@ -24,7 +24,7 @@ public class ConfigLoader {
      * If the file does not exist it also creates the file using the given object defaults
      *
      * @param cls The object type you wish to load, also dictates the class of the returned object
-     * @param file   The file that is to be created/read from
+     * @param file The file that is to be created/read from
      * @return The object loaded from file
      */
     public static <T> T loadConfig(Class<T> cls, File file) throws IOException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
