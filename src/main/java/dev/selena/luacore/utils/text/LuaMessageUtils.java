@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 import dev.selena.luacore.LuaCore;
 import org.bukkit.Bukkit;
+import org.bukkit.Utility;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -98,4 +99,38 @@ public class LuaMessageUtils extends ContentUtils {
             playerSend(player, message);
         }
     }
+
+    /**
+     * Used for debugging sending a warning to the console
+     * @param warning The warning message you want to send
+     * @see LuaCore#setVerbose(boolean)
+     * @see LuaCore#isVerbose()
+     */
+    public static void verboseWarn(String warning) {
+        if (LuaCore.isVerbose())
+            consoleWarn(warning);
+    }
+
+    /**
+     * Used for debugging sending an error to the console
+     * @param error The error message you want to send
+     * @see LuaCore#setVerbose(boolean)
+     * @see LuaCore#isVerbose()
+     */
+    public static void verboseError(String error) {
+        if (LuaCore.isVerbose())
+            consoleError(error);
+    }
+
+    /**
+     * Used for debugging sending a message to the console
+     * @param message The message you want to send
+     * @see LuaCore#setVerbose(boolean)
+     * @see LuaCore#isVerbose()
+     */
+    public static void verboseMessage(String message) {
+        if (LuaCore.isVerbose())
+            consoleSend(message);
+    }
+
 }

@@ -185,8 +185,7 @@ public class LuaManager {
      * @param folderName The start path for loading the files
      */
     public static void loadResourceFolder(String folderName) {
-        if (LuaCore.isVerbose())
-            LuaMessageUtils.consoleSend(folderName);
+        LuaMessageUtils.verboseMessage(folderName);
         File tempDir = new File(LuaCore.getPlugin().getDataFolder(), folderName);
         if (!tempDir.exists() && !tempDir.mkdirs()) {
             return;
@@ -232,11 +231,9 @@ public class LuaManager {
         if (folderContent != null) {
             for (File file : folderContent) {
                 if (file.isFile()) {
-                    if (LuaCore.isVerbose())
-                        LuaMessageUtils.consoleSend("Found file: " + file.getName());
+                    LuaMessageUtils.verboseMessage("Found file: " + file.getName());
                 } else if (file.isDirectory()) {
-                    if (LuaCore.isVerbose())
-                        LuaMessageUtils.consoleSend("Found subdirectory: " + file.getName());
+                    LuaMessageUtils.verboseMessage("Found subdirectory: " + file.getName());
                 }
             }
         }

@@ -61,8 +61,7 @@ public class LuaValueMapper {
                     setField(field, clazz, value);
 
                 } catch (NoSuchFieldException e) {
-                    if (LuaCore.isVerbose())
-                        LuaMessageUtils.consoleWarn("Skipping field: " + fieldName + ", Due to there being no field in the class");
+                    LuaMessageUtils.consoleWarn("Skipping field: " + fieldName + ", Due to there being no field in the class");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
