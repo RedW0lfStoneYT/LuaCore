@@ -1,6 +1,7 @@
 package dev.selena.luacore;
 
 import dev.selena.luacore.utils.items.ItemEvent;
+import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.plugin.Plugin;
 
 
@@ -32,6 +33,7 @@ public class LuaCore {
      */
     public static void setVerbose(boolean verbose) {
         LuaCore.verbose = verbose;
+        LuaMessageUtils.verboseMessage("Verbose mode is enabled");
     }
 
     /**
@@ -55,6 +57,8 @@ public class LuaCore {
      * @return Returns the compound name for your plugin
      */
     public static String getCompountName() {
-        return LuaCore.getPlugin().getName();
+        String name = LuaCore.getPlugin().getName();
+        LuaMessageUtils.verboseMessage(name);
+        return name;
     }
 }

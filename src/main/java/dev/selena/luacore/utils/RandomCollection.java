@@ -1,5 +1,7 @@
 package dev.selena.luacore.utils;
 
+import dev.selena.luacore.utils.text.LuaMessageUtils;
+
 import java.util.NavigableMap;
 import java.util.Random;
 import java.util.TreeMap;
@@ -33,6 +35,7 @@ public class RandomCollection<E> {
         if (weight <= 0) return this;
         total += weight;
         map.put(total, result);
+        LuaMessageUtils.verboseMessage("New total weight value: " + total);
         return this;
     }
 

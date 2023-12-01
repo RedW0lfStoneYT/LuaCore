@@ -18,6 +18,7 @@ public class LuaMessageUtils extends ContentUtils {
             .disableHtmlEscaping()
             .setPrettyPrinting()
             .serializeNulls()
+            .excludeFieldsWithoutExposeAnnotation()
             .create();
 
 

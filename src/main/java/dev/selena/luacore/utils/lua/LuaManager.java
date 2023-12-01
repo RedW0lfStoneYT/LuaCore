@@ -38,7 +38,10 @@ public class LuaManager {
      */
     public static boolean runScript(String function, String scriptPath, String scriptName, Player player, int level, Event event) {
 
+        Long start = System.currentTimeMillis();
         scriptName = scriptName.endsWith(".lua") ? scriptName : scriptName + ".lua";
+
+        LuaMessageUtils.verboseMessage("Attempting to run script: " + scriptName);
         // Load the Lua script from file
         String scriptFilePath = new File(LuaCore.getPlugin().getDataFolder() + "/" + scriptPath, scriptName).getPath();
 
@@ -46,8 +49,10 @@ public class LuaManager {
         globals.get("package").set("path", globals.get("package").get("path").tojstring() + ";" + scriptDirectory + "?.lua;" + scriptDirectory + "?/?.lua;" + scriptDirectory + "utils/?.lua");
         LuaValue chunk = globals.loadfile(scriptFilePath);
         chunk.call();
-        if (!doesFunctionExists(scriptFilePath, function))
+        if (!doesFunctionExists(scriptFilePath, function)) {
+            LuaMessageUtils.verboseMessage(function + " does not exist in " + scriptName);
             return false;
+        }
 
         // Get the run function from the globals environment
         LuaValue runFunction = globals.get(function);
@@ -61,6 +66,8 @@ public class LuaManager {
         LuaValue[] args = {playerArg, levelArg, scriptHelper, eventArgs};
 
         runFunction.invoke(args);
+        Long end = System.currentTimeMillis();
+        LuaMessageUtils.verboseMessage("Executed " + scriptName + ". The script took " + (end - start) + "ms");
 
         return true;
     }
@@ -159,6 +166,7 @@ public class LuaManager {
      * @return True if the function exists
      */
     private static boolean doesFunctionExists(String luaScriptPath, String functionName) {
+        LuaMessageUtils.verboseMessage("Checking if " + functionName + " exists");
         // Create a Lua globals environment
         Globals globals = JsePlatform.standardGlobals();
 
@@ -171,10 +179,12 @@ public class LuaManager {
             // Get the Lua value associated with the function name
             LuaValue functionValue = result.get(functionName);
 
+            LuaMessageUtils.verboseMessage(functionName + " does exist");
             // Check if the Lua value is a function
             return functionValue.isfunction();
         }
 
+        LuaMessageUtils.verboseError(functionName + " does NOT exist");
         return false;
     }
 
