@@ -6,8 +6,9 @@ import java.util.TreeMap;
 
 /**
  * Used for weighted random item/object generation
- * @param <E>
  * For examples check the <a href="https://github.com/RedW0lfStoneYT/LuaCore/wiki/Using-the-built-in-weighted-random-for-rewards">wiki</a>
+ * @param <E>
+ * The reward of any type
  */
 public class RandomCollection<E> {
     private final NavigableMap<Double, E> map = new TreeMap<Double, E>();
