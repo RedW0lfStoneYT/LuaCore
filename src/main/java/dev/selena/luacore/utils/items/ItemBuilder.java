@@ -4,6 +4,7 @@ import de.tr7zw.changeme.nbtapi.NBTCompound;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import dev.selena.luacore.LuaCore;
 import dev.selena.luacore.utils.text.ContentUtils;
+import dev.selena.luacore.utils.text.LuaMessageUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -306,7 +307,9 @@ public class ItemBuilder {
             }
         if (customNBT != null && !customNBT.isEmpty()) {
             for (String nameSpace : customNBT.keySet()) {
-                NBTCompound compound = nbtItem.getCompound(LuaCore.getCompountName());
+                LuaMessageUtils.verboseMessage("NBT Compound name: " + LuaCore.getCompountName());
+                NBTCompound compound = nbtItem.getOrCreateCompound(LuaCore.getCompountName());
+
                 Object content = customNBT.get(nameSpace);
                 NBTUtils.storeNBTContent(compound, content, nameSpace);
             }
