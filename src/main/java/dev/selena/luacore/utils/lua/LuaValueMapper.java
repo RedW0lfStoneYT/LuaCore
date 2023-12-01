@@ -1,15 +1,18 @@
 package dev.selena.luacore.utils.lua;
 
-import dev.selena.luacore.LuaCore;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.CoerceLuaToJava;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 /**
  * Used for mapping Lua values to a class
@@ -22,24 +25,35 @@ public class LuaValueMapper {
 
     /**
      * Used for loading a Lua table into memory
+     *
      * @param scriptPath The path to the script
      * @return The Lua Table for the script returns
      */
     public static LuaTable loadTable(String scriptPath) {
+        LuaMessageUtils.verboseMessage("Checking if " + scriptPath + " has a table");
         LuaValue luaScript = luaGlobals.loadfile(scriptPath).call();
 
         if (luaScript.istable()) {
-            return luaScript.checktable();
+            try {
+                LuaTable table = luaScript.checktable();
+                LuaMessageUtils.verboseMessage("Table exists");
+                return table;
+            } catch (LuaError e) {
+                LuaMessageUtils.verboseError("There is no table in " + scriptPath);
+                e.printStackTrace();
+            }
         }
+        LuaMessageUtils.verboseError("There is no table in " + scriptPath);
         return null;
     }
 
     /**
      * Used for mapping lua values to the class
-     * @param cls The class you want to map to
+     *
+     * @param cls        The class you want to map to
      * @param scriptPath The path to the script
+     * @param <T>        The mapper class
      * @return The mapped class instance
-     * @param <T> The mapper class
      */
     public static <T> T mapToClass(Class<T> cls, String scriptPath) {
         try {
@@ -74,31 +88,27 @@ public class LuaValueMapper {
     }
 
 
-    //Likely not the best way to do this, feel free to help me out with a PR
+// Still can be improved I'm sure
     private static void setField(Field field, Object clazz, LuaValue value) throws IllegalAccessException {
+        LuaMessageUtils.verboseMessage("Attempting to access " + field.getName());
         Class<?> fieldType = field.getType();
+        switch(fieldType.getName()) {
+            case "org.bukkit.World" -> field.set(clazz, Bukkit.getWorld(value.tojstring()));
+            case "org.bukkit.Material" -> field.set(clazz, Material.getMaterial(value.tojstring()));
+            default -> {
+                LuaMessageUtils.verboseMessage("Field type: " + fieldType.getName());
+                try {
+                    field.get(clazz);
+                } catch (IllegalAccessException e) {
+                    LuaMessageUtils.verboseMessage("Field " + field.getName() + " is not accessible");
+                }
 
-        if (fieldType == boolean.class) {
-            field.setBoolean(clazz, value.toboolean());
-        } else if (fieldType == int.class) {
-            field.setInt(clazz, value.toint());
-        } else if (fieldType == float.class) {
-            field.setFloat(clazz, (float) value.todouble());
-        } else if (fieldType == double.class) {
-            field.setDouble(clazz, value.todouble());
-        } else if (fieldType == byte.class) {
-            field.setByte(clazz, value.tobyte());
-        } else if (fieldType == Material.class) {
-            field.set(clazz, Material.getMaterial(value.tojstring()));
-        } else if (fieldType == long.class) {
-            field.setLong(clazz, value.tolong());
-        } else if (fieldType == short.class) {
-            field.setLong(clazz, value.toshort());
-        } else if (fieldType == char.class) {
-            field.setLong(clazz, value.tochar());
-        } else if (fieldType == String.class) {
-            field.set(clazz, value.tojstring());
+                LuaMessageUtils.verboseMessage("Attempting to set " + field.getName() + " to " + value);
+                Object convertedValue = CoerceLuaToJava.coerce(value, fieldType);
+                field.set(clazz, convertedValue);
+            }
         }
     }
+
 
 }
