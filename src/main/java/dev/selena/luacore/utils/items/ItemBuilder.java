@@ -261,11 +261,11 @@ public class ItemBuilder {
         item.setAmount(Math.max(1, amount));
         ItemMeta meta = item.getItemMeta();
         if (title != null)
-            meta.displayName(ContentUtils.componentColor(title));
+            meta.displayName(ContentUtils.colorStringToComponent(title));
         if (lore != null) {
             List<Component> loreLines = new ArrayList<>();
             for (String line : lore) {
-                loreLines.add(ContentUtils.componentColor(line));
+                loreLines.add(ContentUtils.colorStringToComponent(line));
             }
             meta.lore(loreLines);
         }

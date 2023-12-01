@@ -62,21 +62,7 @@ public class LuaMessageUtils extends ContentUtils {
      * @param content Message content you want to send to the player
      */
     public static void playerSend(Player player, Object... content) {
-        player.sendMessage(colorArray(content));
-    }
-
-
-    /**
-     * Colors an array using hex coloring
-     * @param content The array content
-     * @return The colored array
-     */
-    public static String[] colorArray(Object[] content) {
-        String[] lines = new String[content.length];
-        for (int i = 0; i < content.length; i++) {
-            lines[i] = color(content[i] == null ? "null" : content[i].toString());
-        }
-        return lines;
+        player.sendMessage(ContentUtils.colorArray(content));
     }
 
 
@@ -86,7 +72,7 @@ public class LuaMessageUtils extends ContentUtils {
      * @param content The message content
      */
     public static void sender(CommandSender sender, Object... content) {
-        sender.sendMessage(colorArray(content));
+        sender.sendMessage(ContentUtils.colorArray(content));
     }
 
 
