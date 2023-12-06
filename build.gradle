@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'dev.selena.lua'
-version '1.0.6'
+version '1.0.6-SNAPSHOT'
 apply plugin: 'java'
 defaultTasks('build')
 
@@ -41,7 +41,10 @@ dependencies {
     implementation 'io.github.classgraph:classgraph:4.8.162'
     implementation('com.iridium:IridiumColorAPI:1.0.6')
 
+
+
 }
+
 
 build {
     dependsOn shadowJar
@@ -92,8 +95,8 @@ publishing {
 
     repositories {
         maven {
-            name = "Public"
-            url = "https://repo.selenadevelopment.com/releases"
+            name = "PublicAdmin"
+            url = "https://repo.selenadevelopment.com/snapshots"
             credentials(PasswordCredentials)
             authentication {
                 basic(BasicAuthentication)
