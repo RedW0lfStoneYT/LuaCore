@@ -29,8 +29,10 @@ dependencies {
     // Tests
     testImplementation 'com.github.seeseemelk:MockBukkit-v1.20:3.24.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testImplementation 'junit:junit:4.13.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
     implementation 'org.slf4j:slf4j-simple:2.0.5'
+    testImplementation 'org.mockito:mockito-core:5.2.0'
 
     implementation 'org.luaj:luaj-jse:3.0.1'
     compileOnly 'org.spigotmc:spigot:1.20.1-R0.1-SNAPSHOT'

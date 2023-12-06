@@ -11,6 +11,7 @@ public class LuaCore {
     private static boolean verbose;
 
 
+
     /**
      * This needs to be called in the OnEnable method of your plugin for it to work
      * @param plugin Your main class that extends JavaPlugin
