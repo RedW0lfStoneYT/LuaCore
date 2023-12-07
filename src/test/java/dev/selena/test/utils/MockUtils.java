@@ -32,7 +32,7 @@ public class MockUtils {
     private MockUtils() {
     } // Hides constructor
 
-    public static MockUtils setUp() // Initialises the mock utility with mocked plugin class
+    public static MockUtils setUp()
     {
         mockedStatic.when(Bukkit::getVersion).thenReturn("1.20.1");
         MockUtils utils = new MockUtils().mockLibClass().mockPluginClass();
