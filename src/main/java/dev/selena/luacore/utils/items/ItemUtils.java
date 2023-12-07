@@ -1,5 +1,6 @@
 package dev.selena.luacore.utils.items;
 
+import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -165,42 +166,16 @@ public class ItemUtils {
     }
 
     /**
-     * Used for Custom enchants plugin but can be used for other plugins
-     * @param item The ItemStack you want to check
-     * @param argument The string argument of the application type
-     * @return True if you can apply the string related request
-     */
-    public static boolean canApply(ItemStack item, String argument) {
-        return switch (argument.toLowerCase()) {
-            case "any" -> isTool(item) || isArmor(item) || isWeapon(item) || isBow(item) || isCrossBow(item);
-            // armor
-            case "armor" -> isArmor(item);
-            case "helmet" -> isHelmet(item);
-            case "chestplate", "chest plate" -> isChestplate(item);
-            case "leggings" -> isLeggings(item);
-            case "boots" -> isBoots(item);
-            // weapons
-            case "weapon" -> isWeapon(item);
-            case "sword" -> isSword(item);
-            case "axe" -> isAxe(item);
-            case "bow" -> isBow(item);
-            case "crossbow" -> isCrossBow(item);
-            // tools
-            case "tool", "tools" -> isTool(item);
-            case "shovel" -> isShovel(item);
-            case "pickaxe" -> isPickaxe(item);
-            case "hoe" -> isHoe(item);
-            default -> false;
-        };
-    }
-
-    /**
      * Used for removing x items from a players inventory or some form of stack
      * @param item The item you want to remove from
      * @param amount The amount of items you want to remove
      * @return if the value is less than or equal to 0 it will return an Air ItemStack
      */
     public static ItemStack deleteItem(ItemStack item, int amount) {
+        if (amount <= 0) {
+            LuaMessageUtils.consoleError("Cannot remove " + amount + " from item. The amount must be above 0");
+            return item;
+        }
         int newAmount = item.getAmount() - amount;
         if (newAmount > 0) {
             item.setAmount(newAmount);
