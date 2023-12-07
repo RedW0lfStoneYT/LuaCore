@@ -120,6 +120,7 @@ class LuaManagerTest {
         assertTrue(ranFine);
     }
 
+
     @Test
     void runScript_FailDueToLuaError() throws URISyntaxException, IOException {
         LuaManager.loadResourceFolder("test");
