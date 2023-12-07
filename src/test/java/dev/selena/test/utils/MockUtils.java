@@ -26,12 +26,14 @@ public class MockUtils {
     private static LuaCore libMock; // Mocked plugin
     static MockedStatic<Bukkit> mockedStatic;
 
+    static {
+        mockedStatic = Mockito.mockStatic(Bukkit.class);
+    }
     private MockUtils() {
     } // Hides constructor
 
     public static MockUtils setUp() // Initialises the mock utility with mocked plugin class
     {
-        mockedStatic = Mockito.mockStatic(Bukkit.class);
         mockedStatic.when(Bukkit::getVersion).thenReturn("1.20.1");
         MockUtils utils = new MockUtils().mockLibClass().mockPluginClass();
         mockedStatic.when(pluginMock::getServer).thenReturn(Mockito.mock(Server.class));

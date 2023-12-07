@@ -32,7 +32,7 @@ dependencies {
     testImplementation 'com.github.seeseemelk:MockBukkit-v1.20:3.24.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'com.github.seeseemelk:MockBukkit-v1.20:3.9.0'
+//    testImplementation 'com.github.seeseemelk:MockBukkit-v1.20:3.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
     implementation 'org.slf4j:slf4j-simple:2.0.5'
     testImplementation('org.mockito:mockito-inline:5.2.0')

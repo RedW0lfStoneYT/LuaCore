@@ -19,7 +19,6 @@ import java.net.URISyntaxException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 class LuaValueMapperTest {
 
 
@@ -30,7 +29,7 @@ class LuaValueMapperTest {
     @BeforeAll
     public static void setup() throws IOException, URISyntaxException {
         temporaryFolder.create();
-        MockUtils.setUp().mockDataFolder(temporaryFolder.getRoot()).mockLogger();
+        MockUtils.setUp().mockDataFolder(temporaryFolder.getRoot());
         LuaManager.loadResourceFolder("test");
     }
 
