@@ -12,6 +12,7 @@ import org.luaj.vm2.lib.jse.JsePlatform;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -194,56 +195,29 @@ public class LuaManager {
      * Note its best to add all the resource files into sub folders
      * @param folderName The start path for loading the files
      */
-    public static void loadResourceFolder(String folderName) {
+    public static void loadResourceFolder(String folderName) throws URISyntaxException, IOException {
         LuaMessageUtils.verboseMessage(folderName);
-        File tempDir = new File(LuaCore.getPlugin().getDataFolder(), folderName);
+
+        File tempDir = new File(LuaManager.class.getClassLoader().getResource(folderName).toURI());
         if (!tempDir.exists() && !tempDir.mkdirs()) {
             return;
         }
 
-        // Get the JAR file path
-        String jarFilePath;
-        try {
-            jarFilePath = Objects.requireNonNull(LuaManager.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-
-
-        // Extract the folder content from the JAR file
-        try (JarFile jarFile = new JarFile(jarFilePath)) {
-            Enumeration<JarEntry> entries = jarFile.entries();
-            while (entries.hasMoreElements()) {
-                JarEntry entry = entries.nextElement();
-                if (entry.isDirectory() && entry.getName().startsWith(folderName)) {
-                    new File(tempDir, entry.getName().substring(folderName.length())).mkdirs();
-                }
-                if (!entry.isDirectory() && entry.getName().startsWith(folderName)) {
-                    String fileName = entry.getName().substring(folderName.length());
-                    try (InputStream fileStream = jarFile.getInputStream(entry)) {
-                        if (fileStream != null) {
-                            Path destinationPath = new File(tempDir, fileName).toPath();
-                            Files.copy(fileStream, destinationPath);
-                        }
-                    } catch (FileAlreadyExistsException ignore) {
-
-                    }
-                }
-
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         // Process the files within the temporary directory
         File[] folderContent = tempDir.listFiles();
+
         if (folderContent != null) {
             for (File file : folderContent) {
+
                 if (file.isFile()) {
                     LuaMessageUtils.verboseMessage("Found file: " + file.getName());
+                    Path destinationPath = new File(LuaCore.getPlugin().getDataFolder() + "/" + folderName, file.getName()).toPath();
+                    Path input = new File("/" + file.getParent() + "/" + file.getName()).toPath();
+                    destinationPath.toFile().getParentFile().mkdirs();
+                    Files.copy(input, destinationPath);
                 } else if (file.isDirectory()) {
                     LuaMessageUtils.verboseMessage("Found subdirectory: " + file.getName());
+                    new File(LuaCore.getPlugin().getDataFolder() + "/" + folderName, file.getName()).mkdirs();
                 }
             }
         }

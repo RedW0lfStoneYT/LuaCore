@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +15,6 @@ import java.net.URISyntaxException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(MockitoJUnitRunner.class)
 class LuaManagerTest {
 
     @ClassRule
@@ -57,7 +55,7 @@ class LuaManagerTest {
     }
 
     @Test
-    void loadResourceFolder() {
+    void loadResourceFolder() throws URISyntaxException, IOException {
         LuaManager.loadResourceFolder("test");
         File file = new File(MockUtils.getPluginMock().getDataFolder(), "test");
         assertTrue(file.exists());
