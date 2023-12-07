@@ -62,7 +62,7 @@ public class MockUtils {
     public MockUtils mockLogger() // Mocks JavaPlugin.getLogger
     {
         Logger testLogger = Logger.getLogger("TestLogger");
-        given(pluginMock.getServer().getLogger()).willReturn(testLogger);
+        given(pluginMock.getLogger()).willReturn(testLogger);
         return this;
     }
 
