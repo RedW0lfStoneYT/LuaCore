@@ -104,8 +104,12 @@ publishing {
 
     repositories {
         maven {
-            name = "PublicAdmin"
-            url = "https://repo.selenadevelopment.com/snapshots"
+            name = "Public"
+            if (version.toString().endsWith("SNAPSHOT")) {
+                url = "https://repo.selenadevelopment.com/snapshots"
+            } else {
+                url = "https://repo.selenadevelopment.com/releases"
+            }
             credentials(PasswordCredentials)
             authentication {
                 basic(BasicAuthentication)
