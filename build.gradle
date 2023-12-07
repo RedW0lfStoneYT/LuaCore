@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'dev.selena.lua'
-version '1.0.6-SNAPSHOT'
+version '1.0.7'
 apply plugin: 'java'
 defaultTasks('build')
 
@@ -101,8 +101,8 @@ publishing {
 
     repositories {
         maven {
-            name = "PublicAdmin"
-            url = "https://repo.selenadevelopment.com/snapshots"
+            name = "Public"
+            url = "https://repo.selenadevelopment.com/releases"
             credentials(PasswordCredentials)
             authentication {
                 basic(BasicAuthentication)
