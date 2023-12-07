@@ -59,8 +59,9 @@ javadoc {
     source = sourceSets.main.allJava
     if (System.getenv("DEV_BUILD")) {
         destinationDir = file("/home/web/docs/beta/luacore")
+    } else {
+        destinationDir = file("/home/web/docs/luacore")
     }
-    destinationDir = file("/home/web/docs/luacore")
 }
 
 java {
