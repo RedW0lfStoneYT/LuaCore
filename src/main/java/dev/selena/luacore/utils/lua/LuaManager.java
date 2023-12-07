@@ -33,11 +33,10 @@ public class LuaManager {
      * @param scriptPath The path to the folder your script is in
      * @param scriptName The name of the script
      * @param player Used to parse in a player argument
-     * @param level Used for custom enchants plugin, can be used for anything else
      * @param event Used for event specific stuff inside the lua script
      * @return True if the function exists in the Lua file
      */
-    public static boolean runScript(String function, String scriptPath, String scriptName, Player player, int level, Event event) {
+    public static boolean runScript(String function, String scriptPath, String scriptName, Player player, Event event) {
 
         Long start = System.currentTimeMillis();
         scriptName = scriptName.endsWith(".lua") ? scriptName : scriptName + ".lua";
@@ -62,9 +61,8 @@ public class LuaManager {
         LuaValue playerArg = CoerceJavaToLua.coerce(player);
         LuaValue eventArgs = CoerceJavaToLua.coerce(event);
         LuaValue scriptHelper = CoerceJavaToLua.coerce(new ScriptHelper());
-        LuaValue levelArg = CoerceJavaToLua.coerce(level);
 
-        LuaValue[] args = {playerArg, levelArg, scriptHelper, eventArgs};
+        LuaValue[] args = {playerArg, scriptHelper, eventArgs};
 
         runFunction.invoke(args);
         Long end = System.currentTimeMillis();
@@ -80,26 +78,24 @@ public class LuaManager {
      * @param function The name of the function you want to run
      * @param scriptName The name of the Script
      * @param player Used for parsing in player arguments
-     * @param level Used for custom enchants but can be used for anything else
      * @return True if the function exists
      */
-    public static boolean runScript(String function, String scriptName, Player player, int level) {
-        return runScript(function, "", scriptName, player, level, null);
+    public static boolean runScript(String function, String scriptName, Player player) {
+        return runScript(function, "", scriptName, player, null);
     }
 
     /**
      * Used for calling a Lua script from Java Code,
      * In this situation Script path is just the plugins Data Folder.
      * This one runs the "run" function
-     * @see LuaManager#runScript(String, String, String, Player, int, Event) If you want full control
+     * @see LuaManager#runScript(String, String, String, Player, Event) If you want full control
      * @param scriptName The name of the Script
      * @param player Used for parsing in player arguments
-     * @param level Used for custom enchants but can be used for anything else
      * @return True if the function exists
      */
-    public static boolean runScript(String scriptName, Player player, int level) {
+    public static boolean runScript(String scriptName, Player player) {
 
-        return runScript("run", scriptName, player, level);
+        return runScript("run", scriptName, player);
     }
 
 
@@ -110,27 +106,12 @@ public class LuaManager {
      * @param path The folder path that the script is in
      * @param scriptName The name of the script
      * @param player Used for parsing in player arguments
-     * @param level Used in custom enchants but can be used for any int
      * @return True if the function exists
      */
-    public static boolean runScript(String function, String path, String scriptName, Player player, int level) {
-        return runScript(function, path, scriptName, player, level, null);
+    public static boolean runScript(String function, String path, String scriptName, Player player) {
+        return runScript(function, path, scriptName, player, null);
     }
 
-
-    /**
-     * Used for running events using the "event" function in the lua script
-     * @param scriptName The name of the script you want to run
-     * @param player Used for parsing in player arguments
-     * @param level Used in custom enchants but can be used for any int
-     * @param event The Event that is causing this function to be called
-     *              Used for handling events in your lua script
-     * @return True if the "event" function exists
-     */
-    public static boolean runEvent(String scriptName, Player player, int level, Event event) {
-
-        return runScript("event", "", scriptName, player, level, event);
-    }
 
     /**
      * Used for running events using the "event" function in the lua script
@@ -142,22 +123,22 @@ public class LuaManager {
      */
     public static boolean runEvent(String scriptName, Player player, Event event) {
 
-        return runScript("event", "", scriptName, player, 0, event);
+        return runScript("event", "", scriptName, player, event);
     }
+
 
     /**
      * Used for running events using the "event" function in the lua script
      * @param scriptPath The path to the script
      * @param scriptName The name of the script you want to run
      * @param player Used for parsing in player arguments
-     * @param level Used in custom enchants but can be used for any int
      * @param event The Event that is causing this function to be called
      *              Used for handling events in your lua script
      * @return True if the "event" function exists
      */
-    public static boolean runEvent(String scriptPath, String scriptName, Player player, int level, Event event) {
+    public static boolean runEvent(String scriptPath, String scriptName, Player player, Event event) {
 
-        return runScript("event", scriptPath, scriptName, player, level, event);
+        return runScript("event", scriptPath, scriptName, player, event);
     }
 
     /**
