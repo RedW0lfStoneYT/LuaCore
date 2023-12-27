@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'dev.selena.lua'
-version '1.0.7'
+version '1.0.8'
 apply plugin: 'java'
 defaultTasks('build')
 
@@ -25,6 +25,7 @@ repositories {
     }
 
     maven { url 'https://repo.papermc.io/repository/maven-public/' }
+    maven { url = "https://repo.codemc.org/repository/maven-public/" }
 }
 
 dependencies {
@@ -32,7 +33,6 @@ dependencies {
     testImplementation 'com.github.seeseemelk:MockBukkit-v1.20:3.24.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
     testImplementation 'junit:junit:4.13.2'
-//    testImplementation 'com.github.seeseemelk:MockBukkit-v1.20:3.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
     implementation 'org.slf4j:slf4j-simple:2.0.5'
     testImplementation('org.mockito:mockito-inline:5.2.0')
@@ -46,6 +46,8 @@ dependencies {
     implementation("de.tr7zw:item-nbt-api:2.12.1")
     implementation 'io.github.classgraph:classgraph:4.8.162'
     implementation('com.iridium:IridiumColorAPI:1.0.6')
+    // TODO make this functional
+    compileOnly "dev.jorel:commandapi-bukkit-core:9.3.0"
 
 
 
@@ -58,7 +60,11 @@ build {
 
 javadoc {
     source = sourceSets.main.allJava
-    destinationDir = file("/home/web/docs/luacore")
+    if (System.getenv("DEV_BUILD")) {
+        destinationDir = file("/home/web/docs/beta/luacore")
+    } else {
+        destinationDir = file("/home/web/docs/luacore")
+    }
 }
 
 java {
@@ -102,7 +108,11 @@ publishing {
     repositories {
         maven {
             name = "Public"
-            url = "https://repo.selenadevelopment.com/releases"
+            if (version.toString().endsWith("SNAPSHOT")) {
+                url = "https://repo.selenadevelopment.com/snapshots"
+            } else {
+                url = "https://repo.selenadevelopment.com/releases"
+            }
             credentials(PasswordCredentials)
             authentication {
                 basic(BasicAuthentication)

@@ -54,6 +54,25 @@ class LuaValueMapperTest {
     }
 
 
+    @Test
+    void StringMap_Fail() {
+        MappingTest mapped = LuaValueMapper.mapToClass(MappingTest.class, FileManager.folderPath("test") + "MapWithMissingValues.lua");
+        assertNull(mapped);
+    }
+
+    @Test
+    void BooleanMap_Fail() {
+        MappingTest mapped = LuaValueMapper.mapToClass(MappingTest.class, FileManager.folderPath("test") + "MapWithMissingValues.lua");
+        assertNull(mapped);
+    }
+    @Test
+    void IntMap_Fail() {
+        MappingTest mapped = LuaValueMapper.mapToClass(MappingTest.class, FileManager.folderPath("test") + "MapWithMissingValues.lua");
+        assertNull(mapped);
+
+    }
+
+
     public static class MappingTest {
         @Expose
         public String Test_String = "123";
