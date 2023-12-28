@@ -2,6 +2,9 @@ package dev.selena.luacore.exceptions.data;
 
 import java.io.FileNotFoundException;
 
+/**
+ * Thrown when the user data folder contains no json files
+ */
 public class NoUserJsonFoundException extends FileNotFoundException {
 
     /**

@@ -1,5 +1,8 @@
 package dev.selena.luacore.exceptions.data;
 
+/**
+ * Used for player data management related issues
+ */
 public class NotUserFolderException extends ClassCastException {
 
     /**

@@ -10,11 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * This class is required for any User folder class
+ */
 public abstract class UserFolder {
 
     private final List<String> loadedFiles = new ArrayList<>();
     private final UUID uuid;
 
+    /**
+     * Used for setting the UUID for various internal uses
+     * @param uuid The players UUID
+     */
     public UserFolder(UUID uuid) {
         this.uuid = uuid;
     }

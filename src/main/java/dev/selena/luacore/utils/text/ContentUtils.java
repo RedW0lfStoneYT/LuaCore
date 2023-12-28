@@ -9,12 +9,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Used for message content manipulation
+ */
 public class ContentUtils {
 
 
     /**
      * Used for making the first Letter of each word caps
-     * @param content The String you want to capatlize
+     * @param content The String you want to capitalize
      * @return The formatted string content
      */
     public static String capsFirst(String content) {

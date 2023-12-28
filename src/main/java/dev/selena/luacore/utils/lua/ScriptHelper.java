@@ -19,6 +19,9 @@ import org.luaj.vm2.lib.jse.JsePlatform;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * A useful tool for script assistance
+ */
 public class ScriptHelper {
 
 

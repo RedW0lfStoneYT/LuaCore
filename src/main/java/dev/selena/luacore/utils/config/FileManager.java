@@ -15,6 +15,9 @@ public class FileManager {
 
     private static FileManager instance;
 
+    /**
+     * Used for initial class setup
+     */
     public FileManager() {
         FileManager.instance = this;
     }
@@ -47,7 +50,12 @@ public class FileManager {
     public static String folderPath(String path) {
         File file = new File(LuaCore.getPlugin().getDataFolder(), path);
         if (!file.exists())
-            file.mkdirs();
+            if (!file.mkdirs())
+                try {
+                    throw new IOException("There was an issue loading folder: " + path);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
         return file.getPath() + File.separator;
     }
 
@@ -59,6 +67,11 @@ public class FileManager {
      * @param file The file you are mapping from
      * @return Class T mapped with the data from the Json file
      * @param <T> Class type
+     * @throws IOException Thrown when the file can not be found
+     * @throws InstantiationException Throwing when the class has an initialization issue
+     * @throws IllegalAccessException Thrown when trying to access a field without the correct access level
+     * @throws InvocationTargetException Thrown when the mapper class has a constructor that does not match the arguments (There should be none)
+     * @throws NoSuchMethodException Thrown when the class somehow manages not to have a constructor
      */
     public static <T> T loadFile(Class<T> clazz, File file) throws IOException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         return ConfigLoader.loadConfig(clazz, file);

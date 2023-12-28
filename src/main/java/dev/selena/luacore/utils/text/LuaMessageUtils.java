@@ -11,6 +11,9 @@ import org.bukkit.entity.Player;
 
 import java.util.logging.Level;
 
+/**
+ * Used for sending messages to both console and users
+ */
 public class LuaMessageUtils extends ContentUtils {
 
     private static final boolean debug = true;

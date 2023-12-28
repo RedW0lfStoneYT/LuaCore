@@ -4,15 +4,14 @@ import dev.selena.luacore.exceptions.lua.NoReturnValueException;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.luaj.vm2.*;
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaError;
+import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceLuaToJava;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Objects;
 
 /**
  * Used for mapping Lua values to a class
@@ -21,15 +20,6 @@ import java.util.Objects;
 public class LuaValueMapper {
 
     private static final Globals luaGlobals = JsePlatform.standardGlobals();
-
-    /**
-     * Used for gathering the libraries LuaGlobals
-     * @return The instance of the LuaGlobals
-     */
-    public static Globals getLuaGlobals() {
-        return luaGlobals;
-    }
-
 
     /**
      * Used for loading a Lua table into memory
@@ -75,7 +65,6 @@ public class LuaValueMapper {
 
             if (table == null)
                 throw new NullPointerException("The lua table cannot be null");
-            MethodHandles.Lookup lookup = MethodHandles.lookup();
 
             for (LuaValue key : table.keys()) {
                 String fieldName = key.tojstring();
@@ -103,6 +92,14 @@ public class LuaValueMapper {
 
 
 // Still can be improved I'm sure
+
+    /**
+     * Used for accessing the fields of the class and populating the values
+     * @param field The field you want to access
+     * @param clazz The class the field is in
+     * @param value The value you want to set it to
+     * @throws IllegalAccessException Thrown when you do not have the ability to access the field
+     */
     private static void setField(Field field, Object clazz, LuaValue value) throws IllegalAccessException {
         LuaMessageUtils.verboseMessage("Attempting to access " + field.getName());
         Class<?> fieldType = field.getType();

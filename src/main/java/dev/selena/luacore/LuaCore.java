@@ -1,16 +1,13 @@
 package dev.selena.luacore;
 
-import com.google.gson.annotations.Expose;
 import dev.selena.luacore.utils.data.UserDataManager;
 import dev.selena.luacore.utils.items.ItemEvent;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
-
-
+/**
+ * Main class for the library
+ */
 public class LuaCore {
 
     private static Plugin plugin;

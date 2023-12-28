@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
+/**
+ * Used for internal handling of player data
+ */
 @Beta
 public class UserDataManager {
 

@@ -4,6 +4,9 @@ import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Useful item utility class
+ */
 public class ItemUtils {
 
     /**

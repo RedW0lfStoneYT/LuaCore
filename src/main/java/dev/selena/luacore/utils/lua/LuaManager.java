@@ -14,6 +14,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Main class for Lua management
+ */
 public class LuaManager {
 
 

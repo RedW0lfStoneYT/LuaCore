@@ -9,6 +9,9 @@ import dev.selena.luacore.LuaCore;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * NBT utility class mainly for serialization and storing custom nbt compounds
+ */
 public class NBTUtils {
 
     private static final Gson gson = new GsonBuilder()
@@ -17,10 +20,22 @@ public class NBTUtils {
             .create();
 
 
+    /**
+     * Used internally to serialize the nbt data
+     * @param content The class you want to serialize
+     * @return The now serialized json string
+     */
     private static String serializeContent(Object content) {
         return gson.toJson(content);
     }
 
+    /**
+     * Used to convert the stored json into a populated class
+     * @param cls The class you want to populate
+     * @param json The NBT json compound
+     * @return The now populated class
+     * @param <T> The type of the class you want to populate
+     */
     private static <T> T deserializeContent(Class<T> cls, String json) {
         return gson.fromJson(json, cls);
     }
