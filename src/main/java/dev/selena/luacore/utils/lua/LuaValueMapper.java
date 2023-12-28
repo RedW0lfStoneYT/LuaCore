@@ -1,17 +1,17 @@
 package dev.selena.luacore.utils.lua;
 
+import dev.selena.luacore.exceptions.lua.NoReturnValueException;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaError;
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.*;
 import org.luaj.vm2.lib.jse.CoerceLuaToJava;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 
 /**
@@ -22,6 +22,14 @@ public class LuaValueMapper {
 
     private static final Globals luaGlobals = JsePlatform.standardGlobals();
 
+    /**
+     * Used for gathering the libraries LuaGlobals
+     * @return The instance of the LuaGlobals
+     */
+    public static Globals getLuaGlobals() {
+        return luaGlobals;
+    }
+
 
     /**
      * Used for loading a Lua table into memory
@@ -29,8 +37,12 @@ public class LuaValueMapper {
      * @param scriptPath The path to the script
      * @return The Lua Table for the script returns
      */
-    public static LuaTable loadTable(String scriptPath) {
+    public static LuaTable loadTable(String scriptPath) throws NoReturnValueException {
         LuaMessageUtils.verboseMessage("Checking if " + scriptPath + " has a table");
+
+        if (luaGlobals.finder.findResource(scriptPath) == null) {
+            throw new NoReturnValueException("There is no returns in the lua script: " + scriptPath);
+        }
         LuaValue luaScript = luaGlobals.loadfile(scriptPath).call();
 
         if (luaScript.istable()) {
@@ -40,7 +52,7 @@ public class LuaValueMapper {
                 return table;
             } catch (LuaError e) {
                 LuaMessageUtils.verboseError("There is no table in " + scriptPath);
-                e.printStackTrace();
+                throw new NoReturnValueException(e.getMessage());
             }
         }
         LuaMessageUtils.verboseError("There is no table in " + scriptPath);
@@ -55,7 +67,7 @@ public class LuaValueMapper {
      * @param <T>        The mapper class
      * @return The mapped class instance
      */
-    public static <T> T mapToClass(Class<T> cls, String scriptPath) {
+    public static <T> T mapToClass(Class<T> cls, String scriptPath) throws NoReturnValueException {
         try {
             LuaTable table = loadTable(scriptPath);
 
@@ -81,6 +93,8 @@ public class LuaValueMapper {
                 }
             }
             return clazz;
+        } catch (NoReturnValueException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -109,6 +123,7 @@ public class LuaValueMapper {
             }
         }
     }
+
 
 
 }

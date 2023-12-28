@@ -1,18 +1,13 @@
 package dev.selena.luacore.utils.lua;
 
 import com.google.gson.annotations.Expose;
+import dev.selena.luacore.exceptions.lua.NoReturnValueException;
 import dev.selena.luacore.utils.config.FileManager;
-import dev.selena.luacore.utils.text.LuaMessageUtils;
 import dev.selena.test.utils.MockUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -34,41 +29,30 @@ class LuaValueMapperTest {
     }
 
     @Test
-    void StringMap() {
+    void StringMap() throws NoReturnValueException {
         MappingTest mapped = LuaValueMapper.mapToClass(MappingTest.class, FileManager.folderPath("test") + "Test.lua");
-        assert mapped != null;
+        assertNotNull(mapped);
         assertNotEquals(mapped.Test_String, unmapped.Test_String);
     }
 
     @Test
-    void BooleanMap() {
+    void BooleanMap() throws NoReturnValueException {
         MappingTest mapped = LuaValueMapper.mapToClass(MappingTest.class, FileManager.folderPath("test") + "Test.lua");
-        assert mapped != null;
+        assertNotNull(mapped);
         assertNotEquals(mapped.Test_Boolean, unmapped.Test_Boolean);
     }
     @Test
-    void IntMap() {
+    void IntMap() throws NoReturnValueException {
         MappingTest mapped = LuaValueMapper.mapToClass(MappingTest.class, FileManager.folderPath("test") + "Test.lua");
+        assertNotNull(mapped);
         assertNotEquals(mapped.Test_Int, unmapped.Test_Int);
 
     }
 
 
     @Test
-    void StringMap_Fail() {
-        MappingTest mapped = LuaValueMapper.mapToClass(MappingTest.class, FileManager.folderPath("test") + "MapWithMissingValues.lua");
-        assertNull(mapped);
-    }
-
-    @Test
-    void BooleanMap_Fail() {
-        MappingTest mapped = LuaValueMapper.mapToClass(MappingTest.class, FileManager.folderPath("test") + "MapWithMissingValues.lua");
-        assertNull(mapped);
-    }
-    @Test
-    void IntMap_Fail() {
-        MappingTest mapped = LuaValueMapper.mapToClass(MappingTest.class, FileManager.folderPath("test") + "MapWithMissingValues.lua");
-        assertNull(mapped);
+    void Class_Mapping_Fail() {
+        assertThrows(NoReturnValueException.class, () -> LuaValueMapper.mapToClass(MappingTest.class, FileManager.folderPath("test") + "MapWithMissingValues.lua"));
 
     }
 
