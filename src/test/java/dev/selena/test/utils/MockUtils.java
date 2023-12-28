@@ -1,7 +1,9 @@
 package dev.selena.test.utils;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
+import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import dev.selena.luacore.LuaCore;
+import dev.selena.luacore.utils.data.UserDataManager;
 import dev.selena.luacore.utils.lua.LuaManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -29,20 +31,25 @@ public class MockUtils {
     static {
         mockedStatic = Mockito.mockStatic(Bukkit.class);
     }
+
     private MockUtils() {
     } // Hides constructor
 
-    public static MockUtils setUp()
-    {
-        mockedStatic.when(Bukkit::getVersion).thenReturn("1.20.1");
+    public static MockUtils setUp() {
+        mockedStatic.when(Bukkit::getVersion).thenReturn("1.20.1-R0.1-SNAPSHOT");
         MockUtils utils = new MockUtils().mockLibClass().mockPluginClass();
         mockedStatic.when(pluginMock::getServer).thenReturn(Mockito.mock(Server.class));
-        libMock.setPlugin(pluginMock);
+        LuaCore.setPlugin(pluginMock);
         return utils;
     }
 
     public MockUtils verbose() {
-        libMock.setVerbose(true);
+        LuaCore.setVerbose(true);
+        return this;
+    }
+
+    public MockUtils withDataFolder() {
+        LuaCore.setUserDataManager(new UserDataManager("data"));
         return this;
     }
 
