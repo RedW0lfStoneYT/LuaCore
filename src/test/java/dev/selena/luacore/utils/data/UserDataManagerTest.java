@@ -33,7 +33,10 @@ class UserDataManagerTest {
 
     @Test
     void getUserFolderPath() {
-        assertEquals(temporaryFolder.getRoot().getPath() + File.separator + "data\\5f87bb6c-38f4-4d94-93ab-73cd18986499\\" , manager.getUserFolderPath(UUID.fromString("5f87bb6c-38f4-4d94-93ab-73cd18986499")));
+        String generated = manager.getUserFolderPath(UUID.fromString("5f87bb6c-38f4-4d94-93ab-73cd18986499"));
+        String base = temporaryFolder.getRoot().getPath() + File.separator + "data" + File.separator + "5f87bb6c-38f4-4d94-93ab-73cd18986499\\";
+        System.out.println(base + " = " + generated);
+        assertEquals(base , generated);
     }
 
     @Test
