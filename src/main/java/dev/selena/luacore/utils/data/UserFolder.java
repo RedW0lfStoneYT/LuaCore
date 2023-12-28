@@ -1,7 +1,7 @@
 package dev.selena.luacore.utils.data;
 
 import dev.selena.luacore.LuaCore;
-import dev.selena.luacore.exceptions.NoUserJsonFoundException;
+import dev.selena.luacore.exceptions.data.NoUserJsonFoundException;
 import dev.selena.luacore.utils.config.FileManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,15 +12,18 @@ import java.util.UUID;
 
 public abstract class UserFolder {
 
-    private List<String> loadedFiles;
+    private final List<String> loadedFiles = new ArrayList<>();
+    private final UUID uuid;
+
+    public UserFolder(UUID uuid) {
+        this.uuid = uuid;
+    }
 
     /**
      * Used for setting up the class extending UserFolder
-     * @param uuid The users UUID
      * @throws NoUserJsonFoundException when there is no Json files inside the user folder
      */
-    public void init(UUID uuid) throws NoUserJsonFoundException {
-        loadedFiles = new ArrayList<>();
+    public void init() throws NoUserJsonFoundException {
         File parent = new File(LuaCore.getUserDataManager().getUserFolderPath(uuid));
         File[] children = parent.listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
         if (children == null || loadedFiles.isEmpty()) {
@@ -38,7 +41,8 @@ public abstract class UserFolder {
     public <T> T loadData(@NotNull Class<T> clazz, @NotNull String fileName) {
         T data = null;
         try {
-            data = FileManager.loadFile(clazz, FileManager.file(UserDataManager.folderName, fileName));
+            File file = FileManager.file(UserDataManager.folderName, uuid.toString() + File.separator + fileName);
+            data = FileManager.loadFile(clazz, file);
             loadedFiles.add(fileName);
         } catch (Exception exception) {
             exception.printStackTrace();
