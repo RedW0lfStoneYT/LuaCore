@@ -1,7 +1,6 @@
 package dev.selena.luacore.utils.data;
 
 import dev.selena.luacore.LuaCore;
-import dev.selena.luacore.exceptions.data.NoUserDataFolderException;
 import dev.selena.luacore.exceptions.data.NoUserJsonFoundException;
 import dev.selena.luacore.exceptions.data.NotUserFolderException;
 import dev.selena.test.utils.MockUtils;
@@ -34,19 +33,18 @@ class UserDataManagerTest {
     @Test
     void getUserFolderPath() {
         String generated = manager.getUserFolderPath(UUID.fromString("5f87bb6c-38f4-4d94-93ab-73cd18986499"));
-        String base = temporaryFolder.getRoot().getPath() + File.separator + "data" + File.separator + "5f87bb6c-38f4-4d94-93ab-73cd18986499\\";
-        System.out.println(base + " = " + generated);
+        String base = temporaryFolder.getRoot().getPath() + File.separator + "data" + File.separator + "5f87bb6c-38f4-4d94-93ab-73cd18986499" + File.separator;
         assertEquals(base , generated);
     }
 
     @Test
-    void getUserDataFolder_Initializes_Folder_Class_Success() throws NoUserDataFolderException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, NoUserJsonFoundException {
+    void getUserDataFolder_Initializes_Folder_Class_Success() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, NoUserJsonFoundException {
         TestDataFolder_Success folder = manager.getUserDataFolder(TestDataFolder_Success.class, UUID.randomUUID());
         assertNotNull(folder);
     }
 
     @Test
-    void getUserDataFolder_Loads_File_Class_Success() throws NoUserDataFolderException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, NoUserJsonFoundException {
+    void getUserDataFolder_Loads_File_Class_Success() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, NoUserJsonFoundException {
         TestDataFolder_Success folder = manager.getUserDataFolder(TestDataFolder_Success.class, UUID.randomUUID());
         assertTrue(folder.file.test);
     }
