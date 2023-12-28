@@ -31,6 +31,15 @@ public class FileManager {
     }
 
     /**
+     * Used for getting a folder
+     * @param path The folder name relative to your plugin data folder
+     * @return The folder in the form of a Java File
+     */
+    public static File folder(String path) {
+        return new File(folderPath(path));
+    }
+
+    /**
      * Returns a folder from your Plugins data folder
      * @param path Folder name inside the data folder
      * @return A string path of the requested folder
@@ -51,16 +60,9 @@ public class FileManager {
      * @return Class T mapped with the data from the Json file
      * @param <T> Class type
      */
-    public static <T> T loadFile(Class<T> clazz, File file) {
-        try {
-            return ConfigLoader.loadConfig(clazz, file);
-        } catch (IOException | InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-        return null;
+    public static <T> T loadFile(Class<T> clazz, File file) throws IOException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+        return ConfigLoader.loadConfig(clazz, file);
+
     }
 
 
