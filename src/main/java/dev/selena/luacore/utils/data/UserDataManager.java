@@ -18,6 +18,9 @@ import java.util.UUID;
 @Beta
 public class UserDataManager {
 
+    /**
+     * The folder that the user data is stored in
+     */
     public static String folderName;
     private final Map<UUID, Object> userMap;
 

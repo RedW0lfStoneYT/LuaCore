@@ -26,6 +26,7 @@ public class LuaValueMapper {
      *
      * @param scriptPath The path to the script
      * @return The Lua Table for the script returns
+     * @throws NoReturnValueException Thrown when there is no lua return table
      */
     public static LuaTable loadTable(String scriptPath) throws NoReturnValueException {
         LuaMessageUtils.verboseMessage("Checking if " + scriptPath + " has a table");
@@ -56,6 +57,7 @@ public class LuaValueMapper {
      * @param scriptPath The path to the script
      * @param <T>        The mapper class
      * @return The mapped class instance
+     * @throws NoReturnValueException Thrown when there is no lua return table
      */
     public static <T> T mapToClass(Class<T> cls, String scriptPath) throws NoReturnValueException {
         try {

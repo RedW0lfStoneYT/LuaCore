@@ -17,10 +17,17 @@ public class RandomCollection<E> {
     private final Random random;
     private double total = 0;
 
+    /**
+     * Used to initialize the class using a new instance of random
+     */
     public RandomCollection() {
         this(new Random());
     }
 
+    /**
+     * Used to initialize the class using a fixed instance of random
+     * @param random The random instance you want to parse in
+     */
     public RandomCollection(Random random) {
         this.random = random;
     }

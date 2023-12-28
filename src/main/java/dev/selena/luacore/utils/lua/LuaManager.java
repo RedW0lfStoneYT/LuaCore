@@ -148,6 +148,8 @@ public class LuaManager {
      * Used for loading a folder from the Resources folder
      * Note its best to add all the resource files into sub folders
      * @param folderName The start path for loading the files
+     * @throws URISyntaxException Thrown when the toURI method fails
+     * @throws IOException thrown when the files fail to copy from the plugin into the allocated folder
      */
     public static void loadResourceFolder(String folderName) throws URISyntaxException, IOException {
         LuaMessageUtils.verboseMessage(folderName);
