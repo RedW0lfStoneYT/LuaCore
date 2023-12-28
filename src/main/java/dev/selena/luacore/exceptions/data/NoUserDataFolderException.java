@@ -1,4 +1,4 @@
-package dev.selena.luacore.exceptions;
+package dev.selena.luacore.exceptions.data;
 
 import dev.selena.luacore.utils.data.UserDataManager;
 

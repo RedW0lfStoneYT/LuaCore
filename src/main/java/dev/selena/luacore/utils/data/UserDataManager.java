@@ -1,10 +1,10 @@
 package dev.selena.luacore.utils.data;
 
 import com.google.common.annotations.Beta;
-import dev.selena.luacore.exceptions.NoUserDataFolderException;
-import dev.selena.luacore.exceptions.NoUserJsonFoundException;
-import dev.selena.luacore.exceptions.NotUserFolderException;
+import dev.selena.luacore.exceptions.data.NoUserJsonFoundException;
+import dev.selena.luacore.exceptions.data.NotUserFolderException;
 import dev.selena.luacore.utils.config.FileManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -35,8 +35,8 @@ public class UserDataManager {
      * @param uuid The users UUID
      * @return The folder path
      */
-    public String getUserFolderPath(UUID uuid) {
-        return FileManager.folderPath(folderName + File.separator + uuid.toString());
+    public String getUserFolderPath(@NotNull UUID uuid) {
+        return FileManager.folderPath(folderName + File.separator + uuid);
     }
 
     /**
@@ -45,7 +45,6 @@ public class UserDataManager {
      * @param uuid The users UUID
      * @return The initialized class
      * @param <T> The type of the class
-     * @throws NoUserDataFolderException Thrown when the folder has not been set up make sure to call {@link UserDataManager#createUserDataFolder(UUID)}
      * @throws NoSuchMethodException Thrown on failed class initialization
      * @throws InvocationTargetException Thrown on failed class initialization
      * @throws InstantiationException Thrown on failed class initialization
@@ -53,33 +52,26 @@ public class UserDataManager {
      * @throws NoUserJsonFoundException Thrown when you have not called the {@link UserFolder#loadData(Class, String)} method.
      */
     @SuppressWarnings("unchecked")
-    public <T> T getUserDataFolder(Class<T> userFolderClass, UUID uuid) throws NoUserDataFolderException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoUserJsonFoundException {
+    public <T> T getUserDataFolder(Class<T> userFolderClass, UUID uuid) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoUserJsonFoundException {
         if (userMap.containsKey(uuid)) {
             return (T) userMap.get(uuid);
         }
         File parent = new File(getUserFolderPath(uuid));
-        if (!parent.exists()) {
-            throw new NoUserDataFolderException("There is no user data for the UUID: " + uuid + ". Please be sure to call UserDataManager#createUserDataFolder(uuid)");
+        if (!(UserFolder.class.isAssignableFrom(userFolderClass))) {
+            throw new NotUserFolderException("The class " + userFolderClass.getName() + " Is not instance of UserData");
         }
-        T userClass = userFolderClass.getConstructor().newInstance();
-        if (!(userClass instanceof UserFolder)) {
-            throw new NotUserFolderException("The class " + userClass.getClass().getName() + " Is not instance of UserData");
-        }
-        ((UserFolder) userClass).init(uuid);
-        userMap.put(uuid, userClass);
+        T userClass = userFolderClass.getConstructor(UUID.class).newInstance(uuid);
 
-        return userClass;
+        try {
+            ((UserFolder) userClass).init();
+            userMap.put(uuid, userClass);
+
+            return userClass;
+        } catch (NotUserFolderException exception) {
+            return null;
+        }
 
     }
 
-    /**
-     * Used for initial creation of the user folder.
-     * @param uuid the users UUID
-     */
-    public void createUserDataFolder(UUID uuid) {
-        File folder = new File(getUserFolderPath(uuid));
-        if (!folder.exists())
-            folder.mkdirs();
-    }
 
 }

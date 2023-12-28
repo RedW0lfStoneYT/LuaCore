@@ -1,4 +1,4 @@
-package dev.selena.luacore.exceptions;
+package dev.selena.luacore.exceptions.data;
 
 public class NotUserFolderException extends ClassCastException {
 
