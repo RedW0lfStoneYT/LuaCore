@@ -117,7 +117,7 @@ publishing {
             }
             credentials(PasswordCredentials)
             authentication {
-                basic(BasicAuthentication)
+                BasicAuthentication
             }
         }
     }
