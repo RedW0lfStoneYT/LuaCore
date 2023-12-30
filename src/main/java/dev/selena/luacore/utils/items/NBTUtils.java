@@ -17,6 +17,7 @@ public class NBTUtils {
     private static final Gson gson = new GsonBuilder()
             .disableHtmlEscaping()
             .setPrettyPrinting()
+            .excludeFieldsWithoutExposeAnnotation()
             .create();
 
 
