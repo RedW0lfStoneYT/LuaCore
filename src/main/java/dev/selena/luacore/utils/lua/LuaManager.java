@@ -161,6 +161,7 @@ public class LuaManager {
      * Note its best to add all the resource files into sub folders
      * @param folderName The start path for loading the files
      * @throws IOException thrown when the files fail to copy from the plugin into the allocated folder
+     * This is partly based off <a href="https://gist.github.com/kamontat/c4435fd3e646ef61328f60c92bcec4ab">kamontat jar extraction</a>
      */
     public static void loadResourceFolder(String folderName) throws IOException {
         folderName = folderName.replace("/", File.separator).replace("\\", File.separator);
