@@ -57,16 +57,34 @@ dependencies {
 
 
 build {
-    dependsOn shadowJar
+    dependsOn(shadowJar, test)
 }
+
 
 javadoc {
     source = sourceSets.main.allJava
+    classpath = configurations.compileClasspath
     if (System.getenv("DEV_BUILD")) {
         destinationDir = file("/home/web/docs/beta/luacore")
     } else {
         destinationDir = file("/home/web/docs/luacore")
     }
+
+    options
+            {
+                setMemberLevel JavadocMemberLevel.PUBLIC
+                setAuthor true
+
+                links "https://docs.oracle.com/javase/8/docs/api/"
+            }
+}
+
+
+
+task packageJavadoc(type: Jar) {
+    dependsOn(build)
+    from javadoc
+    classifier = 'javadoc'
 }
 
 java {
@@ -106,7 +124,6 @@ shadowJar {
 }
 
 publishing {
-
     repositories {
         maven {
             name = "Public"
@@ -117,13 +134,16 @@ publishing {
             }
             credentials(PasswordCredentials)
             authentication {
-                BasicAuthentication
+                basic(BasicAuthentication)
             }
         }
     }
     publications {
         maven(MavenPublication) {
             from components.java
+
+
+            artifact packageJavadoc
             groupId = group
             artifactId = rootProject.name
             version = version

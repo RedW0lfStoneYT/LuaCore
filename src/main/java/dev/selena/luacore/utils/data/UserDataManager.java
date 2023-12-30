@@ -15,7 +15,6 @@ import java.util.UUID;
 /**
  * Used for internal handling of player data
  */
-@Beta
 public class UserDataManager {
 
     /**
@@ -28,6 +27,7 @@ public class UserDataManager {
      * Used for setting up the manager class.
       * @param baseFolder The base folder for user data to be stored in
      */
+    @Beta
     public UserDataManager(String baseFolder) {
         UserDataManager.folderName = baseFolder;
         File folder = FileManager.folder(folderName);
@@ -41,6 +41,7 @@ public class UserDataManager {
      * @param uuid The users UUID
      * @return The folder path
      */
+    @Beta
     public String getUserFolderPath(@NotNull UUID uuid) {
         return FileManager.folderPath(folderName + File.separator + uuid);
     }
@@ -57,6 +58,7 @@ public class UserDataManager {
      * @throws IllegalAccessException Thrown on failed class initialization
      * @throws NoUserJsonFoundException Thrown when you have not called the {@link UserFolder#loadData(Class, String)} method.
      */
+    @Beta
     @SuppressWarnings("unchecked")
     public <T> T getUserDataFolder(Class<T> userFolderClass, UUID uuid) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoUserJsonFoundException {
         if (userMap.containsKey(uuid)) {
