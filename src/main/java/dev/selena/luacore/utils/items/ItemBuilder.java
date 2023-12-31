@@ -6,13 +6,17 @@ import dev.selena.luacore.LuaCore;
 import dev.selena.luacore.utils.text.ContentUtils;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.trim.ArmorTrim;
 
 import java.util.*;
 
@@ -23,6 +27,7 @@ public class ItemBuilder {
 
     private Material type;
     private String title;
+    private Color itemColor;
     private int amount;
     private String[] lore;
     private Map<String, Integer> enchants;
@@ -33,6 +38,7 @@ public class ItemBuilder {
     private Map<String, Integer> intNBT;
     private Map<String, Boolean> booleanNBT;
     private Map<String, Object> customNBT;
+    private ArmorTrim trim;
 
 
     /**
@@ -248,6 +254,26 @@ public class ItemBuilder {
     }
 
     /**
+     * Used for setting color of leather armor
+     * @param itemColor The color you want to set using bukkit Color
+     * @return This instance to continue
+     */
+    public ItemBuilder setColor(Color itemColor) {
+        this.itemColor = itemColor;
+        return this;
+    }
+
+    /**
+     * Used to add armor trims to a piece of armor
+     * @param trim The armor trim you want to add
+     * @return This instance to continue
+     */
+    public ItemBuilder setArmorTrim(ArmorTrim trim) {
+        this.trim = trim;
+        return this;
+    }
+
+    /**
      * Used for creating the previously created ItemStack
      * @return The built ItemStack
      */
@@ -313,6 +339,17 @@ public class ItemBuilder {
                 Object content = customNBT.get(nameSpace);
                 NBTUtils.storeNBTContent(compound, content, nameSpace);
             }
+        }
+        if (itemColor != null && ItemUtils.isLeather(item)) {
+            LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) item.getItemMeta();
+            leatherArmorMeta.setColor(itemColor);
+            item.setItemMeta(leatherArmorMeta);
+        }
+        if (trim != null && ItemUtils.isArmor(item)) {
+            ArmorMeta armorMeta = (ArmorMeta) item.getItemMeta();
+            armorMeta.setTrim(trim);
+            item.setItemMeta(armorMeta);
+
         }
 
         if (!usable)

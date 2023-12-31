@@ -1,19 +1,18 @@
 package dev.selena.luacore;
 
-import com.google.gson.annotations.Expose;
+import dev.selena.luacore.utils.data.UserDataManager;
 import dev.selena.luacore.utils.items.ItemEvent;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
-
-
+/**
+ * Main class for the library
+ */
 public class LuaCore {
 
     private static Plugin plugin;
     private static boolean verbose;
+    private static UserDataManager userDataManager;
 
 
 
@@ -23,6 +22,23 @@ public class LuaCore {
      */
     public static void setPlugin(Plugin plugin) {
         LuaCore.plugin = plugin;
+    }
+
+    /**
+     * Used for setting up user data management, This is in early beta currently
+     * @param userDataManager The instance of the UserDataManager class
+     */
+    public static void setUserDataManager(UserDataManager userDataManager) {
+        LuaCore.userDataManager = userDataManager;
+    }
+
+
+    /**
+     * Used for accessing the UserDataManager class, This is in early beta currently
+     * @return The instance of UserDataManger
+     */
+    public static UserDataManager getUserDataManager() {
+        return userDataManager;
     }
 
     /**

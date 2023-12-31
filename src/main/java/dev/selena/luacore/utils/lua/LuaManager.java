@@ -1,19 +1,32 @@
 package dev.selena.luacore.utils.lua;
 
 import dev.selena.luacore.LuaCore;
+import dev.selena.luacore.utils.config.FileManager;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
+import org.luaj.vm2.server.Launcher;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
+/**
+ * Main class for Lua management
+ */
 public class LuaManager {
 
 
@@ -97,6 +110,7 @@ public class LuaManager {
      * @param scriptName The name of the script file
      * @param args The list of argument variables you want to pass in
      * @return True when all checks are parsed
+     * NOTE: Be sure to add the Event instance into the LuaArgValue list
      */
     public static boolean runEvent(String scriptPath, String scriptName, LuaArgValue ... args) {
         return runScript("event", scriptPath, scriptName, args);
@@ -107,6 +121,7 @@ public class LuaManager {
      * @param script The path to the script inclusive (test/test.lua)
      * @param args The list of argument variables you want to pass in
      * @return True when all checks are parsed
+     * NOTE: Be sure to add the Event instance into the LuaArgValue list
      */
     public static boolean runEvent(String script, LuaArgValue... args) {
         return runEvent("", script, args);
@@ -145,38 +160,73 @@ public class LuaManager {
      * Used for loading a folder from the Resources folder
      * Note its best to add all the resource files into sub folders
      * @param folderName The start path for loading the files
+     * @throws IOException thrown when the files fail to copy from the plugin into the allocated folder
+     * This is partly based off <a href="https://gist.github.com/kamontat/c4435fd3e646ef61328f60c92bcec4ab">kamontat jar extraction</a>
      */
-    public static void loadResourceFolder(String folderName) throws URISyntaxException, IOException {
-        LuaMessageUtils.verboseMessage(folderName);
+    public static void loadResourceFolder(String folderName) throws IOException {
+        folderName = folderName.replace("/", File.separator).replace("\\", File.separator);
+        final File jarFile = new File(LuaManager.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 
-        File tempDir = new File(LuaManager.class.getClassLoader().getResource(folderName).toURI());
-        if (!tempDir.exists() && !tempDir.mkdirs()) {
-            return;
-        }
+        if(jarFile.isFile()) {  // Run with JAR file
+            final JarFile jar = new JarFile(jarFile);
+            final Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
+            while(entries.hasMoreElements()) {
+                JarEntry next = entries.nextElement();
+                final String name = next.getName();
+                if (name.startsWith(folderName + File.separator) && !name.equals(folderName + File.separator)) { //filter according to the path
+                    File dest = LuaCore.getPlugin().getDataFolder();
+                    File file = new File(dest, name);
+                    LuaMessageUtils.verboseMessage(file.getPath());
+                    LuaMessageUtils.verboseMessage(name);
 
-        // Process the files within the temporary directory
-        File[] folderContent = tempDir.listFiles();
+                    if (!next.isDirectory()) {
+                        file.getParentFile().mkdir();
+                        file.createNewFile();
 
-        if (folderContent != null) {
-            for (File file : folderContent) {
+                        changeContents(jar, next, file);
 
-                if (file.isFile()) {
-                    LuaMessageUtils.verboseMessage("Found file: " + file.getName());
-                    File destFile = new File(LuaCore.getPlugin().getDataFolder() + "/" + folderName, file.getName());
-                    if (destFile.exists())
-                        continue;
-                    Path destinationPath = destFile.toPath();
+                        LuaMessageUtils.verboseMessage("Found file: " + file.getName());
 
-                    Path input = new File("/" + file.getParent() + "/" + file.getName()).toPath();
-                    destinationPath.toFile().getParentFile().mkdirs();
-                    Files.copy(input, destinationPath);
-                } else if (file.isDirectory()) {
-                    LuaMessageUtils.verboseMessage("Found subdirectory: " + file.getName());
-                    new File(LuaCore.getPlugin().getDataFolder() + "/" + folderName, file.getName()).mkdirs();
+                    } else {
+                        file.mkdir();
+                        LuaMessageUtils.verboseMessage("Found subdirectory: " + file.getName());
+                        new File(LuaCore.getPlugin().getDataFolder() + File.separator + folderName, file.getName()).mkdirs();
+                    }
+
+                }
+            }
+            jar.close();
+        } else { // Run with IDE
+            final URL url = Launcher.class.getResource("/" + folderName);
+            if (url != null) {
+                try {
+                    final File apps = new File(url.toURI());
+                    for (File app : apps.listFiles()) {
+                        File file = FileManager.file("", app.getPath().split("test", 2)[1]);
+                        if (file.exists())
+                            continue;
+                        if (file.isDirectory())
+                            file.mkdirs();
+                        else
+                            file.getParentFile().mkdirs();
+                        System.out.println(file.toPath());
+                        Files.copy(app.toPath(), file.toPath());
+                    }
+                } catch (URISyntaxException ex) {
+                    // never happens
                 }
             }
         }
+    }
 
+    private static void changeContents(JarFile jarFile, JarEntry entry, File file) throws IOException {
+        InputStream input = jarFile.getInputStream(entry); // stream from jar
+        FileOutputStream fileOutput = new FileOutputStream(file); // stream from dist file
+        while (input.available() > 0) {  // write contents of 'jar' to 'file'
+            fileOutput.write(input.read());
+        }
+        fileOutput.close();
+        input.close();
     }
 
 }

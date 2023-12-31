@@ -4,6 +4,9 @@ import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Useful item utility class
+ */
 public class ItemUtils {
 
     /**
@@ -113,6 +116,18 @@ public class ItemUtils {
     public static boolean isBoots(ItemStack item) {
         String name = getLowerName(item);
         return name.endsWith("boots");
+    }
+
+    /**
+     * Used for checking if an item is leather for dying
+     * @param item The item you want to check
+     * @return True if leather armor or horse armor
+     */
+    public static boolean isLeather(ItemStack item) {
+
+        if (!isArmor(item) && !item.getType().equals(Material.LEATHER_HORSE_ARMOR))
+            return false;
+        return getLowerName(item).startsWith("leather");
     }
 
     /**

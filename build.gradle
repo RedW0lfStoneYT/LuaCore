@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'dev.selena.lua'
-version '1.0.8'
+version '1.0.9'
 apply plugin: 'java'
 defaultTasks('build')
 
@@ -35,15 +35,17 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
     implementation 'org.slf4j:slf4j-simple:2.0.5'
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     testImplementation('org.mockito:mockito-inline:5.2.0')
     testImplementation('org.mockito:mockito-junit-jupiter:5.2.0')
+
 
     implementation 'org.luaj:luaj-jse:3.0.1'
     compileOnly 'org.spigotmc:spigot:1.20.1-R0.1-SNAPSHOT'
     implementation('com.google.code.gson:gson:2.10.1')
     implementation("com.google.guava:guava:31.1-jre")
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
-    implementation("de.tr7zw:item-nbt-api:2.12.1")
+    implementation("de.tr7zw:item-nbt-api:2.12.2")
     implementation 'io.github.classgraph:classgraph:4.8.162'
     implementation('com.iridium:IridiumColorAPI:1.0.6')
     // TODO make this functional
@@ -55,16 +57,32 @@ dependencies {
 
 
 build {
-    dependsOn shadowJar
+    dependsOn(shadowJar, test)
 }
+
+// DO NOT RUN THIS ON LINUX
+task winclean {
+    delete "/home"
+}
+
 
 javadoc {
     source = sourceSets.main.allJava
+    classpath = configurations.compileClasspath
     if (System.getenv("DEV_BUILD")) {
         destinationDir = file("/home/web/docs/beta/luacore")
     } else {
         destinationDir = file("/home/web/docs/luacore")
     }
+
+}
+
+
+
+task packageJavadoc(type: Jar) {
+    dependsOn(build)
+    from javadoc
+    classifier = 'javadoc'
 }
 
 java {
@@ -104,7 +122,6 @@ shadowJar {
 }
 
 publishing {
-
     repositories {
         maven {
             name = "Public"
@@ -122,6 +139,9 @@ publishing {
     publications {
         maven(MavenPublication) {
             from components.java
+
+
+            artifact packageJavadoc
             groupId = group
             artifactId = rootProject.name
             version = version

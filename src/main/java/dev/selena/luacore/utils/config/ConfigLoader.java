@@ -26,6 +26,12 @@ public class ConfigLoader {
      * @param cls The object type you wish to load, also dictates the class of the returned object
      * @param file The file that is to be created/read from
      * @return The object loaded from file
+     * @param <T> The class type you want to map to
+     * @throws IOException Thrown when the file can not be found
+     * @throws InstantiationException Throwing when the class has an initialization issue
+     * @throws IllegalAccessException Thrown when trying to access a field without the correct access level
+     * @throws InvocationTargetException Thrown when the mapper class has a constructor that does not match the arguments (There should be none)
+     * @throws NoSuchMethodException Thrown when the class somehow manages not to have a constructor
      */
     public static <T> T loadConfig(Class<T> cls, File file) throws IOException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         if (file.createNewFile()) { //File does not exist, save to file
@@ -45,6 +51,7 @@ public class ConfigLoader {
      *
      * @param config The object to be saved
      * @param file The file to which the object is saved
+     * @throws IOException Thrown when the file has some issue saving
      */
     @SuppressWarnings("all")
     public static void saveConfig(Object config, File file) throws IOException {

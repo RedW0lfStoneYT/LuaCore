@@ -1,5 +1,6 @@
 package dev.selena.luacore.utils.lua;
 
+import dev.selena.luacore.exceptions.lua.NoReturnValueException;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -10,9 +11,7 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceLuaToJava;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.util.Objects;
 
 /**
  * Used for mapping Lua values to a class
@@ -22,15 +21,19 @@ public class LuaValueMapper {
 
     private static final Globals luaGlobals = JsePlatform.standardGlobals();
 
-
     /**
      * Used for loading a Lua table into memory
      *
      * @param scriptPath The path to the script
      * @return The Lua Table for the script returns
+     * @throws NoReturnValueException Thrown when there is no lua return table
      */
-    public static LuaTable loadTable(String scriptPath) {
+    public static LuaTable loadTable(String scriptPath) throws NoReturnValueException {
         LuaMessageUtils.verboseMessage("Checking if " + scriptPath + " has a table");
+
+        if (luaGlobals.finder.findResource(scriptPath) == null) {
+            throw new NoReturnValueException("There is no returns in the lua script: " + scriptPath);
+        }
         LuaValue luaScript = luaGlobals.loadfile(scriptPath).call();
 
         if (luaScript.istable()) {
@@ -40,7 +43,7 @@ public class LuaValueMapper {
                 return table;
             } catch (LuaError e) {
                 LuaMessageUtils.verboseError("There is no table in " + scriptPath);
-                e.printStackTrace();
+                throw new NoReturnValueException(e.getMessage());
             }
         }
         LuaMessageUtils.verboseError("There is no table in " + scriptPath);
@@ -54,8 +57,9 @@ public class LuaValueMapper {
      * @param scriptPath The path to the script
      * @param <T>        The mapper class
      * @return The mapped class instance
+     * @throws NoReturnValueException Thrown when there is no lua return table
      */
-    public static <T> T mapToClass(Class<T> cls, String scriptPath) {
+    public static <T> T mapToClass(Class<T> cls, String scriptPath) throws NoReturnValueException {
         try {
             LuaTable table = loadTable(scriptPath);
 
@@ -63,7 +67,6 @@ public class LuaValueMapper {
 
             if (table == null)
                 throw new NullPointerException("The lua table cannot be null");
-            MethodHandles.Lookup lookup = MethodHandles.lookup();
 
             for (LuaValue key : table.keys()) {
                 String fieldName = key.tojstring();
@@ -81,6 +84,8 @@ public class LuaValueMapper {
                 }
             }
             return clazz;
+        } catch (NoReturnValueException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -89,6 +94,14 @@ public class LuaValueMapper {
 
 
 // Still can be improved I'm sure
+
+    /**
+     * Used for accessing the fields of the class and populating the values
+     * @param field The field you want to access
+     * @param clazz The class the field is in
+     * @param value The value you want to set it to
+     * @throws IllegalAccessException Thrown when you do not have the ability to access the field
+     */
     private static void setField(Field field, Object clazz, LuaValue value) throws IllegalAccessException {
         LuaMessageUtils.verboseMessage("Attempting to access " + field.getName());
         Class<?> fieldType = field.getType();
@@ -109,6 +122,7 @@ public class LuaValueMapper {
             }
         }
     }
+
 
 
 }
