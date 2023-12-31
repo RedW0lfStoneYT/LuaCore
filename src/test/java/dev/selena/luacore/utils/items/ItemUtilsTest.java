@@ -219,5 +219,17 @@ class ItemUtilsTest {
         assertEquals(nItem, item);
     }
 
+    @Test
+    void isLeather_Success() {
+        ItemStack item = new ItemStack(Material.LEATHER_HORSE_ARMOR);
+        assertTrue(ItemUtils.isLeather(item));
+    }
+
+    @Test
+    void isLeather_Fail() {
+        ItemStack item = new ItemStack(Material.STONE);
+        assertFalse(ItemUtils.isLeather(item));
+    }
+
 
 }

@@ -119,6 +119,18 @@ public class ItemUtils {
     }
 
     /**
+     * Used for checking if an item is leather for dying
+     * @param item The item you want to check
+     * @return True if leather armor or horse armor
+     */
+    public static boolean isLeather(ItemStack item) {
+
+        if (!isArmor(item) && !item.getType().equals(Material.LEATHER_HORSE_ARMOR))
+            return false;
+        return getLowerName(item).startsWith("leather");
+    }
+
+    /**
      * Checks if the ItemStack is a tool
      * @param item The itemStack you want to check
      * @return True if the item is an Axe, Pickaxe, Shovel, or Hoe

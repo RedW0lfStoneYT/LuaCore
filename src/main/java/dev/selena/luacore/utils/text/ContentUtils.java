@@ -4,6 +4,7 @@ package dev.selena.luacore.utils.text;
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.Color;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +33,7 @@ public class ContentUtils {
     public static String color(String message) {
         return IridiumColorAPI.process(message);
     }
+
 
     /**
      * Used for coloring string using Iridium
