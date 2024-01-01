@@ -3,7 +3,7 @@ package dev.selena.luacore.utils.text;
 
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import net.kyori.adventure.text.Component;
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.Color;
 
 import java.util.Arrays;

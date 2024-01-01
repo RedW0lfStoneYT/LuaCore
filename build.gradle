@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'dev.selena.lua'
-version '1.0.9'
+version '1.1.0-SNAPSHOT'
 apply plugin: 'java'
 defaultTasks('build')
 
@@ -41,7 +41,6 @@ dependencies {
 
 
     implementation 'org.luaj:luaj-jse:3.0.1'
-    compileOnly 'org.spigotmc:spigot:1.20.1-R0.1-SNAPSHOT'
     implementation('com.google.code.gson:gson:2.10.1')
     implementation("com.google.guava:guava:31.1-jre")
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
