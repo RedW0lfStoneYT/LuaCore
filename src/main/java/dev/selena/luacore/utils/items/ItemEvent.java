@@ -1,6 +1,7 @@
 package dev.selena.luacore.utils.items;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -19,7 +20,7 @@ public class ItemEvent implements Listener {
     @EventHandler
     public void itemUse(PlayerInteractEvent event) {
         ItemStack item = event.getItem();
-        if (item == null || item.getType().isEmpty())
+        if (item == null || item.getType().isAir() || item.getType().isEmpty())
             return;
         NBTItem nItem = new NBTItem(item);
         if (!nItem.hasCustomNbtData())
@@ -37,7 +38,7 @@ public class ItemEvent implements Listener {
     @EventHandler
     public void blockPlace(BlockPlaceEvent event) {
         ItemStack item = event.getItemInHand();
-        if (item.getType().isEmpty())
+        if (item == null || item.getType().isAir() || item.getType().isEmpty())
             return;
         NBTItem nItem = new NBTItem(item);
         if (!nItem.hasCustomNbtData())
