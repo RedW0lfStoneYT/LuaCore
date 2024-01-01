@@ -20,7 +20,7 @@ public class ItemEvent implements Listener {
     @EventHandler
     public void itemUse(PlayerInteractEvent event) {
         ItemStack item = event.getItem();
-        if (item == null || item.getType().isAir() || item.getType().isEmpty())
+        if (item == null || item.getType().isAir())
             return;
         NBTItem nItem = new NBTItem(item);
         if (!nItem.hasCustomNbtData())
@@ -38,7 +38,7 @@ public class ItemEvent implements Listener {
     @EventHandler
     public void blockPlace(BlockPlaceEvent event) {
         ItemStack item = event.getItemInHand();
-        if (item == null || item.getType().isAir() || item.getType().isEmpty())
+        if (item == null || item.getType().isAir())
             return;
         NBTItem nItem = new NBTItem(item);
         if (!nItem.hasCustomNbtData())

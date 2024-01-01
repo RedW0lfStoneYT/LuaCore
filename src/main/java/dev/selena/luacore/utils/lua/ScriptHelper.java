@@ -193,8 +193,21 @@ public class ScriptHelper {
      * @return True if the effect is a debuff
      */
     public static boolean isDebuff(PotionEffectType effectType) {
-
-        return effectType.getEffectCategory() == PotionEffectType.Category.HARMFUL;
+        if (effectType == PotionEffectType.BLINDNESS
+                || effectType == PotionEffectType.SLOW
+                || effectType == PotionEffectType.SLOW_DIGGING
+                || effectType == PotionEffectType.CONFUSION
+                || effectType == PotionEffectType.SLOW
+                || effectType == PotionEffectType.HUNGER
+                || effectType == PotionEffectType.WEAKNESS
+                || effectType == PotionEffectType.POISON
+                || effectType == PotionEffectType.WITHER
+                || effectType == PotionEffectType.UNLUCK
+                || effectType == PotionEffectType.BAD_OMEN
+                || effectType == PotionEffectType.DARKNESS
+        )
+            return true;
+        return false;
     }
 
     /**
@@ -232,7 +245,7 @@ public class ScriptHelper {
     public static void removeDebuffs(Player player) {
         for (PotionEffect effect : player.getActivePotionEffects()) {
             PotionEffectType type = effect.getType();
-            if (type.getEffectCategory() == PotionEffectType.Category.HARMFUL)
+            if (isDebuff(type))
                 player.removePotionEffect(type);
         }
     }

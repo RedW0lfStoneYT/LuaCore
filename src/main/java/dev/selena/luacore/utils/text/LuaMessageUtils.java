@@ -94,7 +94,6 @@ public class LuaMessageUtils extends ContentUtils {
      * Used for debugging sending a warning to the console
      * @param warning The warning message you want to send
      * @see LuaCore#setVerbose(boolean)
-     * @see LuaCore#isVerbose()
      */
     public static void verboseWarn(String warning) {
         if (LuaCore.isVerbose())
@@ -105,7 +104,6 @@ public class LuaMessageUtils extends ContentUtils {
      * Used for debugging sending an error to the console
      * @param error The error message you want to send
      * @see LuaCore#setVerbose(boolean)
-     * @see LuaCore#isVerbose()
      */
     public static void verboseError(String error) {
         if (LuaCore.isVerbose())
@@ -116,7 +114,6 @@ public class LuaMessageUtils extends ContentUtils {
      * Used for debugging sending a message to the console
      * @param message The message you want to send
      * @see LuaCore#setVerbose(boolean)
-     * @see LuaCore#isVerbose()
      */
     public static void verboseMessage(String message) {
         if (LuaCore.isVerbose())

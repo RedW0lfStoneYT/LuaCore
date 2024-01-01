@@ -2,8 +2,7 @@ package dev.selena.luacore.utils.text;
 
 
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
-import net.kyori.adventure.text.Component;
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.Color;
 
 import java.util.Arrays;
@@ -41,9 +40,10 @@ public class ContentUtils {
      * @param message The string content you want to color
      * @return The newly colored Component
      */
-    public static Component colorStringToComponent(String message) {
-        return Component.text(IridiumColorAPI.process(message));
-    }
+    // Thanks spigot 1.20.2+ for getting rid of Components....
+//    public static Component colorStringToComponent(String message) {
+//        return Component.text(IridiumColorAPI.process(message));
+//    }
 
     /**
      * Colors a List using Iridium
