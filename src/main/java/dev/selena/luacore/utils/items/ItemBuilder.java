@@ -5,7 +5,6 @@ import de.tr7zw.changeme.nbtapi.NBTItem;
 import dev.selena.luacore.LuaCore;
 import dev.selena.luacore.utils.text.ContentUtils;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -288,13 +287,13 @@ public class ItemBuilder {
         item.setAmount(Math.max(1, amount));
         ItemMeta meta = item.getItemMeta();
         if (title != null)
-            meta.displayName(ContentUtils.colorStringToComponent(title));
+            meta.setDisplayName(ContentUtils.color(title));
         if (lore != null) {
-            List<Component> loreLines = new ArrayList<>();
+            List<String> loreLines = new ArrayList<>();
             for (String line : lore) {
-                loreLines.add(ContentUtils.colorStringToComponent(line));
+                loreLines.add(ContentUtils.color(line));
             }
-            meta.lore(loreLines);
+            meta.setLore(loreLines);
         }
         if (enchants != null && !enchants.isEmpty()) {
             for (String enchant : enchants.keySet()) {

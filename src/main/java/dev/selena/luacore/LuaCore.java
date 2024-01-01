@@ -3,6 +3,8 @@ package dev.selena.luacore;
 import dev.selena.luacore.utils.data.UserDataManager;
 import dev.selena.luacore.utils.items.ItemEvent;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
+import lombok.Getter;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -10,10 +12,30 @@ import org.bukkit.plugin.Plugin;
  */
 public class LuaCore {
 
+    /**
+     * -- GETTER --
+     *  Gets your plugins instance
+     *
+     * @return Plugin instance
+     */
+    @Getter
     private static Plugin plugin;
+    /**
+     * -- GETTER --
+     *  Used for checking if verbose is enabled
+     *
+     * @return The verbose value
+     */
+    @Getter
     private static boolean verbose;
+    /**
+     * -- GETTER --
+     *  Used for accessing the UserDataManager class, This is in early beta currently
+     *
+     * @return The instance of UserDataManger
+     */
+    @Getter
     private static UserDataManager userDataManager;
-
 
 
     /**
@@ -34,14 +56,6 @@ public class LuaCore {
 
 
     /**
-     * Used for accessing the UserDataManager class, This is in early beta currently
-     * @return The instance of UserDataManger
-     */
-    public static UserDataManager getUserDataManager() {
-        return userDataManager;
-    }
-
-    /**
      * This should only be called by one plugin on your server,
      * Used for preventing the placement/usage of un usable items
      */
@@ -57,22 +71,6 @@ public class LuaCore {
     public static void setVerbose(boolean verbose) {
         LuaCore.verbose = verbose;
         LuaMessageUtils.verboseMessage("Verbose mode is enabled");
-    }
-
-    /**
-     * Used for checking if verbose is enabled
-     * @return The verbose value
-     */
-    public static boolean isVerbose() {
-        return verbose;
-    }
-
-    /**
-     * Gets your plugins instance
-     * @return Plugin instance
-     */
-    public static Plugin getPlugin() {
-        return plugin;
     }
 
     /**
