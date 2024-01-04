@@ -17,6 +17,7 @@ public class ConfigLoader {
     private static final Gson gson = new GsonBuilder()
             .disableHtmlEscaping()
             .setPrettyPrinting()
+            .excludeFieldsWithoutExposeAnnotation()
             .create();
 
     /**

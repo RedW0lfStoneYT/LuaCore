@@ -1,8 +1,11 @@
 package dev.selena.luacore.utils.data;
 
+import com.google.gson.annotations.Expose;
 import dev.selena.luacore.LuaCore;
 import dev.selena.luacore.exceptions.data.NoUserJsonFoundException;
 import dev.selena.luacore.exceptions.data.NotUserFolderException;
+import dev.selena.luacore.utils.config.ConfigLoader;
+import dev.selena.luacore.utils.config.FileManager;
 import dev.selena.test.utils.MockUtils;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.util.UUID;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserDataManagerTest {
@@ -41,6 +45,17 @@ class UserDataManagerTest {
     void getUserDataFolder_Initializes_Folder_Class_Success() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, NoUserJsonFoundException {
         TestDataFolder_Success folder = manager.getUserDataFolder(TestDataFolder_Success.class, UUID.randomUUID());
         assertNotNull(folder);
+    }
+
+
+    @Test
+    void saveUserData() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, IOException {
+        UUID uuid = UUID.randomUUID();
+        TestDataFolder_Success folder = manager.getUserDataFolder(TestDataFolder_Success.class, uuid);
+        folder.file.setTest(false);
+        manager.saveAllUserData();
+        TestDataFile newFile = ConfigLoader.loadConfig(TestDataFile.class, FileManager.file(manager.getRelativeUserFolderPath(uuid), "test.json"));
+        assertFalse(newFile.test);
     }
 
     @Test
@@ -82,10 +97,11 @@ class UserDataManagerTest {
 
     public static class TestDataFolder_Success extends UserFolder {
 
-        public TestDataFile file = loadData(TestDataFile.class, "test.json");
+        public TestDataFile file;
 
         public TestDataFolder_Success(UUID uuid) {
             super(uuid);
+            file = loadData(TestDataFile.class, "test.json");
         }
 
         @Override
@@ -95,6 +111,7 @@ class UserDataManagerTest {
     }
 
     public static class TestDataFolder_Fail extends UserFolder {
+
 
         public TestDataFile file;
 
@@ -109,7 +126,12 @@ class UserDataManagerTest {
     }
 
     public static class TestDataFile {
-        public final boolean test = true;
+        @Expose
+        public boolean test = true;
+
+        public void setTest(boolean test) {
+            this.test = test;
+        }
     }
 
     public static class TestDataFolder_Fail_Wrong_Class_Type {
