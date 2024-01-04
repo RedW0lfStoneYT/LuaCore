@@ -86,7 +86,7 @@ public class LuaCore {
     /**
      * Used for saving all needed data call this in onDisable
      */
-    public void save() {
+    public static void save() {
         try {
             if (userDataManager != null)
                 userDataManager.saveAllUserData();
