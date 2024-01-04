@@ -82,4 +82,16 @@ public class LuaCore {
         LuaMessageUtils.verboseMessage(name);
         return name;
     }
+
+    /**
+     * Used for saving all needed data call this in onDisable
+     */
+    public void save() {
+        try {
+            if (userDataManager != null)
+                userDataManager.saveAllUserData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

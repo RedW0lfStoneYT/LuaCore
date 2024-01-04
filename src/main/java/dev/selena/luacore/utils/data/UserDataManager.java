@@ -3,10 +3,12 @@ package dev.selena.luacore.utils.data;
 import com.google.common.annotations.Beta;
 import dev.selena.luacore.exceptions.data.NoUserJsonFoundException;
 import dev.selena.luacore.exceptions.data.NotUserFolderException;
+import dev.selena.luacore.utils.config.ConfigLoader;
 import dev.selena.luacore.utils.config.FileManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.TreeMap;
@@ -43,7 +45,16 @@ public class UserDataManager {
      */
     @Beta
     public String getUserFolderPath(@NotNull UUID uuid) {
-        return FileManager.folderPath(folderName + File.separator + uuid);
+        return FileManager.folderPath(getRelativeUserFolderPath(uuid));
+    }
+
+    /**
+     * Used for getting the path inside your plugin data folder excluding /plugins/PLUGIN/
+     * @param uuid the players UUID
+     * @return the relative folder path
+     */
+    public String getRelativeUserFolderPath(@NotNull UUID uuid) {
+        return (folderName + File.separator + uuid);
     }
 
     /**
@@ -64,7 +75,6 @@ public class UserDataManager {
         if (userMap.containsKey(uuid)) {
             return (T) userMap.get(uuid);
         }
-        File parent = new File(getUserFolderPath(uuid));
         if (!(UserFolder.class.isAssignableFrom(userFolderClass))) {
             throw new NotUserFolderException("The class " + userFolderClass.getName() + " Is not instance of UserData");
         }
@@ -79,6 +89,35 @@ public class UserDataManager {
             return null;
         }
 
+    }
+
+    /**
+     * Used for saving the users data
+     * @param folder The UserFolder class
+     * @throws IOException thrown by {@link ConfigLoader#saveConfig(Object, File)}
+     */
+    public void saveUserData(UserFolder folder) throws IOException {
+        if (folder == null)
+            throw new NotUserFolderException("The class " + folder.getClass().getName() + " Is not instance of UserData");
+        String folderPath = getRelativeUserFolderPath(folder.getUuid());
+        for (Class<?> clazz : folder.getLoadedFiles().keySet()) {
+            UserFolder.FileClass fileClass = folder.getLoadedFiles().get(clazz);
+            String fileName = fileClass.fileName;
+            File file = FileManager.file(folderPath, fileName);
+            ConfigLoader.saveConfig(fileClass.data, file);
+        }
+    }
+
+    /**
+     * Used for saving all users data
+     * @throws IOException thrown by {@link ConfigLoader#saveConfig(Object, File)}
+     */
+    public void saveAllUserData() throws IOException {
+        for (Object folderInst : userMap.values()) {
+            if (!(folderInst instanceof UserFolder folder))
+                throw new NotUserFolderException("The class " + folderInst.getClass().getName() + " Is not instance of UserData");
+            saveUserData(folder);
+        }
     }
 
 

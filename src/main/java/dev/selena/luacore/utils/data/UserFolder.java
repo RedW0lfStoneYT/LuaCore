@@ -3,19 +3,20 @@ package dev.selena.luacore.utils.data;
 import dev.selena.luacore.LuaCore;
 import dev.selena.luacore.exceptions.data.NoUserJsonFoundException;
 import dev.selena.luacore.utils.config.FileManager;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * This class is required for any User folder class
  */
 public abstract class UserFolder {
 
-    private final List<String> loadedFiles = new ArrayList<>();
+    @Getter
+    private final Map<Class<?>, FileClass> loadedFiles = new HashMap<>();
+    @Getter
     private final UUID uuid;
 
     /**
@@ -48,14 +49,27 @@ public abstract class UserFolder {
     public <T> T loadData(@NotNull Class<T> clazz, @NotNull String fileName) {
         T data = null;
         try {
-            File file = FileManager.file(UserDataManager.folderName, uuid.toString() + File.separator + fileName);
+            File file = FileManager.file(LuaCore.getUserDataManager().getRelativeUserFolderPath(uuid), fileName);
             data = FileManager.loadFile(clazz, file);
-            loadedFiles.add(fileName);
+            loadedFiles.put(clazz, new FileClass(fileName, data));
         } catch (Exception exception) {
             exception.printStackTrace();
         }
 
         return data;
+    }
+
+    /**
+     * Data file class used for managing data internally
+     */
+    public static class FileClass {
+        String fileName;
+        Object data;
+
+        public FileClass(String name, Object data) {
+            fileName = name;
+            this.data = data;
+        }
     }
 
 }
