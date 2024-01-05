@@ -8,6 +8,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/Compatibility" />
+            <option value="$PROJECT_DIR$/Compatibility/NMS_1_20_R3" />
           </set>
         </option>
       </GradleProjectSettings>

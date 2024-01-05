@@ -11,3 +11,7 @@ toolchainManagement {
         }
     }
 }
+include 'Compatibility'
+include 'Compatibility:NMS_1_20_R3'
+findProject(':Compatibility:NMS_1_20_R3')?.name = 'NMS_1_20_R3'
+
