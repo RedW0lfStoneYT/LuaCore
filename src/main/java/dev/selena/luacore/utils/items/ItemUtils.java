@@ -181,10 +181,10 @@ public class ItemUtils {
     }
 
     /**
-     * Used for removing x items from a players inventory or some form of stack
+     * Used for removing x items from a player inventory or some form of stack
      * @param item The item you want to remove from
-     * @param amount The amount of items you want to remove
-     * @return if the value is less than or equal to 0 it will return an Air ItemStack
+     * @param amount The number of items you want to remove
+     * @return if the value is less than or equal to 0, it will return an Air ItemStack
      */
     public static ItemStack deleteItem(ItemStack item, int amount) {
         if (amount <= 0) {

@@ -4,6 +4,7 @@ import dev.selena.luacore.utils.data.UserDataManager;
 import dev.selena.luacore.utils.items.ItemEvent;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.plugin.Plugin;
 
@@ -36,7 +37,9 @@ public class LuaCore {
      */
     @Getter
     private static UserDataManager userDataManager;
-
+    @Getter
+    @Setter
+    private static CoreLogger coreLogger;
 
     /**
      * This needs to be called in the OnEnable method of your plugin for it to work
@@ -44,6 +47,15 @@ public class LuaCore {
      */
     public static void setPlugin(Plugin plugin) {
         LuaCore.plugin = plugin;
+    }
+
+    /**
+     * Method to setup the library with the required methods (setPlugin and setCoreLogger)
+     * @param plugin Your plugin instance
+     */
+    public static void setupCore(Plugin plugin) {
+        setPlugin(plugin);
+        setCoreLogger(new CoreLogger(plugin));
     }
 
     /**
@@ -94,4 +106,5 @@ public class LuaCore {
             e.printStackTrace();
         }
     }
+
 }

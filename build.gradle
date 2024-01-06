@@ -8,7 +8,7 @@ plugins {
 }
 
 group 'dev.selena.lua'
-version '1.1.0-SNAPSHOT'
+version '1.1.0-Dev1'
 apply plugin: 'java'
 defaultTasks('build')
 
@@ -34,57 +34,57 @@ repositories {
 }
 
 // Ty oraxen dev team lol
-class NMSVersion {
-    String nmsVersion
-    String serverVersion
-    int javaVersion
-
-    NMSVersion(String nms, String server, int javaVersion) {
-        this.nmsVersion = nms
-        this.serverVersion = server
-        this.javaVersion = javaVersion
-    }
-}
-
-static NMSVersion toNms(String nms, String server, int javaVersion) {
-    return new NMSVersion(nms, server, javaVersion)
-}
-
-List<NMSVersion> SUPPORTED_VERSIONS = [
-//        toNms("NMS_1_20_R2", "1.20.2-R0.1-SNAPSHOT", 17),
-toNms("NMS_1_20_R3", "1.20.4-R0.1-SNAPSHOT", 17)
-]
-
-SUPPORTED_VERSIONS.each { it ->
-    def server = it.serverVersion
-    def javaV = it.javaVersion
-    project(":Compatibility:${it.nmsVersion}") {
-
-        apply plugin: "java"
-        apply plugin: "io.papermc.paperweight.userdev"
-        apply plugin: 'com.github.johnrengelman.shadow'
-        repositories {
-            mavenLocal()
-            maven {
-                url = "https://papermc.io/repo/repository/maven-public/"
-            } // Paper
-            maven {
-                url = "https://repo.mineinabyss.com/releases"
-            }
-        }
-        dependencies {
-            //
-            compileOnly "org.spigotmc:spigot:${server}:remapped-mojang"
-            paperweight.paperDevBundle(server)
-            compileOnly "org.spigotmc:spigot-api:${server}"
-            compileOnly(project(":Compatibility"))
-        }
-        java {
-            toolchain.languageVersion.set(JavaLanguageVersion.of(javaV))
-        }
-
-    }
-}
+//class NMSVersion {
+//    String nmsVersion
+//    String serverVersion
+//    int javaVersion
+//
+//    NMSVersion(String nms, String server, int javaVersion) {
+//        this.nmsVersion = nms
+//        this.serverVersion = server
+//        this.javaVersion = javaVersion
+//    }
+//}
+//
+//static NMSVersion toNms(String nms, String server, int javaVersion) {
+//    return new NMSVersion(nms, server, javaVersion)
+//}
+//
+//List<NMSVersion> SUPPORTED_VERSIONS = [
+////        toNms("NMS_1_20_R2", "1.20.2-R0.1-SNAPSHOT", 17),
+//toNms("NMS_1_20_R3", "1.20.4-R0.1-SNAPSHOT", 17)
+//]
+//
+//SUPPORTED_VERSIONS.each { it ->
+//    def server = it.serverVersion
+//    def javaV = it.javaVersion
+//    project(":Compatibility:${it.nmsVersion}") {
+//
+//        apply plugin: "java"
+//        apply plugin: "io.papermc.paperweight.userdev"
+//        apply plugin: 'com.github.johnrengelman.shadow'
+//        repositories {
+//            mavenLocal()
+//            maven {
+//                url = "https://papermc.io/repo/repository/maven-public/"
+//            } // Paper
+//            maven {
+//                url = "https://repo.mineinabyss.com/releases"
+//            }
+//        }
+//        dependencies {
+//            //
+//            compileOnly "org.spigotmc:spigot:${server}:remapped-mojang"
+//            paperweight.paperDevBundle(server)
+//            compileOnly "org.spigotmc:spigot-api:${server}"
+//            compileOnly(project(":Compatibility"))
+//        }
+//        java {
+//            toolchain.languageVersion.set(JavaLanguageVersion.of(javaV))
+//        }
+//
+//    }
+//}
 
 dependencies {
     // Tests
@@ -108,14 +108,13 @@ dependencies {
     // TODO make this functional
     compileOnly "dev.jorel:commandapi-bukkit-core:9.3.0"
     // Shadowed dependencies
-    implementation(project(":Compatibility"))
     implementation("de.tr7zw:item-nbt-api:2.12.2")
     implementation('com.iridium:IridiumColorAPI:1.0.6')
     implementation 'org.luaj:luaj-jse:3.0.1'
     implementation('com.google.code.gson:gson:2.10.1')
     implementation("com.google.guava:guava:31.1-jre")
 //    implementation(project(path: ":Compatibility", configure: 'shadow'))
-    SUPPORTED_VERSIONS.forEach { implementation(project(path: ":Compatibility:${it.nmsVersion}", configuration: "reobf")) }
+//    SUPPORTED_VERSIONS.forEach { implementation(project(path: ":Compatibility:${it.nmsVersion}", configuration: "reobf")) }
 
 }
 
@@ -180,7 +179,7 @@ test {
 
 shadowJar {
     dependsOn(jar)
-    SUPPORTED_VERSIONS.each { dependsOn(":Compatibility:${it.nmsVersion}:reobfJar") }
+//    SUPPORTED_VERSIONS.each { dependsOn(":Compatibility:${it.nmsVersion}:reobfJar") }
     if (System.getenv("BUILD_NUMBER") == null) {
         archiveFileName.set(rootProject.name + "-" + version + ".jar")
     } else {
