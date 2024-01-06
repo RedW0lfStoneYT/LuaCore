@@ -41,7 +41,7 @@ public class LuaMessageUtils extends ContentUtils {
      * @param content The content you want to send to console
      */
     public static void consoleSend(Object content) {
-        LuaCore.getPlugin().getLogger().info(color(content.toString()));
+        LuaCore.getCoreLogger().log(Level.INFO, content.toString());
     }
 
     /**
@@ -49,7 +49,7 @@ public class LuaMessageUtils extends ContentUtils {
      * @param content The warning message you want to send
      */
     public static void consoleWarn(Object content) {
-        LuaCore.getPlugin().getLogger().warning(content.toString());
+        LuaCore.getCoreLogger().log(Level.WARNING, content.toString());
     }
 
     /**
@@ -57,7 +57,7 @@ public class LuaMessageUtils extends ContentUtils {
      * @param content The error message you want to send
      */
     public static void consoleError(Object content) {
-        LuaCore.getPlugin().getLogger().log(Level.SEVERE, content.toString());
+        LuaCore.getCoreLogger().log(Level.SEVERE, content.toString());
     }
 
     /**

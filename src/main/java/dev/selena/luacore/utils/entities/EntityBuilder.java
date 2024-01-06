@@ -8,6 +8,9 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.Map;
 
+/**
+ * THIS CLASS IS NOT AT ALL READY YET PLEASE DO NOT USE
+ */
 public class EntityBuilder {
     
     @Setter
