@@ -1,11 +1,12 @@
 package dev.selena.luacore;
 
+import dev.selena.luacore.nms.Compatibility;
+import dev.selena.luacore.nms.Version;
 import dev.selena.luacore.utils.data.UserDataManager;
 import dev.selena.luacore.utils.items.ItemEvent;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -40,6 +41,10 @@ public class LuaCore {
     @Getter
     @Setter
     private static CoreLogger coreLogger;
+    @Getter
+    private static boolean nmsVersionSupported = true;
+    @Getter
+    private static Version nmsVersion;
 
     /**
      * This needs to be called in the OnEnable method of your plugin for it to work
@@ -56,6 +61,11 @@ public class LuaCore {
     public static void setupCore(Plugin plugin) {
         setPlugin(plugin);
         setCoreLogger(new CoreLogger(plugin));
+        if (Compatibility.getVersion().equals("NOT_SUPPORTED"))
+            nmsVersionSupported = false;
+        else
+            nmsVersion = Version.valueOf(Compatibility.getVersion());
+
     }
 
     /**
