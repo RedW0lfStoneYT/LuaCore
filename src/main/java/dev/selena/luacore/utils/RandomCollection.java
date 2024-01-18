@@ -2,9 +2,7 @@ package dev.selena.luacore.utils;
 
 import dev.selena.luacore.utils.text.LuaMessageUtils;
 
-import java.util.NavigableMap;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Used for weighted random item/object generation
@@ -53,5 +51,16 @@ public class RandomCollection<E> {
     public E getRandom() {
         double value = random.nextDouble() * total;
         return map.higherEntry(value).getValue();
+    }
+
+    /**
+     * Used for appending the collection map with another existing map
+     * @param results The map of results/loot you want to append to the existing collection
+     */
+    public void addAll(Map<E, Double> results) {
+        for (E result : results.keySet()) {
+            total += results.get(result);
+            map.put(total, result);
+        }
     }
 }
