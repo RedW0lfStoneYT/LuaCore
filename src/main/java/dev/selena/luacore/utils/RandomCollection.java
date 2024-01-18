@@ -63,4 +63,8 @@ public class RandomCollection<E> {
             map.put(total, result);
         }
     }
+
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
 }
