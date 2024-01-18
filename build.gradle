@@ -50,7 +50,7 @@ static NMSVersion toNms(String nms, String server, int javaVersion) {
 }
 
 List<NMSVersion> SUPPORTED_VERSIONS = [
-//        toNms("NMS_1_20_R2", "1.20.2-R0.1-SNAPSHOT", 17),
+toNms("NMS_1_20_R2", "1.20.2-R0.1-SNAPSHOT", 17),
 toNms("NMS_1_20_R3", "1.20.4-R0.1-SNAPSHOT", 17)
 ]
 
@@ -129,7 +129,9 @@ dependencies {
     implementation('com.google.code.gson:gson:2.10.1')
     implementation("com.google.guava:guava:31.1-jre")
     compileOnly(project(path: ":Compatibility", configuration: 'shadow'))
-    compileOnly(project(path: ":Compatibility:NMS_1_20_R3", configuration: "reobf"))
+//    compileOnly(project(path: ":Compatibility:NMS_1_20_R3", configuration: "reobf"))
+//    compileOnly(project(path: ":Compatibility:NMS_1_20_R2", configuration: "reobf"))
+    SUPPORTED_VERSIONS.each { compileOnly(project(path: ":Compatibility:${it.nmsVersion}", configuration: "reobf")) }
 
 }
 
