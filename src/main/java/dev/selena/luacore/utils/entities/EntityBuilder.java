@@ -192,7 +192,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the armor bonus attribute
+     * Used for setting the armor bonus attribute (0.0 to 30.0, default 0.0)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param armorBonus The value for the attribute
      * @return The current builder instance
      */
@@ -202,7 +203,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the armor toughness bonus attribute
+     * Used for setting the armor toughness bonus attribute (0.0 to 20.0, default 0.0)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param armorToughnessBonus The value for the attribute
      * @return The current builder instance
      */
@@ -212,7 +214,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the attack damage bonus
+     * Used for setting the attack damage bonus (0.0 to 2048.0 default, 2.0)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param attackDamageBonus The value for the attribute
      * @return The current builder instance
      */
@@ -222,7 +225,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the attack knock back attribute
+     * Used for setting the attack knock back attribute (0.0 to 5.0, default 0.0)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param attackKnockBack The value for the attribute
      * @return The current builder instance
      */
@@ -232,7 +236,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the attack speed attribute
+     * Used for setting the attack speed attribute (0.0 to 1024.0, default 4)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param attackSpeed The value for the attribute
      * @return The current builder instance
      */
@@ -242,7 +247,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the flight speed attribute
+     * Used for setting the flight speed attribute (0.0 to 1024.0, default 0.4)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param flyingSpeed The value for the attribute
      * @return The current builder instance
      */
@@ -252,7 +258,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the entity follow range attribute
+     * Used for setting the entity follow range attribute (0.0 to 2048, default 32.0)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param followRange The value for the attribute
      * @return The current builder instance
      */
@@ -262,7 +269,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the knock back resistance attribute
+     * Used for setting the knock back resistance attribute (0.0 to 1.0, default 0.0)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param knockBackResistance The value for the attribute
      * @return The current builder instance
      */
@@ -272,7 +280,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the luck attribute (-1024.0 to 1024.0)
+     * Used for setting the luck attribute (-1024.0 to 1024.0, default 0.0)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param luck The value for the attribute
      * @return The current builder instance
      */
@@ -282,7 +291,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the maximum absorption attribute (0.0 to 2048.0)
+     * Used for setting the maximum absorption attribute (0.0 to 2048.0, default 0.0)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param maxAbsorption The value for the attribute
      * @return The current builder instance
      */
@@ -292,7 +302,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the maximum health attribute (0.0 to 1024.0)
+     * Used for setting the maximum health attribute (0.0 to 1024.0, default 20.0)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param maxHealth The value for the attribute
      * @return The current builder instance
      */
@@ -302,7 +313,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the entity movement speed attribute (0.0 to 1024.0)
+     * Used for setting the entity movement speed attribute (0.0 to 1024.0, default depends on entity)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param movementSpeed The value for the attribute
      * @return The current builder instance
      */
@@ -312,7 +324,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the horse jump strength attribute (0.0 to 2.0)
+     * Used for setting the horse jump strength attribute (0.0 to 2.0, default 0.7)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param horseJumpStrength The value for the attribute
      * @return The current builder instance
      */
@@ -322,7 +335,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the entity scale attribute (0.0625 to 16.0)
+     * Used for setting the entity scale attribute (0.0625 to 16.0, default 1.0)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param entityScale The value for the attribute
      * @return The current builder instance
      */
@@ -332,7 +346,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used to set the entity interaction with block distance attribute (0.0 to 64)
+     * Used to set the entity interaction with block distance attribute (0.0 to 64, default 4.5)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param entityInteractWithBlockDistance The value for the attribute
      * @return The current builder instance
      */
@@ -342,7 +357,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used to set the entity interaction with entity distance attribute (0.0 to 64.0)
+     * Used to set the entity interaction with entity distance attribute (0.0 to 64.0, default 3.0)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param entityInteractWithEntityDistance The value for the attribute
      * @return The current builder instance
      */
@@ -352,7 +368,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the entity step height attribute
+     * Used for setting the entity step height attribute (0.0 to 10.0, default 0.6)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param stepHeight The value for the attribute
      * @return The current builder instance
      */
@@ -362,7 +379,8 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the zombie reinforcements attribute
+     * Used for setting the zombie reinforcements attribute (true or false, default false)
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param zombieReinforcements The value for the attribute
      * @return The current builder instance
      */
