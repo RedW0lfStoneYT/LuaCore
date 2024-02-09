@@ -15,6 +15,6 @@ please refer to the wiki once its up for how to use.
 Be sure to add the following to your onEnable() method
 `LuaCore.setPlugin(this);`
 
-Wiki will be coming soon, working on [JavaDocs](docs.selenadevelopment.com) atm
+Wiki will be coming soon, working on [JavaDocs](https://docs.selenadevelopment.com) atm
 
 You can view the example project used in the wiki examples [here](https://github.com/RedW0lfStoneYT/LuaCoreExample)
