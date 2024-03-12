@@ -64,6 +64,10 @@ public class RandomCollection<E> {
         }
     }
 
+    /**
+     * Used for checking if the collection is empty
+     * @return True if empty
+     */
     public boolean isEmpty() {
         return map.isEmpty();
     }

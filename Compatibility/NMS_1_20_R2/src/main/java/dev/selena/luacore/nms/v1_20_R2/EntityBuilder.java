@@ -5,12 +5,20 @@ import lombok.Getter;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 
+/**
+ * NMS Entity builder for 1.20.2
+ */
 public class EntityBuilder implements INMSEntityBuilder {
+
 
 
     @Getter
     private final LivingEntity entity;
-    
+
+    /**
+     * Used for creating instance of 1.20.2 entity builder
+     * @param entity The entity you want to alter
+     */
     public EntityBuilder(LivingEntity entity) {
         this.entity = entity;
     }

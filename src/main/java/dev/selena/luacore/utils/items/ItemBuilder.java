@@ -287,7 +287,6 @@ public class ItemBuilder {
      */
     public ItemBuilder setSkullTexture(URL textureUrl) {
         return setSkullProfile(textureUrl, UUID.randomUUID(), null);
-
     }
 
     /**

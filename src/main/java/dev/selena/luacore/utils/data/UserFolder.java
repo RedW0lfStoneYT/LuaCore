@@ -66,6 +66,11 @@ public abstract class UserFolder {
         String fileName;
         Object data;
 
+        /**
+         * Used to create a new FileClass instance for user data
+         * @param name The name of the file
+         * @param data The data being parsed in
+         */
         public FileClass(String name, Object data) {
             fileName = name;
             this.data = data;

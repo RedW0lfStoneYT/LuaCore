@@ -10,9 +10,17 @@ import java.util.MissingResourceException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Modified Logger class allowing LuaCore to log with color
+ */
 public class CoreLogger extends Logger {
     private String pluginName;
     private boolean unitTest;
+
+    /**
+     * Used for creating a new instance of the plugin logger
+     * @param context The main plugin class that extends JavaPlugin
+     */
     public CoreLogger(Plugin context) {
         super(context.getClass().getCanonicalName(), null);
 
@@ -28,6 +36,11 @@ public class CoreLogger extends Logger {
     }
 
 
+    /**
+     * Used for sending a message to console
+     * @param level   One of the message level identifiers, e.g., SEVERE
+     * @param message     The string message (or a key in the message catalog)
+     */
     @Override
     public void log(Level level, String message) {
         if (!isLoggable(level)) {

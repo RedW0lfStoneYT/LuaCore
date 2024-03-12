@@ -517,6 +517,7 @@ public class EntityBuilder {
      * @see EntityBuilder#spawn(Location) 
      * @param location The location you want to spawn the entity
      * @param world The world you want to spawn the entity in
+     * @return The entity that has just been spawned
      */
     public Entity spawn(Location location, World world) {
 
@@ -529,12 +530,12 @@ public class EntityBuilder {
         AtomicReference<Entity> ent = new AtomicReference<>();
         world.spawn(location, entityType.getEntityClass(), entity -> {
             LivingEntity entityLiving = (LivingEntity) entity;
-            INMSEntityBuilder builder = LuaCore.getNmsVersion().getClazz().getEntityBuilder(entityLiving);
+            INMSEntityBuilder nmsBuilder = LuaCore.getNmsVersion().getClazz().getEntityBuilder(entityLiving);
             boolean hasName = !this.displayName.isEmpty();
             entityLiving.setCustomNameVisible(hasName);
             if (hasName)
                 entityLiving.setCustomName(ContentUtils.color(this.displayName));
-            builder.setArmorBonus(armorBonus)
+            nmsBuilder.setArmorBonus(armorBonus)
                     .setArmorToughnessBonus(armorToughnessBonus)
                     .setAttackDamageBonus(attackDamageBonus)
                     .setAttackKnockBack(attackKnockBack)
@@ -552,7 +553,7 @@ public class EntityBuilder {
                     .setEntityInteractWithLivingEntityDistance(entityInteractWithEntityDistance)
                     .setStepHeight(stepHeight)
                     .spawnZombieReinforcements(zombieReinforcements);
-            entityLiving = builder.getEntity();
+            entityLiving = nmsBuilder.getEntity();
             entityLiving.addPotionEffects(potionEffects);
             EntityEquipment equipment = entityLiving.getEquipment();
             assert equipment != null;
@@ -586,6 +587,7 @@ public class EntityBuilder {
      * Used for spawning the entity in the world
      * @see EntityBuilder#spawn(Location, World) 
      * @param location The location you want to spawn the entity (World must not be null)
+     * @return The entity that has just been spawned
      */
     public Entity spawn(Location location) {
         if (location.getWorld() == null)

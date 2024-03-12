@@ -4,13 +4,19 @@ import dev.selena.luacore.nms.INMSEntityBuilder;
 import lombok.Getter;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
-
+/**
+ * NMS Entity builder for 1.20.3-1.20.4
+ */
 public class EntityBuilder implements INMSEntityBuilder {
 
 
     @Getter
     private final LivingEntity entity;
-    
+
+    /**
+     * Used for creating instance of 1.20.3-1.20.4 entity builder
+     * @param entity The entity you want to alter
+     */
     public EntityBuilder(LivingEntity entity) {
         this.entity = entity;
     }
