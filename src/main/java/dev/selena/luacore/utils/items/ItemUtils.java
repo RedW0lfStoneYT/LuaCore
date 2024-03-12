@@ -92,6 +92,7 @@ public class ItemUtils {
      * @return True if the item is a chestplate
      */
     public static boolean isChestplate(ItemStack item) {
+
         String name = getLowerName(item);
         return name.endsWith("chestplate")
                 || name.endsWith("tunic");
@@ -177,7 +178,7 @@ public class ItemUtils {
     }
 
     private static String getLowerName(ItemStack item) {
-        return item.getType().name().toLowerCase();
+        return item == null || item.getType() == Material.AIR ? "" : item.getType().name().toLowerCase();
     }
 
     /**

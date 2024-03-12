@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import de.tr7zw.changeme.nbtapi.NBTCompound;
 import dev.selena.luacore.LuaCore;
+import dev.selena.luacore.utils.text.LuaMessageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ public class NBTUtils {
     private static final Gson gson = new GsonBuilder()
             .disableHtmlEscaping()
             .setPrettyPrinting()
+            .serializeNulls()
             .excludeFieldsWithoutExposeAnnotation()
             .create();
 
@@ -49,6 +51,7 @@ public class NBTUtils {
      * @param nameSpaceKey where you should get the data from later
      */
     public static void storeNBTContent(NBTCompound compoundTag, Object content, String nameSpaceKey) {
+        LuaMessageUtils.json_dump(content);
         String json = serializeContent(content);
 
         compoundTag.setString(nameSpaceKey, json);
@@ -66,6 +69,7 @@ public class NBTUtils {
     public static <T> T getNBTContent(Class<T> cls, String nameSpaceKey, NBTCompound compoundTag) {
         if (compoundTag.hasTag(nameSpaceKey)) {
             String json = compoundTag.getString(nameSpaceKey);
+            LuaMessageUtils.verboseMessage("Deserializing " + json);
             return deserializeContent(cls, json);
         }
         return null;

@@ -193,7 +193,7 @@ public class ScriptHelper {
      * @return True if the effect is a debuff
      */
     public static boolean isDebuff(PotionEffectType effectType) {
-        if (effectType == PotionEffectType.BLINDNESS
+        return effectType == PotionEffectType.BLINDNESS
                 || effectType == PotionEffectType.SLOW
                 || effectType == PotionEffectType.SLOW_DIGGING
                 || effectType == PotionEffectType.CONFUSION
@@ -204,10 +204,7 @@ public class ScriptHelper {
                 || effectType == PotionEffectType.WITHER
                 || effectType == PotionEffectType.UNLUCK
                 || effectType == PotionEffectType.BAD_OMEN
-                || effectType == PotionEffectType.DARKNESS
-        )
-            return true;
-        return false;
+                || effectType == PotionEffectType.DARKNESS;
     }
 
     /**

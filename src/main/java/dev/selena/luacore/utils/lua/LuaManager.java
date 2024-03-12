@@ -164,10 +164,13 @@ public class LuaManager {
      * This is partly based off <a href="https://gist.github.com/kamontat/c4435fd3e646ef61328f60c92bcec4ab">kamontat jar extraction</a>
      */
     public static void loadResourceFolder(String folderName) throws IOException {
+
         folderName = folderName.replace("/", File.separator).replace("\\", File.separator);
         final File jarFile = new File(LuaManager.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 
+        LuaMessageUtils.verboseMessage("Starting to load files from " + folderName);
         if(jarFile.isFile()) {  // Run with JAR file
+            LuaMessageUtils.verboseMessage("File is Jar");
             final JarFile jar = new JarFile(jarFile);
             final Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
             while(entries.hasMoreElements()) {

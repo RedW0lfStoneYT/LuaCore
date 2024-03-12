@@ -16,7 +16,6 @@ import java.util.logging.Level;
  */
 public class LuaMessageUtils extends ContentUtils {
 
-    private static final boolean debug = true;
     private static final Gson gson = new GsonBuilder()
             .disableHtmlEscaping()
             .setPrettyPrinting()
@@ -30,7 +29,7 @@ public class LuaMessageUtils extends ContentUtils {
      * @param cls The Class instance you want to dump to console
      */
     public static void json_dump(Object cls) {
-        if (!debug)
+        if (!LuaCore.isVerbose())
             return;
         String classGson = gson.toJson(cls);
         consoleSend("\n" + gson.toJson(JsonParser.parseString(classGson)));

@@ -17,7 +17,7 @@ function event(args)
             print("Player Join Test Passed")
         end
     else
-        print("Player Join Test Failed")
+        print("Player Join Test Failed Successfully")
     end
 
 end

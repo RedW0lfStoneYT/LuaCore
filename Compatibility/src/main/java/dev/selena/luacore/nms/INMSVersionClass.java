@@ -12,6 +12,6 @@ public interface INMSVersionClass {
      * @param entity The entity you want to alter
      * @return The builder
      */
-    public INMSEntityBuilder getEntityBuilder(LivingEntity entity);
+    INMSEntityBuilder getEntityBuilder(LivingEntity entity);
 
 }

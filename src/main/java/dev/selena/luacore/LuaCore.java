@@ -63,10 +63,17 @@ public class LuaCore {
     public static void setupCore(Plugin plugin) {
         setPlugin(plugin);
         setCoreLogger(new CoreLogger(plugin));
-        if (Compatibility.getVersion().equals("NOT_SUPPORTED"))
+        if (Compatibility.getVersion().equals("NOT_SUPPORTED")) {
+            LuaMessageUtils.consoleError("No NMS supported");
             nmsVersionSupported = false;
+        }
         else
-            nmsVersion = Version.valueOf(Compatibility.getVersion());
+            try {
+                nmsVersion = Version.valueOf(Compatibility.getVersion());
+            } catch (IllegalArgumentException e) {
+                LuaMessageUtils.consoleError("No NMS supported");
+                nmsVersionSupported = false;
+            }
 
     }
 

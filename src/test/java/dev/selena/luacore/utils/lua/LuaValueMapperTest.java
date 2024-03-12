@@ -19,7 +19,7 @@ class LuaValueMapperTest {
 
     @ClassRule
     public static TemporaryFolder temporaryFolder = new TemporaryFolder();
-    private static MappingTest unmapped = new MappingTest();
+    private static final MappingTest unmapped = new MappingTest();
 
     @BeforeAll
     public static void setup() throws IOException, URISyntaxException {

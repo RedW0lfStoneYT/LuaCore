@@ -381,9 +381,11 @@ public class ItemBuilder {
         if (customNBT != null && !customNBT.isEmpty()) {
             LuaMessageUtils.verboseMessage("NBT Compound name: " + LuaCore.getCompountName());
             for (String nameSpace : customNBT.keySet()) {
+                LuaMessageUtils.verboseMessage(nameSpace);
                 NBTCompound compound = nbtItem.getOrCreateCompound(LuaCore.getCompountName());
 
                 Object content = customNBT.get(nameSpace);
+                LuaMessageUtils.json_dump(content);
                 NBTUtils.storeNBTContent(compound, content, nameSpace);
             }
         }

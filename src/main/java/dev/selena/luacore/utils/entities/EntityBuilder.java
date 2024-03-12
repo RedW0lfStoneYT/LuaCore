@@ -9,6 +9,7 @@ import dev.selena.luacore.utils.RandomCollection;
 import dev.selena.luacore.utils.items.ItemUtils;
 import dev.selena.luacore.utils.items.NBTUtils;
 import dev.selena.luacore.utils.text.ContentUtils;
+import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -49,6 +50,25 @@ public class EntityBuilder {
             entityInteractWithBlockDistance,
             entityInteractWithEntityDistance,
             stepHeight;
+    private boolean armorBonus_isCustom = false,
+            armorToughnessBonus_isCustom = false,
+            attackDamageBonus_isCustom = false,
+            attackKnockBack_isCustom = false,
+            attackSpeed_isCustom = false,
+            flyingSpeed_isCustom = false,
+            followRange_isCustom = false,
+            knockBackResistance_isCustom = false,
+            luck_isCustom = false,
+            maxAbsorption_isCustom = false,
+            maxHealth_isCustom = false,
+            movementSpeed_isCustom = false,
+            horseJumpStrength_isCustom = false,
+            // Preparing for 1.20. = false5
+            entityScale_isCustom = false,
+            entityInteractWithBlockDistance_isCustom = false,
+            entityInteractWithEntityDistance_isCustom = false,
+            stepHeight_isCustom = false,
+            zombieReinforcements_isCustom = false;
     private boolean zombieReinforcements;
     private EntityType entityType;
     private String displayName;
@@ -129,7 +149,7 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for adding a drop to the collection
+     * Used for adding a drop to the collection (Currently broken thanks to NBTApi :/)
      * @param chance The weighted chance
      * @param item The items you want added
      * @return The current builder instance
@@ -140,7 +160,7 @@ public class EntityBuilder {
     }
 
     /**
-     * used to add a map of drops to the drop collection
+     * used to add a map of drops to the drop collection (Currently broken thanks to NBTApi :/)
      * @param drops The map of drops
      * @return The current builder instance
      */
@@ -173,7 +193,7 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for adding custom NBTData to the entity
+     * Used for adding custom NBTData to the entity (Currently broken thanks to NBTApi :/)
      * @param key The key used to gather the data
      * @param cls The NBTData class (NOTE: can be essentially anything)
      * @return The current builder instance
@@ -184,7 +204,7 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for adding a map of NBTData to add to the entity
+     * Used for adding a map of NBTData to add to the entity (Currently broken thanks to NBTApi :/)
      * @param values The map of NBTData classes
      * @return The current builder instance
      */
@@ -201,6 +221,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setArmorBonus(float armorBonus) {
         this.armorBonus = armorBonus;
+        this.armorBonus_isCustom = true;
         return this;
     }
 
@@ -212,6 +233,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setArmorToughnessBonus(float armorToughnessBonus) {
         this.armorToughnessBonus = armorToughnessBonus;
+        this.armorToughnessBonus_isCustom = true;
         return this;
     }
 
@@ -223,6 +245,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setAttackDamageBonus(float attackDamageBonus) {
         this.attackDamageBonus = attackDamageBonus;
+        this.attackDamageBonus_isCustom = true;
         return this;
     }
 
@@ -234,6 +257,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setAttackKnockBack(float attackKnockBack) {
         this.attackKnockBack = attackKnockBack;
+        this.attackKnockBack_isCustom = true;
         return this;
     }
 
@@ -245,6 +269,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setAttackSpeed(float attackSpeed) {
         this.attackSpeed = attackSpeed;
+        this.attackSpeed_isCustom = true;
         return this;
     }
 
@@ -256,6 +281,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setFlyingSpeed(float flyingSpeed) {
         this.flyingSpeed = flyingSpeed;
+        this.flyingSpeed_isCustom = true;
         return this;
     }
 
@@ -267,6 +293,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setFollowRange(float followRange) {
         this.followRange = followRange;
+        this.followRange_isCustom = true;
         return this;
     }
 
@@ -278,6 +305,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setKnockBackResistance(float knockBackResistance) {
         this.knockBackResistance = knockBackResistance;
+        this.knockBackResistance_isCustom = true;
         return this;
     }
 
@@ -289,6 +317,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setLuck(float luck) {
         this.luck = luck;
+        this.luck_isCustom = true;
         return this;
     }
 
@@ -300,6 +329,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setMaxAbsorption(float maxAbsorption) {
         this.maxAbsorption = maxAbsorption;
+        this.maxAbsorption_isCustom = true;
         return this;
     }
 
@@ -311,6 +341,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setMaxHealth(float maxHealth) {
         this.maxHealth = maxHealth;
+        this.maxHealth_isCustom = true;
         return this;
     }
 
@@ -322,6 +353,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setMovementSpeed(float movementSpeed) {
         this.movementSpeed = movementSpeed;
+        this.movementSpeed_isCustom = true;
         return this;
     }
 
@@ -333,6 +365,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setHorseJumpStrength(float horseJumpStrength) {
         this.horseJumpStrength = horseJumpStrength;
+        this.horseJumpStrength_isCustom = true;
         return this;
     }
 
@@ -344,6 +377,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setEntityScale(float entityScale) {
         this.entityScale = entityScale;
+        this.entityScale_isCustom = true;
         return this;
     }
 
@@ -355,6 +389,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setEntityInteractWithBlockDistance(float entityInteractWithBlockDistance) {
         this.entityInteractWithBlockDistance = entityInteractWithBlockDistance;
+        this.entityInteractWithBlockDistance_isCustom = true;
         return this;
     }
 
@@ -366,6 +401,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setEntityInteractWithEntityDistance(float entityInteractWithEntityDistance) {
         this.entityInteractWithEntityDistance = entityInteractWithEntityDistance;
+        this.entityInteractWithEntityDistance_isCustom = true;
         return this;
     }
 
@@ -377,6 +413,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setStepHeight(float stepHeight) {
         this.stepHeight = stepHeight;
+        this.stepHeight_isCustom = true;
         return this;
     }
 
@@ -388,6 +425,7 @@ public class EntityBuilder {
      */
     public EntityBuilder setZombieReinforcements(boolean zombieReinforcements) {
         this.zombieReinforcements = zombieReinforcements;
+        this.zombieReinforcements_isCustom = true;
         return this;
     }
 
@@ -472,7 +510,7 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the drop collection for entity death
+     * Used for setting the drop collection for entity death (Currently broken thanks to NBTApi :/)
      * @param drops The {@link RandomCollection} of item drops
      * @return The current builder instance
      */
@@ -512,6 +550,7 @@ public class EntityBuilder {
         return this;
     }
 
+    private final boolean nbtFixed = false;
     /**
      * Used for spawning the entity in the world
      * @see EntityBuilder#spawn(Location) 
@@ -531,28 +570,30 @@ public class EntityBuilder {
         world.spawn(location, entityType.getEntityClass(), entity -> {
             LivingEntity entityLiving = (LivingEntity) entity;
             INMSEntityBuilder nmsBuilder = LuaCore.getNmsVersion().getClazz().getEntityBuilder(entityLiving);
-            boolean hasName = !this.displayName.isEmpty();
+            boolean hasName = this.displayName != null && !this.displayName.isEmpty();
             entityLiving.setCustomNameVisible(hasName);
             if (hasName)
                 entityLiving.setCustomName(ContentUtils.color(this.displayName));
-            nmsBuilder.setArmorBonus(armorBonus)
-                    .setArmorToughnessBonus(armorToughnessBonus)
-                    .setAttackDamageBonus(attackDamageBonus)
-                    .setAttackKnockBack(attackKnockBack)
-                    .setAttackSpeed(attackSpeed)
-                    .setFlyingSpeed(flyingSpeed)
-                    .setFollowRange(followRange)
-                    .setKnockBackResistance(knockBackResistance)
-                    .setLuck(luck)
-                    .setMaxAbsorption(maxAbsorption)
-                    .setMaxHealth(maxHealth)
-                    .setMovementSpeed(movementSpeed)
-                    .setHorseJumpStrength(horseJumpStrength)
-                    .setEntityScale(entityScale)
-                    .setEntityInteractWithBlockDistance(entityInteractWithBlockDistance)
-                    .setEntityInteractWithLivingEntityDistance(entityInteractWithEntityDistance)
-                    .setStepHeight(stepHeight)
-                    .spawnZombieReinforcements(zombieReinforcements);
+
+            if (armorBonus_isCustom) nmsBuilder.setArmorBonus(armorBonus);
+            if (armorToughnessBonus_isCustom) nmsBuilder.setArmorToughnessBonus(armorToughnessBonus);
+            if (attackDamageBonus_isCustom) nmsBuilder.setAttackDamageBonus(attackDamageBonus);
+            if (attackKnockBack_isCustom) nmsBuilder.setAttackKnockBack(attackKnockBack);
+            if (attackSpeed_isCustom) nmsBuilder.setAttackSpeed(attackSpeed);
+            if (flyingSpeed_isCustom) nmsBuilder.setFlyingSpeed(flyingSpeed);
+            if (followRange_isCustom) nmsBuilder.setFollowRange(followRange);
+            if (knockBackResistance_isCustom) nmsBuilder.setKnockBackResistance(knockBackResistance);
+            if (luck_isCustom) nmsBuilder.setLuck(luck);
+            if (maxAbsorption_isCustom) nmsBuilder.setMaxAbsorption(maxAbsorption);
+            if (maxHealth_isCustom) nmsBuilder.setMaxHealth(maxHealth);
+            if (movementSpeed_isCustom) nmsBuilder.setMovementSpeed(movementSpeed);
+            if (horseJumpStrength_isCustom) nmsBuilder.setHorseJumpStrength(horseJumpStrength);
+            if (entityScale_isCustom) nmsBuilder.setEntityScale(entityScale);
+            if (armorBonus_isCustom) nmsBuilder.setEntityInteractWithBlockDistance(entityInteractWithBlockDistance);
+            if (entityInteractWithBlockDistance_isCustom) nmsBuilder.setEntityInteractWithLivingEntityDistance(entityInteractWithEntityDistance);
+            if (stepHeight_isCustom) nmsBuilder.setStepHeight(stepHeight);
+            if (zombieReinforcements_isCustom) nmsBuilder.spawnZombieReinforcements(zombieReinforcements);
+
             entityLiving = nmsBuilder.getEntity();
             entityLiving.addPotionEffects(potionEffects);
             EntityEquipment equipment = entityLiving.getEquipment();
@@ -566,7 +607,13 @@ public class EntityBuilder {
                 equipment.setBoots(boots, true);
             equipment.setItemInMainHand(mainHandItem);
             equipment.setItemInOffHand(offHandItem);
-            NBTEntity nbtEntity = new NBTEntity(entityLiving);
+
+            ent.set(entity);
+        });
+        Entity entity = ent.get();
+        NBTEntity nbtEntity = new NBTEntity(entity);
+        if (nbtFixed) {
+            LuaMessageUtils.verboseMessage("Compound name: " + LuaCore.getCompountName()); // Prints valid name that has been used for NBTItem
             NBTCompound compound = nbtEntity.getOrCreateCompound(LuaCore.getCompountName());
             for (String nameSpace : customNBTData.keySet()) {
                 Object content = customNBTData.get(nameSpace);
@@ -574,13 +621,12 @@ public class EntityBuilder {
             }
             if (!drops.isEmpty())
                 NBTUtils.storeNBTContent(compound, drops, "EntityDrops");
-            nbtEntity.setBoolean("LuaCoreEntity", true);
-            for (String metadataKey : metadataValues.keySet()) {
-                entityLiving.setMetadata(metadataKey, metadataValues.get(metadataKey));
-            }
-            ent.set(entity);
-        });
-        return ent.get();
+        }
+        nbtEntity.setBoolean("LuaCoreEntity", true);
+        for (String metadataKey : metadataValues.keySet()) {
+            entity.setMetadata(metadataKey, metadataValues.get(metadataKey));
+        }
+        return entity;
     }
 
     /**
