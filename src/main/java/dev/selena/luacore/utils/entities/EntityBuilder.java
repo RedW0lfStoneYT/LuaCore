@@ -11,6 +11,7 @@ import dev.selena.luacore.utils.items.NBTUtils;
 import dev.selena.luacore.utils.text.ContentUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
@@ -19,6 +20,7 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * THIS CLASS IS NOT AT ALL READY YET PLEASE DO NOT USE
@@ -516,13 +518,15 @@ public class EntityBuilder {
      * @param location The location you want to spawn the entity
      * @param world The world you want to spawn the entity in
      */
-    public void spawn(Location location, World world) {
+    public Entity spawn(Location location, World world) {
+
         if (entityType == null || entityType.getEntityClass() == null)
             throw new EntityBuildException("Entity type cannot be null");
         if (!entityType.isSpawnable())
             throw new EntityBuildException("Entity type must be spawnable");
         if (!entityType.isAlive())
             throw new EntityBuildException("Entity type must be living");
+        AtomicReference<Entity> ent = new AtomicReference<>();
         world.spawn(location, entityType.getEntityClass(), entity -> {
             LivingEntity entityLiving = (LivingEntity) entity;
             INMSEntityBuilder builder = LuaCore.getNmsVersion().getClazz().getEntityBuilder(entityLiving);
@@ -573,7 +577,9 @@ public class EntityBuilder {
             for (String metadataKey : metadataValues.keySet()) {
                 entityLiving.setMetadata(metadataKey, metadataValues.get(metadataKey));
             }
+            ent.set(entity);
         });
+        return ent.get();
     }
 
     /**
@@ -581,10 +587,10 @@ public class EntityBuilder {
      * @see EntityBuilder#spawn(Location, World) 
      * @param location The location you want to spawn the entity (World must not be null)
      */
-    public void spawn(Location location) {
+    public Entity spawn(Location location) {
         if (location.getWorld() == null)
             throw new EntityBuildException("World cannot be null");
-        this.spawn(location, location.getWorld());
+        return this.spawn(location, location.getWorld());
     }
 
 

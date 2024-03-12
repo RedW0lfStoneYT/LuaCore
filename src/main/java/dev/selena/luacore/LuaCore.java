@@ -3,10 +3,12 @@ package dev.selena.luacore;
 import dev.selena.luacore.nms.Compatibility;
 import dev.selena.luacore.nms.Version;
 import dev.selena.luacore.utils.data.UserDataManager;
+import dev.selena.luacore.utils.entities.EntityBuilder;
 import dev.selena.luacore.utils.items.ItemEvent;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 
 /**

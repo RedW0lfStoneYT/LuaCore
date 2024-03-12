@@ -15,9 +15,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.inventory.meta.trim.ArmorTrim;
+import org.bukkit.profile.PlayerProfile;
+import org.bukkit.profile.PlayerTextures;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.net.URL;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Used for easily creating custom items
@@ -38,6 +45,7 @@ public class ItemBuilder {
     private Map<String, Boolean> booleanNBT;
     private Map<String, Object> customNBT;
     private ArmorTrim trim;
+    private PlayerProfile skullProfile;
 
 
     /**
@@ -273,6 +281,39 @@ public class ItemBuilder {
     }
 
     /**
+     * Used for setting the skull texture (Won't work if the material isn't {@link Material#PLAYER_HEAD})
+     * @param textureUrl The skull texture (NOTE: MUST be a {@link <a href="https://textures.minecraft.net">minecraft texture</a>})
+     * @return This instance to continue
+     */
+    public ItemBuilder setSkullTexture(URL textureUrl) {
+        return setSkullProfile(textureUrl, UUID.randomUUID(), null);
+
+    }
+
+    /**
+     * Used for setting the skulls {@link PlayerProfile} texture.
+     * @param skullTextureUrl The skull texture (NOTE: MUST be a {@link <a href="https://textures.minecraft.net">minecraft texture</a>})
+     * @param skullTextureUUID The UUID of the skull, used for internal minecraft stuff
+     * @param skullTextureName The texture name (from memory must be unique, but I haven't used this in a while)
+     * @return This instance to continue
+     */
+    public ItemBuilder setSkullProfile(@NotNull URL skullTextureUrl, @NotNull UUID skullTextureUUID, @Nullable String skullTextureName) {
+        skullProfile = LuaCore.getPlugin().getServer().createPlayerProfile(skullTextureUUID, skullTextureName);
+        skullProfile.getTextures().setSkin(skullTextureUrl);
+        return this;
+    }
+
+    /**
+     * Used for setting the skulls {@link PlayerProfile}
+     * @param skullProfile The {@link PlayerProfile} you want to set for the skull
+     * @return This instance to continue
+     */
+    public ItemBuilder setSkullProfile(PlayerProfile skullProfile) {
+        this.skullProfile = skullProfile;
+        return this;
+    }
+
+    /**
      * Used for creating the previously created ItemStack
      * @return The built ItemStack
      */
@@ -283,6 +324,14 @@ public class ItemBuilder {
 
 
         ItemStack item = new ItemStack(type);
+
+        if (type == Material.PLAYER_HEAD) {
+            if (skullProfile != null && skullProfile.isComplete()) {
+                SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
+                skullMeta.setOwnerProfile(skullProfile);
+                item.setItemMeta(skullMeta);
+            }
+        }
 
         item.setAmount(Math.max(1, amount));
         ItemMeta meta = item.getItemMeta();
