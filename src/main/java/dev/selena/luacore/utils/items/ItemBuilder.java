@@ -282,7 +282,7 @@ public class ItemBuilder {
 
     /**
      * Used for setting the skull texture (Won't work if the material isn't {@link Material#PLAYER_HEAD})
-     * @param textureUrl The skull texture (NOTE: MUST be a {@link <a href="https://textures.minecraft.net">minecraft texture</a>})
+     * @param textureUrl The skull texture (NOTE: MUST be a <a href="https://textures.minecraft.net" target="_blank">https://textures.minecraft.net</a> texture)
      * @return This instance to continue
      */
     public ItemBuilder setSkullTexture(URL textureUrl) {
@@ -292,7 +292,7 @@ public class ItemBuilder {
 
     /**
      * Used for setting the skulls {@link PlayerProfile} texture.
-     * @param skullTextureUrl The skull texture (NOTE: MUST be a {@link <a href="https://textures.minecraft.net">minecraft texture</a>})
+     * @param skullTextureUrl The skull texture (NOTE: MUST be a <a href="https://textures.minecraft.net" target="_blank">https://textures.minecraft.net</a> texture)
      * @param skullTextureUUID The UUID of the skull, used for internal minecraft stuff
      * @param skullTextureName The texture name (from memory must be unique, but I haven't used this in a while)
      * @return This instance to continue
