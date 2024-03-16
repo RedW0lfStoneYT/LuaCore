@@ -1,8 +1,13 @@
 package dev.selena.luacore.utils.items;
 
+import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.NBTCompound;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import de.tr7zw.changeme.nbtapi.NBTType;
+import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import dev.selena.luacore.LuaCore;
+import dev.selena.luacore.utils.nbt.NBTConstants;
+import dev.selena.luacore.utils.nbt.NBTUtils;
 import dev.selena.luacore.utils.text.ContentUtils;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.Color;
@@ -18,13 +23,11 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.inventory.meta.trim.ArmorTrim;
 import org.bukkit.profile.PlayerProfile;
-import org.bukkit.profile.PlayerTextures;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Used for easily creating custom items
@@ -118,8 +121,17 @@ public class ItemBuilder {
      * @return This instance to continue the building
      * @see #addEnchant(String, int)
      */
-    public ItemBuilder setEnchants(Map<String, Integer> enchants) {
+    public ItemBuilder setEnchantsFromKey(Map<String, Integer> enchants) {
         this.enchants = enchants;
+        return this;
+    }
+
+    public ItemBuilder setEnchantsFromEnchantments(Map<Enchantment, Integer> enchantments) {
+        Map<String, Integer> newMap = new HashMap<>();
+        for(Enchantment enchant : enchantments.keySet()) {
+            newMap.put(enchant.getKey().getKey(), enchantments.get(enchant));
+        }
+        this.enchants = newMap;
         return this;
     }
 
@@ -327,6 +339,7 @@ public class ItemBuilder {
         if (type == Material.PLAYER_HEAD) {
             if (skullProfile != null && skullProfile.isComplete()) {
                 SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
+
                 skullMeta.setOwnerProfile(skullProfile);
                 item.setItemMeta(skullMeta);
             }
@@ -363,7 +376,7 @@ public class ItemBuilder {
         NBTItem nbtItem = new NBTItem(item);
 
         if (!stackable)
-            nbtItem.setUUID("UNSTACKABLE", UUID.randomUUID());
+            nbtItem.setUUID(NBTConstants.UNSTACKABLE.getNbtString(), UUID.randomUUID());
 
         if (stringNBT != null && !stringNBT.isEmpty())
             for (String key : stringNBT.keySet()) {
@@ -408,6 +421,56 @@ public class ItemBuilder {
 
 
         return nbtItem.getItem();
+    }
+
+    public static ItemBuilder fromItemStack(ItemStack item) {
+        return new ItemBuilder(item.getType()){{
+            ItemMeta meta = item.getItemMeta();
+            setTitle(meta.getDisplayName());
+            if (meta instanceof LeatherArmorMeta leatherArmorMeta)
+                setColor(leatherArmorMeta.getColor());
+            setAmount(item.getAmount());
+            setLore(meta.getLore());
+            setEnchantsFromEnchantments(meta.getEnchants());
+            NBT.modify(item, nbt ->{
+                setStackable(!nbt.hasTag(NBTConstants.UNSTACKABLE.getNbtString()));
+                nbt.getKeys().forEach(key -> {
+                    NBTType type = nbt.getType(key);
+                    String value = "Un related";
+                    if (type == NBTType.NBTTagInt) {
+                        if (!key.equals("HideFlags")) {
+                            addNBTInt(key, nbt.getInteger(key));
+                            value = String.valueOf(nbt.getInteger(key));
+                        }
+                    }
+                    if (type == NBTType.NBTTagString) {
+                        addNBTString(key, nbt.getString(key));
+                        value = nbt.getString(key);
+                    }
+                    if (type == NBTType.NBTTagByte) {
+                        if (key.equals("USABLE")) {
+                            setUsable(nbt.getBoolean("USABLE"));
+                        } else {
+                            addNBTBoolean(key, nbt.getBoolean(key));
+                            value = String.valueOf(nbt.getBoolean(key));
+                        }
+                    }
+
+                    LuaMessageUtils.verboseMessage(key + " -> " + nbt.getType(key) + " -> " + value);
+                });
+                ReadWriteNBT compound = nbt.getCompound(LuaCore.getCompountName());
+                if (compound != null) {
+                    compound.getKeys().forEach(key -> {
+                        addCustomNBT(key, compound.getString(key));
+                    });
+                }
+            });
+            setGlowing(meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS));
+            if (meta instanceof ArmorMeta armorMeta)
+                setArmorTrim(armorMeta.hasTrim() ? armorMeta.getTrim() : null);
+            if (meta instanceof SkullMeta skullMeta)
+                setSkullProfile(skullMeta.getOwnerProfile());
+        }};
     }
 
 }
