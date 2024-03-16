@@ -70,7 +70,6 @@ public class LuaCore {
     public static void setupCore(Plugin plugin) {
         setPlugin(plugin);
         setCoreLogger(new CoreLogger(plugin));
-        setVerbose(true);
         File folder = new File(luaCoreLockFolderName);
         if (!folder.exists())
             folder.mkdirs();
