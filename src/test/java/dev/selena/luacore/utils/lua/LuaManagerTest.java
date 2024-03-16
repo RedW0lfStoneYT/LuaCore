@@ -1,26 +1,18 @@
 package dev.selena.luacore.utils.lua;
 
-import be.seeseemelk.mockbukkit.MockBukkit;
-import dev.selena.luacore.LuaCore;
-import dev.selena.luacore.utils.config.FileManager;
 import dev.selena.test.utils.MockUtils;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LuaManagerTest {
 

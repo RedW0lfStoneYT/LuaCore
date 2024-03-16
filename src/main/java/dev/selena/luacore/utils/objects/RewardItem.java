@@ -1,7 +1,6 @@
 package dev.selena.luacore.utils.objects;
 
 import lombok.Getter;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;

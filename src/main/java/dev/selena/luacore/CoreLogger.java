@@ -2,11 +2,9 @@ package dev.selena.luacore;
 
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import dev.selena.luacore.utils.text.ContentUtils;
-import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
-import java.util.MissingResourceException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
