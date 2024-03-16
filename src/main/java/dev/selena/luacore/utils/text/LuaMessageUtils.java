@@ -1,11 +1,10 @@
 package dev.selena.luacore.utils.text;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 import dev.selena.luacore.LuaCore;
+import dev.selena.luacore.utils.nbt.NBTUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Utility;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -16,23 +15,28 @@ import java.util.logging.Level;
  */
 public class LuaMessageUtils extends ContentUtils {
 
-    private static final Gson gson = new GsonBuilder()
-            .disableHtmlEscaping()
-            .setPrettyPrinting()
-            .serializeNulls()
-            .excludeFieldsWithoutExposeAnnotation()
-            .create();
+    private static final Gson gson = NBTUtils.getGson();
 
 
     /**
      * Dumps a Java class to console, can be used for most.
      * @param cls The Class instance you want to dump to console
+     * @see LuaMessageUtils#json_dump(String, Object)
      */
     public static void json_dump(Object cls) {
+        json_dump("", cls);
+    }
+
+    /**
+     * Dumps a Java class to console, can be used for most.
+     * @param prefix The prefix you want to add before the json dump
+     * @param cls The Class instance you want to dump to console
+     */
+    public static void json_dump(String prefix, Object cls) {
         if (!LuaCore.isVerbose())
             return;
         String classGson = gson.toJson(cls);
-        consoleSend("\n" + gson.toJson(JsonParser.parseString(classGson)));
+        consoleSend(prefix + " \n" + gson.toJson(JsonParser.parseString(classGson)));
     }
 
     /**
