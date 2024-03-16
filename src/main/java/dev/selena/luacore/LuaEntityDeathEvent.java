@@ -12,6 +12,9 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Used for handling custom drops only currently, but you can use this for whatever you need.
+ */
 public class LuaEntityDeathEvent extends Event implements Cancellable {
 
     private boolean cancelled;
@@ -27,6 +30,10 @@ public class LuaEntityDeathEvent extends Event implements Cancellable {
     @Setter
     private int dropAmount;
 
+    /**
+     * Used for handling custom drops only currently, but you can use this for whatever you need.
+     * @param luaEntity The {@link LuaEntity} you are dealing with
+     */
     public LuaEntityDeathEvent(LuaEntity luaEntity) {
         this.luaEntity = luaEntity;
         this.dropCollection = luaEntity.getDrops();

@@ -126,6 +126,11 @@ public class ItemBuilder {
         return this;
     }
 
+    /**
+     * Used for setting the enchantment map using spigot Enchantments
+     * @param enchantments The map of enchantments you want to set
+     * @return This instance to continue the building
+     */
     public ItemBuilder setEnchantsFromEnchantments(Map<Enchantment, Integer> enchantments) {
         Map<String, Integer> newMap = new HashMap<>();
         for(Enchantment enchant : enchantments.keySet()) {
@@ -423,6 +428,11 @@ public class ItemBuilder {
         return nbtItem.getItem();
     }
 
+    /**
+     * Used for creating an instance of ItemBuilder from an ItemStack
+     * @param item The ItemStack you want to convert to ItemBuilder
+     * @return A fresh instance of ItemBuilder
+     */
     public static ItemBuilder fromItemStack(ItemStack item) {
         return new ItemBuilder(item.getType()){{
             ItemMeta meta = item.getItemMeta();

@@ -8,6 +8,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 
+/**
+ * Used by LuaCore to call {@link LuaEntityDeathEvent}
+ */
 public class EntityEvents implements Listener {
 
     /**

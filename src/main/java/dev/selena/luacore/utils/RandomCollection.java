@@ -90,6 +90,10 @@ public class RandomCollection<E> {
     }
 
 
+    /**
+     * Used for executing lambda function on each value
+     * @param function The function you want to execute on each entry
+     */
     public void forEach(Function<E, E> function) {
         for (double weight : map.keySet()) {
             E entity = map.get(weight);
@@ -97,6 +101,13 @@ public class RandomCollection<E> {
         }
     }
 
+    /**
+     * Used for cloning a collection instance to another type and doing the required entry manipulation
+     * @param elementType The element type you want to convert to
+     * @param function The required data manipulation to make the conversion work
+     * @return The cloned and altered instance
+     * @param <T> The element Type of the new collection
+     */
     public <T> RandomCollection<T> cloneTo(Class<T> elementType, Function<E, T> function) {
         RandomCollection<T> newCollection = new RandomCollection<>();
         for (double weight : map.keySet()) {

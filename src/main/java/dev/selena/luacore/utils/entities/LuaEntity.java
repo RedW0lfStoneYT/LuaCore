@@ -15,6 +15,9 @@ import org.bukkit.inventory.ItemStack;
 import java.lang.reflect.Type;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Used for handling of LuaCore Entities
+ */
 public class LuaEntity {
 
     @Getter
@@ -25,6 +28,10 @@ public class LuaEntity {
     @Getter
     private boolean luaEntity;
 
+    /**
+     * used for setting up stuff for the LuaEntity
+     * @param entity The entity you want to parse
+     */
     public LuaEntity(Entity entity) {
         spigotEntity = entity;
         NBT.modifyPersistentData(entity, nbtData -> {
@@ -47,6 +54,11 @@ public class LuaEntity {
         LuaMessageUtils.json_dump("Drops:", drops);
     }
 
+    /**
+     * Used for seeing if an entity is a LuaEntity (This is plugin-specific)
+     * @param entity The entity you want to check
+     * @return True if contains the "LuaCoreEntity" NBT for your plugin
+     */
     public static boolean isLuaEntity(Entity entity) {
         AtomicBoolean returnValue = new AtomicBoolean(true);
         NBT.modifyPersistentData(entity, nbtData -> {

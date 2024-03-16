@@ -210,6 +210,11 @@ public class LuaCore {
         }
     }
 
+    /**
+     * Method to get a specific lock file name
+     * @param name The name of the file (exclusive on the lock root dir)
+     * @return The path string for the new lock file
+     */
     public static String getLockFileName(String name) {
         return luaCoreLockFolderName + File.separator + name;
     }

@@ -43,9 +43,14 @@ public class NBTUtils {
         return gson.toJson(content);
     }
 
+    /**
+     * Used internally to serialize the nbt data
+     * @param content The class you want to serialize
+     * @param type The object Type
+     * @return The now serialized json string
+     */
     private static String serializeContent(Object content, Type type) {
-        String json = gson.toJson(content, type);
-        return json;
+        return gson.toJson(content, type);
     }
 
     /**
@@ -59,6 +64,13 @@ public class NBTUtils {
         return gson.fromJson(json, cls);
     }
 
+    /**
+     * Used to convert the stored json into a populated class
+     * @param type The object type you want to populate
+     * @param json The NBT json compound
+     * @return The now populated class
+     * @param <T> The type of the class you want to populate
+     */
     private static <T> T deserializeContent(Type type, String json) {
         return gson.fromJson(json, type);
     }
@@ -89,6 +101,14 @@ public class NBTUtils {
         readWriteNBT.setString(nameSpaceKey, json);
     }
 
+    /**
+     * Stores custom NBT content for entity
+     * @param readWriteNBT The ReadWriteNBT tag you want to store in, usually use your plugins one
+     * @see LuaCore#getCompountName()
+     * @param content The value of the data you want to store
+     * @param nameSpaceKey where you should get the data from later
+     * @param type The object type you want to populate
+     */
     public static void storeEntityNBTContent(ReadWriteNBT readWriteNBT, Object content, String nameSpaceKey, Type type) {
         LuaMessageUtils.json_dump(content);
         String json = serializeContent(content, type);
@@ -115,7 +135,7 @@ public class NBTUtils {
     /**
      * Gets custom NBT data
      * @param cls The class you want to map to
-     * @param nameSpaceKey The key you set in {@link #storeNBTContent(NBTCompound, Object, String)}
+     * @param nameSpaceKey The key you set in {@link #storeEntityNBTContent(ReadWriteNBT, Object, String)} 
      * @param readWriteNBT The NBTCompound you are storing the custom NBT in
      * @return Fully mapped class
      * @param <T> The class type
@@ -129,6 +149,14 @@ public class NBTUtils {
         return null;
     }
 
+    /**
+     * Gets custom NBT data
+     * @param type The object type you want to map to
+     * @param nameSpaceKey The key you set in {@link #storeEntityNBTContent(ReadWriteNBT, Object, String, Type)}
+     * @param readWriteNBT The NBTCompound you are storing the custom NBT in
+     * @return Fully mapped class
+     * @param <T> The class type
+     */
     public static <T> T getEntityNBTContent(Type type, String nameSpaceKey, ReadWriteNBT readWriteNBT) {
         if (readWriteNBT.hasTag(nameSpaceKey)) {
             String json = readWriteNBT.getString(nameSpaceKey);

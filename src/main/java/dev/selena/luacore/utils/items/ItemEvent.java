@@ -55,6 +55,10 @@ public class ItemEvent implements Listener {
             event.setCancelled(true);
     }
 
+    /**
+     * used for handling unstackable items
+     * @param event ItemSpawnEvent so any creation of Item entities with the "UNSTACKABLE" NBT tag will work
+     */
     @EventHandler
     public void itemSpawn(ItemSpawnEvent event) {
         Item itemEnt = event.getEntity();
