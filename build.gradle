@@ -1,12 +1,12 @@
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'maven-publish'
     id("io.papermc.paperweight.userdev") version "1.5.10" apply false
 }
 
 group 'dev.selena.lua'
-version '1.1.0-Dev4-SNAPSHOT'
+version '1.1.0-Dev5-SNAPSHOT'
 apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
 defaultTasks('build')
@@ -79,7 +79,7 @@ SUPPORTED_VERSIONS.each { it ->
             implementation(project(path: ":Compatibility", configuration: 'shadow'))
         }
         java {
-            toolchain.languageVersion.set(JavaLanguageVersion.of(javaV))
+//            toolchain.languageVersion.set(JavaLanguageVersion.of(javaV))
         }
 
 
@@ -135,12 +135,10 @@ dependencies {
 
 }
 
+
 build {
     dependsOn(shadowJar, test)
 }
-
-
-
 javadoc {
     source = sourceSets.main.allJava
     classpath = configurations.compileClasspath
@@ -180,7 +178,7 @@ publishing {
             from components.java
             groupId = group
             artifactId = rootProject.name
-            version = version
+            version = rootProject.version
 
         }
     }
@@ -196,9 +194,9 @@ shadowJar {
     dependsOn(jar, ":Compatibility:shadowJar")
     SUPPORTED_VERSIONS.each { dependsOn(":Compatibility:${it.nmsVersion}:reobfJar") }
     if (System.getenv("BUILD_NUMBER") == null) {
-        archiveFileName.set(rootProject.name + "-" + version + ".jar")
+        archiveFileName.set(rootProject.name + "-" + rootProject.version + ".jar")
     } else {
-        archiveFileName.set(rootProject.name + "-" + version + "-b" + System.getenv("BUILD_NUMBER") + ".jar")
+        archiveFileName.set(rootProject.name + "-" + rootProject.version + "-b" + System.getenv("BUILD_NUMBER") + ".jar")
     }
 
     dependencies {
