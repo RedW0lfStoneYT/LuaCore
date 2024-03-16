@@ -1,15 +1,15 @@
 package dev.selena.luacore.utils.entities;
 
-import de.tr7zw.changeme.nbtapi.NBTCompound;
-import de.tr7zw.changeme.nbtapi.NBTEntity;
+import de.tr7zw.changeme.nbtapi.NBT;
+import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import dev.selena.luacore.LuaCore;
 import dev.selena.luacore.exceptions.entity.EntityBuildException;
 import dev.selena.luacore.nms.INMSEntityBuilder;
 import dev.selena.luacore.utils.RandomCollection;
+import dev.selena.luacore.utils.items.ItemBuilder;
 import dev.selena.luacore.utils.items.ItemUtils;
-import dev.selena.luacore.utils.items.NBTUtils;
+import dev.selena.luacore.utils.nbt.NBTUtils;
 import dev.selena.luacore.utils.text.ContentUtils;
-import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -80,7 +80,7 @@ public class EntityBuilder {
             leggings,
             mainHandItem,
             offHandItem;
-    private RandomCollection<ItemStack> drops;
+    private RandomCollection<ItemBuilder> drops;
     private Map<String, MetadataValue> metadataValues;
     // Not to sure how well this will work yet, but it should allow the entity to keep the data on reload
     private Map<String, Object> customNBTData;
@@ -154,7 +154,7 @@ public class EntityBuilder {
      * @param item The items you want added
      * @return The current builder instance
      */
-    public EntityBuilder addDrop(double chance, ItemStack item) {
+    public EntityBuilder addDrop(double chance, ItemBuilder item) {
         this.drops.add(chance, item);
         return this;
     }
@@ -164,7 +164,7 @@ public class EntityBuilder {
      * @param drops The map of drops
      * @return The current builder instance
      */
-    public EntityBuilder addDrops(Map<ItemStack, Double> drops) {
+    public EntityBuilder addDrops(Map<ItemBuilder, Double> drops) {
         this.drops.addAll(drops);
         return this;
     }
@@ -193,7 +193,7 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for adding custom NBTData to the entity (Currently broken thanks to NBTApi :/)
+     * Used for adding custom NBTData to the entity
      * @param key The key used to gather the data
      * @param cls The NBTData class (NOTE: can be essentially anything)
      * @return The current builder instance
@@ -204,7 +204,7 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for adding a map of NBTData to add to the entity (Currently broken thanks to NBTApi :/)
+     * Used for adding a map of NBTData to add to the entity
      * @param values The map of NBTData classes
      * @return The current builder instance
      */
@@ -514,7 +514,7 @@ public class EntityBuilder {
      * @param drops The {@link RandomCollection} of item drops
      * @return The current builder instance
      */
-    public EntityBuilder setDrops(RandomCollection<ItemStack> drops) {
+    public EntityBuilder setDrops(RandomCollection<ItemBuilder> drops) {
         this.drops = drops;
         return this;
     }
@@ -550,7 +550,6 @@ public class EntityBuilder {
         return this;
     }
 
-    private final boolean nbtFixed = false;
     /**
      * Used for spawning the entity in the world
      * @see EntityBuilder#spawn(Location) 
@@ -589,8 +588,8 @@ public class EntityBuilder {
             if (movementSpeed_isCustom) nmsBuilder.setMovementSpeed(movementSpeed);
             if (horseJumpStrength_isCustom) nmsBuilder.setHorseJumpStrength(horseJumpStrength);
             if (entityScale_isCustom) nmsBuilder.setEntityScale(entityScale);
-            if (armorBonus_isCustom) nmsBuilder.setEntityInteractWithBlockDistance(entityInteractWithBlockDistance);
-            if (entityInteractWithBlockDistance_isCustom) nmsBuilder.setEntityInteractWithLivingEntityDistance(entityInteractWithEntityDistance);
+            if (entityInteractWithBlockDistance_isCustom) nmsBuilder.setEntityInteractWithBlockDistance(entityInteractWithBlockDistance);
+            if (entityInteractWithEntityDistance_isCustom) nmsBuilder.setEntityInteractWithLivingEntityDistance(entityInteractWithEntityDistance);
             if (stepHeight_isCustom) nmsBuilder.setStepHeight(stepHeight);
             if (zombieReinforcements_isCustom) nmsBuilder.spawnZombieReinforcements(zombieReinforcements);
 
@@ -611,18 +610,16 @@ public class EntityBuilder {
             ent.set(entity);
         });
         Entity entity = ent.get();
-        NBTEntity nbtEntity = new NBTEntity(entity);
-        if (nbtFixed) {
-            LuaMessageUtils.verboseMessage("Compound name: " + LuaCore.getCompountName()); // Prints valid name that has been used for NBTItem
-            NBTCompound compound = nbtEntity.getOrCreateCompound(LuaCore.getCompountName());
+        NBT.modifyPersistentData(entity, nbt -> {
+            ReadWriteNBT compound = nbt.getOrCreateCompound(LuaCore.getCompountName());
+            compound.setBoolean("LuaCoreEntity", true);
             for (String nameSpace : customNBTData.keySet()) {
                 Object content = customNBTData.get(nameSpace);
-                NBTUtils.storeNBTContent(compound, content, nameSpace);
+                NBTUtils.storeEntityNBTContent(compound, content, nameSpace);
             }
             if (!drops.isEmpty())
-                NBTUtils.storeNBTContent(compound, drops, "EntityDrops");
-        }
-        nbtEntity.setBoolean("LuaCoreEntity", true);
+                NBTUtils.storeEntityNBTContent(compound, drops, "EntityDrops");
+        });
         for (String metadataKey : metadataValues.keySet()) {
             entity.setMetadata(metadataKey, metadataValues.get(metadataKey));
         }
@@ -640,6 +637,8 @@ public class EntityBuilder {
             throw new EntityBuildException("World cannot be null");
         return this.spawn(location, location.getWorld());
     }
+
+
 
 
 }
