@@ -600,8 +600,8 @@ public class EntityBuilder {
         if (!entityType.isAlive())
             throw new EntityBuildException("Entity type must be living");
         AtomicReference<Entity> ent = new AtomicReference<>();
-        // TODO, Fix this for backwards compatibility because it turns out the functional spawn is newer
-        world.spawn(location, entityType.getEntityClass(), entity -> {
+        // Sadge I missed the functional entity creation stuff
+        Entity entity = world.spawn(location, entityType.getEntityClass());
             LivingEntity entityLiving = (LivingEntity) entity;
             INMSEntityBuilder nmsBuilder = LuaCore.getNmsVersion().getClazz().getEntityBuilder(entityLiving);
             boolean hasName = this.displayName != null && !this.displayName.isEmpty();
@@ -642,9 +642,6 @@ public class EntityBuilder {
             equipment.setItemInMainHand(mainHandItem);
             equipment.setItemInOffHand(offHandItem);
 
-            ent.set(entity);
-        });
-        Entity entity = ent.get();
         NBT.modifyPersistentData(entity, nbt -> {
             ReadWriteNBT compound = nbt.getOrCreateCompound(LuaCore.getCompountName());
             compound.setBoolean("LuaCoreEntity", true);
