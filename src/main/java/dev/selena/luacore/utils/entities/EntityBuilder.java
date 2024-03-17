@@ -19,6 +19,7 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -149,7 +150,7 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for adding a drop to the collection (Currently broken thanks to NBTApi :/)
+     * Used for adding a drop to the collection
      * @param chance The weighted chance
      * @param item The items you want added
      * @return The current builder instance
@@ -160,12 +161,35 @@ public class EntityBuilder {
     }
 
     /**
-     * used to add a map of drops to the drop collection (Currently broken thanks to NBTApi :/)
+     * used to add a map of drops to the drop collection
      * @param drops The map of drops
      * @return The current builder instance
      */
     public EntityBuilder addDrops(Map<ItemBuilder, Double> drops) {
         this.drops.addAll(drops);
+        return this;
+    }
+
+    /**
+     * Used for adding a drop to the collection
+     * @param chance The weighted chance
+     * @param item The items you want added
+     * @return The current builder instance
+     */
+    public EntityBuilder addDrop(double chance, ItemStack item) {
+        this.drops.add(chance, ItemBuilder.fromItemStack(item));
+        return this;
+    }
+
+    /**
+     * used to add a map of drops to the drop collection
+     * @param drops The map of drops
+     * @return The current builder instance
+     */
+    public EntityBuilder addDropsFromItemMap(Map<ItemStack, Double> drops) {
+        for (ItemStack itemStack : drops.keySet()) {
+            this.drops.add(drops.get(itemStack), ItemBuilder.fromItemStack(itemStack));
+        }
         return this;
     }
 
@@ -510,12 +534,22 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the drop collection for entity death (Currently broken thanks to NBTApi :/)
-     * @param drops The {@link RandomCollection} of item drops
+     * Used for setting the drop collection for entity death
+     * @param drops The {@link RandomCollection} of ItemBuilder drops
      * @return The current builder instance
      */
     public EntityBuilder setDrops(RandomCollection<ItemBuilder> drops) {
         this.drops = drops;
+        return this;
+    }
+
+    /**
+     * Used for setting the drop collection for entity death
+     * @param itemStackDrops The {@link RandomCollection} of ItemStack drops
+     * @return The current builder instance
+     */
+    public EntityBuilder setDropsFromItemCollection(RandomCollection<ItemStack> itemStackDrops) {
+        this.drops = itemStackDrops.cloneTo(ItemBuilder.class, ItemBuilder::fromItemStack);
         return this;
     }
 
@@ -566,6 +600,7 @@ public class EntityBuilder {
         if (!entityType.isAlive())
             throw new EntityBuildException("Entity type must be living");
         AtomicReference<Entity> ent = new AtomicReference<>();
+        // TODO, Fix this for backwards compatibility because it turns out the functional spawn is newer
         world.spawn(location, entityType.getEntityClass(), entity -> {
             LivingEntity entityLiving = (LivingEntity) entity;
             INMSEntityBuilder nmsBuilder = LuaCore.getNmsVersion().getClazz().getEntityBuilder(entityLiving);

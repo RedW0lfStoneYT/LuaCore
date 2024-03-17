@@ -22,6 +22,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.inventory.meta.trim.ArmorTrim;
+import org.bukkit.inventory.meta.trim.TrimMaterial;
+import org.bukkit.inventory.meta.trim.TrimPattern;
 import org.bukkit.profile.PlayerProfile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -148,6 +150,18 @@ public class ItemBuilder {
      */
     public ItemBuilder addEnchant(String enchant, int level) {
         this.enchants.put(enchant,level);
+        return this;
+
+    }
+
+    /**
+     * Used for adding an enchantment
+     * @param enchant The enchantment you want to add
+     * @param level Level of the enchantment
+     * @return This instance to continue the building
+     */
+    public ItemBuilder addEnchant(Enchantment enchant, int level) {
+        this.enchants.put(enchant.getKey().getKey(),level);
         return this;
 
     }
