@@ -58,7 +58,9 @@ public class LuaCore {
     /**
      * This needs to be called in the onEnable method of your plugin for it to work
      * @param plugin Your main class that extends JavaPlugin
+     * @deprecated Use {@link #setupCore(Plugin)}
      */
+    @Deprecated(forRemoval = true)
     public static void setPlugin(Plugin plugin) {
         LuaCore.plugin = plugin;
     }
