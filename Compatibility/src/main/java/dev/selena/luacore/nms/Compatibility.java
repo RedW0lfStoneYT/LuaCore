@@ -12,10 +12,12 @@ public class Compatibility {
      * @return The version number or NOT_SUPPORTED
      */
     public static String getVersion() {
-        try {
-            return Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return "NOT_SUPPORTED";
-        }
+        String[] ver = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",");
+        String versionString = "NOT_SUPPORTED";
+        if (ver.length >= 4)
+            versionString = ver[3];
+        else
+            versionString = Bukkit.getBukkitVersion().split("-")[0];
+        return versionString;
     }
 }

@@ -1,4 +1,4 @@
-package dev.selena.luacore.nms.v1_20_R3;
+package dev.selena.luacore.nms.v1_20_6;
 
 import dev.selena.luacore.nms.INMSEntityBuilder;
 import lombok.Getter;
