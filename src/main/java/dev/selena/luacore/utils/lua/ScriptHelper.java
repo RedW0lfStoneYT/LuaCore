@@ -24,7 +24,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * A useful tool for script assistance
+ * A useful tool for script assistance parsed into lua scripts as arg.scriptHelper
  */
 public class ScriptHelper {
 
@@ -33,11 +33,12 @@ public class ScriptHelper {
      * applies a potion effect to the player
      * Note: if you are running the script on a different thread
      * you will need to use applyPotionEffectAsync
-     * @see ScriptHelper#applyPotionEffectAsync(Player, PotionEffectType, int, int)
-     * @param player The player you want to effect
+     *
+     * @param player     The player you want to effect
      * @param effectType The potion effect type
-     * @param duration Duration of the effect (-1 for infinite)
-     * @param amplifier The amplifier of the effect
+     * @param duration   Duration of the effect (-1 for infinite)
+     * @param amplifier  The amplifier of the effect
+     * @see ScriptHelper#applyPotionEffectAsync(Player, PotionEffectType, int, int)
      */
     public void applyPotionEffect(Player player, PotionEffectType effectType, int duration, int amplifier) {
         PotionEffect effect = new PotionEffect(effectType, duration, amplifier);
@@ -47,10 +48,11 @@ public class ScriptHelper {
     /**
      * Used for applying potion effects when the Lua script
      * isn't on the main thread
-     * @param player The player you want to effect
+     *
+     * @param player     The player you want to effect
      * @param effectType The potion effect type
-     * @param duration The duration of the effect
-     * @param amplifier The amplifier of the effect
+     * @param duration   The duration of the effect
+     * @param amplifier  The amplifier of the effect
      */
     public void applyPotionEffectAsync(Player player, PotionEffectType effectType, int duration, int amplifier) {
         Bukkit.getScheduler().runTask(LuaCore.getPlugin(), () -> {
@@ -60,10 +62,11 @@ public class ScriptHelper {
 
     /**
      * Used for when you cant seem to bind the class in lua
-     * @param player The player you want to effect
+     *
+     * @param player     The player you want to effect
      * @param effectType The String Name of the potion effect
-     * @param duration The duration
-     * @param amplifier The amplifier
+     * @param duration   The duration
+     * @param amplifier  The amplifier
      */
     public void applyPotionEffectAsync(Player player, String effectType, int duration, int amplifier) {
         Bukkit.getScheduler().runTask(LuaCore.getPlugin(), () -> {
@@ -73,7 +76,8 @@ public class ScriptHelper {
 
     /**
      * Used for getting an ItemStack in lua
-     * @param type The Material type
+     *
+     * @param type   The Material type
      * @param amount The ItemStack size
      * @return The requested ItemStack
      */
@@ -83,6 +87,7 @@ public class ScriptHelper {
 
     /**
      * Used for getting the location of a block
+     *
      * @param block The block you want the location of
      * @return Location of the block
      */
@@ -92,6 +97,7 @@ public class ScriptHelper {
 
     /**
      * Used for getting the Block at a location
+     *
      * @param loc The location you want the block of
      * @return The block at the requested location
      */
@@ -101,8 +107,9 @@ public class ScriptHelper {
 
     /**
      * Used for dropping an ItemStack at a location in the world
+     *
      * @param item The Item you want to drop
-     * @param loc The location you want to drop it
+     * @param loc  The location you want to drop it
      */
     public void dropItem(ItemStack item, Location loc) {
         loc.getWorld().dropItem(loc, item);
@@ -110,8 +117,9 @@ public class ScriptHelper {
 
     /**
      * User for giving a player an ItemStack
+     *
      * @param player The player you want to give the Item to
-     * @param item The ItemStack you want to give
+     * @param item   The ItemStack you want to give
      */
     public void giveItem(Player player, ItemStack item) {
         player.getInventory().addItem(item);
@@ -119,33 +127,36 @@ public class ScriptHelper {
 
     /**
      * Used for updating the item in the main hand on an async thread
+     *
      * @param player The player you want to update
-     * @param item The new/modified item
+     * @param item   The new/modified item
      * @param amount optionally, the amount you want to set it to
      */
-    public void setItemInMainHandAsync(Player player, ItemStack item, int ... amount) {
+    public void setItemInMainHandAsync(Player player, ItemStack item, int... amount) {
         setItemInEquipmentSlotAsync(player, item, EquipmentSlot.HAND, amount);
     }
 
     /**
      * Used for updating the item in the offhand on an async thread
+     *
      * @param player The player you want to update
-     * @param item The new/modified item
+     * @param item   The new/modified item
      * @param amount optionally, the amount you want to set it to
      */
-    public void setItemInOffHandAsync(Player player, ItemStack item, int ... amount) {
+    public void setItemInOffHandAsync(Player player, ItemStack item, int... amount) {
         setItemInEquipmentSlotAsync(player, item, EquipmentSlot.OFF_HAND, amount);
     }
 
     /**
      * Used for updating the item in a specified EquipmentSlot on an async thread
+     *
      * @param player The player you want to update
-     * @param item The new/modified item
-     * @param slot The EquipmentSlot
+     * @param item   The new/modified item
+     * @param slot   The EquipmentSlot
      * @param amount optionally, the amount you want to set it to
      * @see <a href="https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/EquipmentSlot.html">EquipmentSlot</a>
      */
-    public void setItemInEquipmentSlotAsync(Player player, ItemStack item, EquipmentSlot slot, int ... amount) {
+    public void setItemInEquipmentSlotAsync(Player player, ItemStack item, EquipmentSlot slot, int... amount) {
         Bukkit.getScheduler().runTask(LuaCore.getPlugin(), () -> {
             setItemInEquipmentSlot(player, item, slot, amount);
         });
@@ -154,31 +165,36 @@ public class ScriptHelper {
 
     /**
      * Used for updating the item in the main hand on the main thread
+     *
      * @param player The player you want to update
-     * @param item The new/modified item
+     * @param item   The new/modified item
      * @param amount optionally, the amount you want to set it to
      */
-    public void setItemInMainHand(Player player, ItemStack item, int ... amount) {
+    public void setItemInMainHand(Player player, ItemStack item, int... amount) {
         setItemInEquipmentSlot(player, item, EquipmentSlot.HAND, amount);
     }
+
     /**
      * Used for updating the item in the offhand on the main thread
+     *
      * @param player The player you want to update
-     * @param item The new/modified item
+     * @param item   The new/modified item
      * @param amount optionally, the amount you want to set it to
      */
-    public void setItemInOffHand(Player player, ItemStack item, int ... amount) {
+    public void setItemInOffHand(Player player, ItemStack item, int... amount) {
         setItemInEquipmentSlot(player, item, EquipmentSlot.OFF_HAND, amount);
     }
+
     /**
      * Used for updating the item in a specified EquipmentSlot on the main thread
+     *
      * @param player The player you want to update
-     * @param item The new/modified item
-     * @param slot The EquipmentSlot
+     * @param item   The new/modified item
+     * @param slot   The EquipmentSlot
      * @param amount optionally, the amount you want to set it to
      * @see <a href="https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/EquipmentSlot.html">EquipmentSlot</a>
      */
-    public void setItemInEquipmentSlot(Player player, ItemStack item, EquipmentSlot slot, int ... amount) {
+    public void setItemInEquipmentSlot(Player player, ItemStack item, EquipmentSlot slot, int... amount) {
         LuaMessageUtils.verboseMessage("Setting item in " + slot.name());
         Bukkit.getScheduler().runTask(LuaCore.getPlugin(), () -> {
             int amountInt = item.getAmount();
@@ -194,8 +210,9 @@ public class ScriptHelper {
     /**
      * Generates a random int between min and max then checks if its equal to the goal
      * Added because I feel Luas Math.random(min, max) is too high bias
-     * @param min The min value (Inclusive)
-     * @param max The max value (exclusive)
+     *
+     * @param min  The min value (Inclusive)
+     * @param max  The max value (exclusive)
      * @param goal The number you are aiming to be below
      * @return True if below the number false if above
      */
@@ -207,7 +224,8 @@ public class ScriptHelper {
 
     /**
      * Used for getting a LuaValue from a script
-     * @param path The script name and path
+     *
+     * @param path         The script name and path
      * @param constantName The variable you want to get
      * @return Returns a LuaValue object from the script
      * @see ScriptHelper#getStringFromLuaValue(LuaValue)
@@ -221,6 +239,7 @@ public class ScriptHelper {
 
     /**
      * Used for converting an Int to roman numerals
+     *
      * @param num The number you want to convert
      * @return The roman numeral value for the int
      */
@@ -239,6 +258,7 @@ public class ScriptHelper {
 
     /**
      * Used for getting a string from a LuaValue
+     *
      * @param content The LuaValue you want to convert to a string
      * @return String from the LuaValue
      * @see ScriptHelper#extractConstantValue(String, String)
@@ -249,6 +269,7 @@ public class ScriptHelper {
 
     /**
      * Used for getting a string array from a LuaValue
+     *
      * @param content The LuaValue you want to convert
      * @return String[] of the LuaValue parsed in
      * @see ScriptHelper#extractConstantValue(String, String)
@@ -270,6 +291,7 @@ public class ScriptHelper {
 
     /**
      * Used for getting an Integer from a LuaValue
+     *
      * @param content The LuaValue you want to convert
      * @return int of the LuaValue parsed in
      * @see ScriptHelper#extractConstantValue(String, String)
@@ -280,6 +302,7 @@ public class ScriptHelper {
 
     /**
      * Used for checking of a potion effect is a debuff
+     *
      * @param effectType The potion effect you want to check
      * @return True if the effect is a debuff
      */
@@ -300,6 +323,7 @@ public class ScriptHelper {
 
     /**
      * Checks if the player has a debuff potion effect
+     *
      * @param player The player you want to check
      * @return True if the player has a debuff
      */
@@ -315,7 +339,8 @@ public class ScriptHelper {
 
     /**
      * Used for checking if the player has a potion effect
-     * @param player The player you want to check
+     *
+     * @param player       The player you want to check
      * @param potionEffect The name of the potion effect
      * @return True if the player has the effect (False if the effect doesn't exist)
      */
@@ -328,6 +353,7 @@ public class ScriptHelper {
 
     /**
      * Removes all debuffs from the player
+     *
      * @param player The player you want to remove the debuffs from
      */
     public static void removeDebuffs(Player player) {
@@ -340,10 +366,11 @@ public class ScriptHelper {
 
     /**
      * Used for removing potion effects from a player
-     * @param player The player you want to remove the effects from
+     *
+     * @param player  The player you want to remove the effects from
      * @param effects The potion effects you want to remove
      */
-    public static void removeEffects(Player player, PotionEffectType ... effects ) {
+    public static void removeEffects(Player player, PotionEffectType... effects) {
         for (PotionEffectType type : effects) {
             if (player.hasPotionEffect(type))
                 player.removePotionEffect(type);
@@ -353,10 +380,11 @@ public class ScriptHelper {
 
     /**
      * Used for removing potion effects when on a different thread
-     * @param player The player you want to remove potion effects from
+     *
+     * @param player  The player you want to remove potion effects from
      * @param effects The potion effect you want to remove from the player
      */
-    public static void removeEffectsAsync(Player player, PotionEffectType ... effects) {
+    public static void removeEffectsAsync(Player player, PotionEffectType... effects) {
         Bukkit.getScheduler().runTask(LuaCore.getPlugin(), () -> {
             removeEffects(player, effects);
 
@@ -365,6 +393,7 @@ public class ScriptHelper {
 
     /**
      * Used for removing a single effect from a player on an async thread
+     *
      * @param player The player you want to remove the effect from
      * @param effect The effect type you want to remove
      */
@@ -376,7 +405,8 @@ public class ScriptHelper {
      * Used for duplicating the array x times
      * Example of use, I had a mask plugin and one of the maks gave 2x the rewards from fishing
      * Using this method you can double the rewards easily
-     * @param array The array you want to duplicate
+     *
+     * @param array  The array you want to duplicate
      * @param amount The amount of duplicates that should go into the array
      * @return The new array
      */
@@ -387,7 +417,6 @@ public class ScriptHelper {
         }
         return multipliedArray;
     }
-
 
 
 }
