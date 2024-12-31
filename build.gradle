@@ -126,7 +126,7 @@ dependencies {
     compileOnly 'org.apache.commons:commons-lang3:3.13.0'
     compileOnly 'io.github.classgraph:classgraph:4.8.162'
     // TODO make this functional
-    compileOnly "dev.jorel:commandapi-bukkit-core:9.3.0"
+    implementation "dev.jorel:commandapi-bukkit-shade:9.7.0"
     // Shadowed dependencies
     implementation("de.tr7zw:item-nbt-api:2.13.2")
     implementation('com.iridium:IridiumColorAPI:1.0.9')
