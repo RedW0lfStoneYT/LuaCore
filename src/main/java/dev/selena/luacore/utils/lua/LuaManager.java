@@ -3,12 +3,15 @@ package dev.selena.luacore.utils.lua;
 import dev.selena.luacore.LuaCore;
 import dev.selena.luacore.utils.config.FileManager;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
 import org.luaj.vm2.server.Launcher;
+import org.luaj.vm2.server.LuajClassLoader;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,6 +32,18 @@ public class LuaManager {
 
     private static final Globals globals = JsePlatform.standardGlobals();
 
+    /**
+     * Used for exposing classes to Lua files (Ideally call on startup)
+     * @param className The class name you want to expose
+     */
+    public static void exposeClass(String className) {
+        try {
+            Class<?> clazz = Class.forName(className);
+            globals.set(clazz.getSimpleName(), CoerceJavaToLua.coerce(clazz));
+        } catch (ClassNotFoundException e) {
+            LuaMessageUtils.consoleError("Class not found: " + className);
+        }
+    }
 
     /**
      * Used to run a lua script
@@ -61,13 +76,13 @@ public class LuaManager {
             return false;
         }
 
-        // Get the run function from the globals environment
-        LuaValue runFunction = globals.get(function);
 
 
         LuaTable argsTable = new LuaTable();
         for (LuaArgValue argValue : args) {
-            argsTable.set(argValue.name(), CoerceJavaToLua.coerce(argValue.value()));
+            LuaValue argObg = CoerceJavaToLua.coerce(argValue.value());
+            argsTable.set(argValue.name(), argObg);
+            LuaMessageUtils.verboseMessage(argValue.name() + " = " + argValue.value() + " of type: " + argObg.typename());
         }
         argsTable.set("scriptHelper", CoerceJavaToLua.coerce(new ScriptHelper()));
 
@@ -77,6 +92,8 @@ public class LuaManager {
         LuaValue[] parsedArgs = {argsTable};
 
 
+        // Get the run function from the globals environment
+        LuaValue runFunction = globals.get(function);
         try {
             runFunction.invoke(parsedArgs);
         } catch (Exception e) {
@@ -179,16 +196,16 @@ public class LuaManager {
                     LuaMessageUtils.verboseMessage(file.getPath());
                     LuaMessageUtils.verboseMessage(name);
 
-                    if (!next.isDirectory()) {
-                        file.getParentFile().mkdir();
+                    if (!next.isDirectory() && !file.exists()) {
+                        file.getParentFile().mkdirs();
                         file.createNewFile();
 
                         changeContents(jar, next, file);
 
                         LuaMessageUtils.verboseMessage("Found file: " + file.getName());
 
-                    } else {
-                        file.mkdir();
+                    } else if (!file.exists()) {
+                        file.mkdirs();
                         LuaMessageUtils.verboseMessage("Found subdirectory: " + file.getName());
                         new File(LuaCore.getPlugin().getDataFolder() + File.separator + folderName, file.getName()).mkdirs();
                     }
