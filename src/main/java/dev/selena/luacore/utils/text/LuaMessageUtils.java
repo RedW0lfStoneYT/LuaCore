@@ -4,10 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import dev.selena.luacore.LuaCore;
 import dev.selena.luacore.utils.nbt.NBTUtils;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.logging.Level;
 
 /**
@@ -69,7 +71,9 @@ public class LuaMessageUtils extends ContentUtils {
      * @param content Message content you want to send to the player
      */
     public static void playerSend(Player player, Object... content) {
-        player.sendMessage(ContentUtils.colorArray(content));
+        for (String colored : ContentUtils.colorArray(content)) {
+            player.sendMessage(PlaceholderAPI.setPlaceholders(player, colored));
+        }
     }
 
 
@@ -79,7 +83,13 @@ public class LuaMessageUtils extends ContentUtils {
      * @param content The message content
      */
     public static void sender(CommandSender sender, Object... content) {
-        sender.sendMessage(ContentUtils.colorArray(content));
+        if (sender instanceof Player player) {
+            playerSend(player, content);
+            return;
+        }
+        for (String colored : ContentUtils.colorArray(content)) {
+            sender.sendMessage(PlaceholderAPI.setPlaceholders(null, colored));
+        }
     }
 
 

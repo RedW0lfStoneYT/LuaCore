@@ -130,6 +130,7 @@ dependencies {
     // Shadowed dependencies
     implementation("de.tr7zw:item-nbt-api:2.14.1")
     implementation('com.iridium:IridiumColorAPI:1.0.9')
+    compileOnly 'me.clip:placeholderapi:2.11.6'
     implementation 'org.luaj:luaj-jse:3.0.1'
     implementation('com.google.code.gson:gson:2.10.1')
     implementation("com.google.guava:guava:31.1-jre")

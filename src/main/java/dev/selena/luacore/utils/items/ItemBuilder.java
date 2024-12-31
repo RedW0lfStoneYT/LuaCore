@@ -10,11 +10,13 @@ import dev.selena.luacore.utils.nbt.NBTConstants;
 import dev.selena.luacore.utils.nbt.NBTUtils;
 import dev.selena.luacore.utils.text.ContentUtils;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentWrapper;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ArmorMeta;
@@ -48,9 +50,11 @@ public class ItemBuilder {
     private Map<String, String> stringNBT;
     private Map<String, Integer> intNBT;
     private Map<String, Boolean> booleanNBT;
+    private Map<String, Float> floatNBT;
     private Map<String, Object> customNBT;
     private ArmorTrim trim;
     private PlayerProfile skullProfile;
+    private Player placeholderPlayer;
 
 
     /**
@@ -63,8 +67,11 @@ public class ItemBuilder {
         this.stringNBT = new TreeMap<>();
         this.intNBT = new TreeMap<>();
         this.booleanNBT = new TreeMap<>();
+        this.floatNBT = new TreeMap<>();
         this.customNBT = new TreeMap<>();
+        this.placeholderPlayer = null;
     }
+
 
     /**
      * Used for creating the item builder with no initial
@@ -73,6 +80,16 @@ public class ItemBuilder {
      */
     public ItemBuilder() {
         this(null);
+    }
+
+    /**
+     * Used for placeholderAPI stuff
+     * @param player The player for the placeholders
+     * @return This instance to continue the building
+     */
+    public ItemBuilder setPlaceholderPlayer(Player player) {
+        this.placeholderPlayer = player;
+        return this;
     }
 
     /**
@@ -251,6 +268,27 @@ public class ItemBuilder {
     }
 
     /**
+     * Used for adding a boolean NBT value to the item
+     * @param key The key you will use to get the boolean later
+     * @param value The value you want to store
+     * @return This instance to continue the building
+     */
+    public ItemBuilder addNBTFloat(String key, float value) {
+        this.floatNBT.put(key, value);
+        return this;
+    }
+
+    /**
+     * Used for setting the values of the NBT float map
+     * @param floatNBT The map of floats you want to store
+     * @return This instance to continue the building
+     */
+    public ItemBuilder setFloatNBT(Map<String, Float> floatNBT) {
+        this.floatNBT = floatNBT;
+        return this;
+    }
+
+    /**
      * Used for setting the values of the custom NBT map
      * @param customNBT The map of custom NBT you want to store
      * @return This instance to continue the building
@@ -367,13 +405,13 @@ public class ItemBuilder {
         item.setAmount(Math.max(1, amount));
         ItemMeta meta = item.getItemMeta();
         if (title != null)
-            meta.setDisplayName(ContentUtils.color(title));
+            meta.setDisplayName(PlaceholderAPI.setPlaceholders(placeholderPlayer, ContentUtils.color(title)));
         if (lore != null) {
             List<String> loreLines = new ArrayList<>();
             for (String line : lore) {
                 loreLines.add(ContentUtils.color(line));
             }
-            meta.setLore(loreLines);
+            meta.setLore(PlaceholderAPI.setPlaceholders(placeholderPlayer, loreLines));
         }
         if (enchants != null && !enchants.isEmpty()) {
             for (String enchant : enchants.keySet()) {
@@ -385,7 +423,7 @@ public class ItemBuilder {
 
         if (glowing && (enchants == null || enchants.isEmpty())) {
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            meta.addEnchant(Enchantment.ARROW_DAMAGE, 1, true);
+            meta.addEnchant(Enchantment.POWER, 1, true);
         }
 
 
@@ -409,6 +447,10 @@ public class ItemBuilder {
         if (booleanNBT != null && !booleanNBT.isEmpty())
             for (String key : booleanNBT.keySet()) {
                 nbtItem.setBoolean(key, booleanNBT.get(key));
+            }
+        if (floatNBT != null && !floatNBT.isEmpty())
+            for (String key : floatNBT.keySet()) {
+                nbtItem.setFloat(key, floatNBT.get(key));
             }
         if (customNBT != null && !customNBT.isEmpty()) {
             LuaMessageUtils.verboseMessage("NBT Compound name: " + LuaCore.getCompountName());
