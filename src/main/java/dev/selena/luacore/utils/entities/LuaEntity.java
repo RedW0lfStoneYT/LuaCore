@@ -66,6 +66,7 @@ public class LuaEntity {
             if (compound == null) {
                 LuaMessageUtils.verboseMessage("No compound");
                 returnValue.set(false);
+                return;
             }
             if (!compound.getBoolean("LuaCoreEntity")) {
                 LuaMessageUtils.verboseMessage("Not a LuaCoreEntity");
