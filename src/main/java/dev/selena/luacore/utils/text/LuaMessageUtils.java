@@ -9,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
 import java.util.logging.Level;
 
 /**
@@ -76,6 +75,17 @@ public class LuaMessageUtils extends ContentUtils {
         }
     }
 
+    /**
+     * Sends a message to the selected player
+     * @param player Player you want to message
+     * @param content Message content you want to send to the player
+     */
+    public static void playerSend(Player player, String ... content) {
+        for (String colored : ContentUtils.colorArray(content)) {
+            player.sendMessage(PlaceholderAPI.setPlaceholders(player, colored));
+        }
+    }
+
 
     /**
      * Sends a message to a command sender
@@ -131,6 +141,37 @@ public class LuaMessageUtils extends ContentUtils {
     public static void verboseMessage(String message) {
         if (LuaCore.isVerbose())
             consoleSend(message);
+    }
+
+    /**
+     * Used for sending debug messages to a player
+     * @param player Player you want to message
+     * @param content Message content you want to send to the player
+     */
+    public static void verbosePlayerSend(Player player, String... content) {
+        if (!LuaCore.isVerbose())
+            return;
+        for (String colored : ContentUtils.colorArray(content)) {
+            player.sendMessage(PlaceholderAPI.setPlaceholders(player, colored));
+        }
+    }
+
+
+    /**
+     * Used for sending debug messages to a command sender
+     * @param sender The command sender
+     * @param content The message content
+     */
+    public static void verboseSender(CommandSender sender, String... content) {
+        if (!LuaCore.isVerbose())
+            return;
+        if (sender instanceof Player player) {
+            playerSend(player, content);
+            return;
+        }
+        for (String colored : ContentUtils.colorArray(content)) {
+            sender.sendMessage(PlaceholderAPI.setPlaceholders(null, colored));
+        }
     }
 
 }
