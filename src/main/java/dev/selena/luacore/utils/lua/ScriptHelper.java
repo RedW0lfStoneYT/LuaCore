@@ -1,12 +1,17 @@
 package dev.selena.luacore.utils.lua;
 
 import dev.selena.luacore.LuaCore;
+import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.luaj.vm2.Globals;
@@ -14,6 +19,8 @@ import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -34,7 +41,6 @@ public class ScriptHelper {
      */
     public void applyPotionEffect(Player player, PotionEffectType effectType, int duration, int amplifier) {
         PotionEffect effect = new PotionEffect(effectType, duration, amplifier);
-
         player.addPotionEffect(effect);
     }
 
@@ -109,6 +115,94 @@ public class ScriptHelper {
      */
     public void giveItem(Player player, ItemStack item) {
         player.getInventory().addItem(item);
+    }
+
+    /**
+     * Used for updating the item in the main hand on an async thread
+     * @param player The player you want to update
+     * @param item The new/modified item
+     * @param amount optionally, the amount you want to set it to
+     */
+    public void setItemInMainHandAsync(Player player, ItemStack item, int ... amount) {
+        setItemInEquipmentSlotAsync(player, item, EquipmentSlot.HAND, amount);
+    }
+
+    /**
+     * Used for updating the item in the offhand on an async thread
+     * @param player The player you want to update
+     * @param item The new/modified item
+     * @param amount optionally, the amount you want to set it to
+     */
+    public void setItemInOffHandAsync(Player player, ItemStack item, int ... amount) {
+        setItemInEquipmentSlotAsync(player, item, EquipmentSlot.OFF_HAND, amount);
+    }
+
+    /**
+     * Used for updating the item in a specified EquipmentSlot on an async thread
+     * @param player The player you want to update
+     * @param item The new/modified item
+     * @param slot The EquipmentSlot
+     * @param amount optionally, the amount you want to set it to
+     * @see <a href="https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/EquipmentSlot.html">EquipmentSlot</a>
+     */
+    public void setItemInEquipmentSlotAsync(Player player, ItemStack item, EquipmentSlot slot, int ... amount) {
+        Bukkit.getScheduler().runTask(LuaCore.getPlugin(), () -> {
+            setItemInEquipmentSlot(player, item, slot, amount);
+        });
+
+    }
+
+    /**
+     * Used for updating the item in the main hand on the main thread
+     * @param player The player you want to update
+     * @param item The new/modified item
+     * @param amount optionally, the amount you want to set it to
+     */
+    public void setItemInMainHand(Player player, ItemStack item, int ... amount) {
+        setItemInEquipmentSlot(player, item, EquipmentSlot.HAND, amount);
+    }
+    /**
+     * Used for updating the item in the offhand on the main thread
+     * @param player The player you want to update
+     * @param item The new/modified item
+     * @param amount optionally, the amount you want to set it to
+     */
+    public void setItemInOffHand(Player player, ItemStack item, int ... amount) {
+        setItemInEquipmentSlot(player, item, EquipmentSlot.OFF_HAND, amount);
+    }
+    /**
+     * Used for updating the item in a specified EquipmentSlot on the main thread
+     * @param player The player you want to update
+     * @param item The new/modified item
+     * @param slot The EquipmentSlot
+     * @param amount optionally, the amount you want to set it to
+     * @see <a href="https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/EquipmentSlot.html">EquipmentSlot</a>
+     */
+    public void setItemInEquipmentSlot(Player player, ItemStack item, EquipmentSlot slot, int ... amount) {
+        LuaMessageUtils.verboseMessage("Setting item in " + slot.name());
+        Bukkit.getScheduler().runTask(LuaCore.getPlugin(), () -> {
+            int amountInt = item.getAmount();
+            if (amount != null) {
+                amountInt = amount[0];
+            }
+            item.setAmount(amountInt);
+            player.getEquipment().setItem(slot, item);
+        });
+
+    }
+
+    /**
+     * Generates a random int between min and max then checks if its equal to the goal
+     * Added because I feel Luas Math.random(min, max) is too high bias
+     * @param min The min value (Inclusive)
+     * @param max The max value (exclusive)
+     * @param goal The number you are aiming to be below
+     * @return True if below the number false if above
+     */
+    public boolean getProbability(int min, int max, int goal) {
+        Random rand = new Random();
+        int randNumber = rand.nextInt(min, max);
+        return randNumber <= goal;
     }
 
     /**
@@ -190,11 +284,11 @@ public class ScriptHelper {
      * @return True if the effect is a debuff
      */
     public static boolean isDebuff(PotionEffectType effectType) {
-        return effectType == PotionEffectType.BLINDNESS
-                || effectType == PotionEffectType.SLOW
-                || effectType == PotionEffectType.SLOW_DIGGING
-                || effectType == PotionEffectType.CONFUSION
-                || effectType == PotionEffectType.SLOW
+        return effectType.getEffectCategory() == PotionEffectType.Category.HARMFUL
+                || effectType == PotionEffectType.BLINDNESS
+                || effectType == PotionEffectType.SLOWNESS
+                || effectType == PotionEffectType.MINING_FATIGUE
+                || effectType == PotionEffectType.NAUSEA
                 || effectType == PotionEffectType.HUNGER
                 || effectType == PotionEffectType.WEAKNESS
                 || effectType == PotionEffectType.POISON
@@ -262,11 +356,20 @@ public class ScriptHelper {
      * @param player The player you want to remove potion effects from
      * @param effects The potion effect you want to remove from the player
      */
-    public static void removeEffectsAsync(Player player, PotionEffectType effects) {
+    public static void removeEffectsAsync(Player player, PotionEffectType ... effects) {
         Bukkit.getScheduler().runTask(LuaCore.getPlugin(), () -> {
             removeEffects(player, effects);
 
         });
+    }
+
+    /**
+     * Used for removing a single effect from a player on an async thread
+     * @param player The player you want to remove the effect from
+     * @param effect The effect type you want to remove
+     */
+    public static void removeEffectAsync(Player player, PotionEffectType effect) {
+        removeEffectsAsync(player, effect);
     }
 
     /**
@@ -284,6 +387,7 @@ public class ScriptHelper {
         }
         return multipliedArray;
     }
+
 
 
 }
