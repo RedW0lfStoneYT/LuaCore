@@ -128,7 +128,7 @@ dependencies {
     // TODO make this functional
     implementation "dev.jorel:commandapi-bukkit-shade:9.7.0"
     // Shadowed dependencies
-    implementation("de.tr7zw:item-nbt-api:2.13.2")
+    implementation("de.tr7zw:item-nbt-api:2.14.1")
     implementation('com.iridium:IridiumColorAPI:1.0.9')
     implementation 'org.luaj:luaj-jse:3.0.1'
     implementation('com.google.code.gson:gson:2.10.1')
