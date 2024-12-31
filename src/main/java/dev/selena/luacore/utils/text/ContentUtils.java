@@ -2,9 +2,7 @@ package dev.selena.luacore.utils.text;
 
 
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.lang3.text.WordUtils;
-import org.bukkit.ChatColor;
 
 import java.util.Arrays;
 import java.util.List;

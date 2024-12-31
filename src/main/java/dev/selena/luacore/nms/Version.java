@@ -1,8 +1,8 @@
 package dev.selena.luacore.nms;
 
 import dev.selena.luacore.nms.v1_20_6.NMS_1_20_6;
-import dev.selena.luacore.nms.v1_20_R2.NMS_1_20_R2;
 import dev.selena.luacore.nms.v1_20_6.NMS_1_20_R3;
+import dev.selena.luacore.nms.v1_20_R2.NMS_1_20_R2;
 import lombok.Getter;
 
 /**

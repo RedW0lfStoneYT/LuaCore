@@ -3,15 +3,12 @@ package dev.selena.luacore.utils.lua;
 import dev.selena.luacore.LuaCore;
 import dev.selena.luacore.utils.config.FileManager;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
 import org.luaj.vm2.server.Launcher;
-import org.luaj.vm2.server.LuajClassLoader;
 
 import java.io.File;
 import java.io.FileOutputStream;
