@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'dev.selena.lua'
-version '1.2.0-Dev2-SNAPSHOT'
+version '1.2.0-Dev14-SNAPSHOT'
 apply plugin: 'java'
 apply plugin: 'com.gradleup.shadow'
 defaultTasks('build')
@@ -31,6 +31,9 @@ repositories {
     }
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url = 'https://oss.sonatype.org/content/repositories/central' }
+    maven {
+        url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
+    }
 }
 
 // Ty oraxen dev team lol
@@ -77,7 +80,7 @@ SUPPORTED_VERSIONS.each { it ->
             //
 //            compileOnly "org.spigotmc:spigot:${server}:remapped-mojang"
             paperweight.paperDevBundle(server)
-            compileOnly "org.spigotmc:spigot-api:${server}"
+            compileOnly "io.papermc.paper:paper-api:${server}"
             implementation(project(path: ":Compatibility", configuration: 'shadow'))
         }
         java {
@@ -116,7 +119,7 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 
     implementation 'commons-lang:commons-lang:2.6'
-    compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly('org.jetbrains:annotations:24.0.1')
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
@@ -208,6 +211,7 @@ shadowJar {
         include(dependency('org.luaj:luaj-jse'))
         include(dependency('io.github.classgraph:classgraph'))
         include(dependency('com.iridium:IridiumColorAPI'))
+        include(dependency('dev.jorel:commandapi-bukkit-shade'))
         include(dependency('org.apache.commons:commons-lang3:3.13.0'))
         SUPPORTED_VERSIONS.forEach { include(project(":Compatibility:${it.nmsVersion}")) }
         include(project(":Compatibility"))
@@ -220,6 +224,7 @@ shadowJar {
     relocate "org.luaj", libs
     relocate "io.github", libs
     relocate "com.iridium", libs
+    relocate "dev.jorel.commandapi", libs
 //
     zip64 true
     subprojects.each { subproject ->
