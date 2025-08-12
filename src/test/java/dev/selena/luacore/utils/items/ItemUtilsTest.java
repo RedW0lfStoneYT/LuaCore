@@ -3,8 +3,10 @@ package dev.selena.luacore.utils.items;
 import dev.selena.test.utils.MockUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockbukkit.mockbukkit.MockBukkit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,7 +17,11 @@ class ItemUtilsTest {
     static void setUp() {
         MockUtils.setUp().mockLogger();
     }
-
+    @AfterAll
+    static void tearDown() {
+        MockBukkit.unmock();
+        MockUtils.tearDownStaticMocks();
+    }
     @Test
     void isWeapon_Sword() {
         ItemStack item = new ItemStack(Material.DIAMOND_SWORD);

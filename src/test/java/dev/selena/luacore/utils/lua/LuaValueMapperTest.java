@@ -4,29 +4,40 @@ import com.google.gson.annotations.Expose;
 import dev.selena.luacore.exceptions.lua.NoReturnValueException;
 import dev.selena.luacore.utils.config.FileManager;
 import dev.selena.test.utils.MockUtils;
-import org.junit.ClassRule;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.TemporaryFolder;
+import org.mockbukkit.mockbukkit.MockBukkit;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class LuaValueMapperTest {
 
 
-    @ClassRule
-    public static TemporaryFolder temporaryFolder = new TemporaryFolder();
-    private static final MappingTest unmapped = new MappingTest();
+    private static Path temporaryFolderPath;
 
     @BeforeAll
-    public static void setup() throws IOException, URISyntaxException {
-        temporaryFolder.create();
-        MockUtils.setUp().mockDataFolder(temporaryFolder.getRoot());
-        LuaManager.loadResourceFolder("test");
+    static void setUp() throws Exception {
+        temporaryFolderPath = Files.createTempDirectory("test-data");
+        MockUtils.setUp()
+                .mockDataFolder(temporaryFolderPath.toFile())
+                .mockLogger()
+                .withResourceFolder("test")
+                .withDataFolder();
     }
+
+    @AfterAll
+    static void tearDown() {
+        MockBukkit.unmock();
+        MockUtils.tearDownStaticMocks();
+    }
+    private static final MappingTest unmapped = new MappingTest();
+
 
     @Test
     void StringMap() throws NoReturnValueException {
