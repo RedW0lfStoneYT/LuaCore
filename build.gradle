@@ -153,6 +153,7 @@ build {
     dependsOn(shadowJar, test)
 }
 javadoc {
+    options.addBooleanOption('html5', true)
     source = sourceSets.main.allJava
     classpath = configurations.compileClasspath
     if (System.getenv("DEV_BUILD")) {
@@ -161,6 +162,15 @@ javadoc {
         destinationDir = file("/home/web/docs/luacore")
     }
 
+}
+
+tasks.register('darkJavadoc') {
+    dependsOn tasks.javadoc
+    doLast {
+        def cssFile = file("${tasks.javadoc.destinationDir}/stylesheet.css")
+        cssFile.append("\n/* Dark mode overrides */\n")
+        cssFile.append(file("$projectDir/dark.css").text)
+    }
 }
 
 
