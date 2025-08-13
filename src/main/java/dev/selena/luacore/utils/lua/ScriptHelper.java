@@ -2,10 +2,10 @@ package dev.selena.luacore.utils.lua;
 
 import dev.selena.luacore.LuaCore;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -14,8 +14,10 @@ import org.bukkit.potion.PotionEffectType;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.compiler.LuaC;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -71,6 +73,28 @@ public class ScriptHelper {
     }
 
     /**
+     * Used for setting an entity attributes
+     * @param entity The entity you want to modify
+     * @param registryName The minecraft registry name you want to set
+     * @param value The value (0d or 1d for boolean)
+     */
+    public void setAttributeAsync(LivingEntity entity, String registryName, double value) {
+        Bukkit.getScheduler().runTask(LuaCore.getPlugin(), (task) -> {
+           setAttribute(entity, registryName, value);
+        });
+    }
+
+    /**
+     * Used for setting an entity attributes
+     * @param entity The entity you want to modify
+     * @param registryName The minecraft registry name you want to set
+     * @param value The value (0d or 1d for boolean)
+     */
+    public void setAttribute(LivingEntity entity, String registryName, double value) {
+        entity.getAttribute(Registry.ATTRIBUTE.get(NamespacedKey.minecraft(registryName))).setBaseValue(value);
+    }
+
+    /**
      * Used for getting an ItemStack in lua
      *
      * @param type   The Material type
@@ -89,6 +113,10 @@ public class ScriptHelper {
      */
     public Location getBlockLocation(Block block) {
         return block.getLocation();
+    }
+
+    public void setBlockAtLocation(Location loc, Material blockType) {
+        loc.getBlock().setType(blockType);
     }
 
     /**
@@ -205,16 +233,15 @@ public class ScriptHelper {
 
     /**
      * Generates a random int between min and max then checks if its equal to the goal
-     * Added because I feel Luas Math.random(min, max) is too high bias
-     *
-     * @param min  The min value (Inclusive)
-     * @param max  The max value (exclusive)
+     * Added because I feel Luas Math.random(min, max) is too high bias.
+     * @param min  The min value (exclusive)
+     * @param max  The max value (inclusive)
      * @param goal The number you are aiming to be below
      * @return True if below the number false if above
      */
     public boolean getProbability(int min, int max, int goal) {
         Random rand = new Random();
-        int randNumber = rand.nextInt(min, max);
+        int randNumber = rand.nextInt(min, max) + 1;
         return randNumber <= goal;
     }
 
@@ -367,6 +394,20 @@ public class ScriptHelper {
      * @param effects The potion effects you want to remove
      */
     public static void removeEffects(Player player, PotionEffectType... effects) {
+        for (PotionEffectType type : effects) {
+            if (player.hasPotionEffect(type))
+                player.removePotionEffect(type);
+
+        }
+    }
+
+    /**
+     * Used for removing potion effects from a player
+     *
+     * @param player  The player you want to remove the effects from
+     * @param effects The potion effects you want to remove
+     */
+    public static void removeEffects(Player player, List<PotionEffectType> effects) {
         for (PotionEffectType type : effects) {
             if (player.hasPotionEffect(type))
                 player.removePotionEffect(type);
