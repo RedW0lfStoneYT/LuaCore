@@ -1,6 +1,7 @@
 package dev.selena.luacore.nms;
 
 import dev.selena.luacore.nms.v1_20_6.NMS_1_20_6;
+import dev.selena.luacore.nms.v1_21_5.NMS_1_21_5;
 import dev.selena.luacore.nms.v1_20_6.NMS_1_20_R3;
 import dev.selena.luacore.nms.v1_20_R2.NMS_1_20_R2;
 import lombok.Getter;
@@ -19,6 +20,7 @@ public enum Version {
      */
     v1_20_R2(new NMS_1_20_R2(), 1202),
     v1_20_6(new NMS_1_20_6(), 1206),
+    v1_21_5(new NMS_1_21_5(), 1215),
     /**
      * Used for any other versions
      */

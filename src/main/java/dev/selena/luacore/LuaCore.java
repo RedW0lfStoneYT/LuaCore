@@ -10,6 +10,7 @@ import dev.selena.luacore.utils.text.LuaMessageUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
@@ -90,7 +91,7 @@ public class LuaCore {
         else
             try {
                 nmsVersion = Version.valueOf(version);
-                LuaMessageUtils.verboseMessage("Using NMS version " + version);
+                LuaMessageUtils.consoleSend("Using NMS version " + version);
             } catch (IllegalArgumentException e) {
                 LuaMessageUtils.consoleWarn("No NMS supported");
                 nmsVersionSupported = false;

@@ -61,9 +61,24 @@ public class EntityBuilder implements INMSEntityBuilder {
     }
 
     @Override
-    public INMSEntityBuilder setAttackSpeed(float bonus) {
+    public INMSEntityBuilder setBurningTime(float bonus) {
+        return this;
+    }
+
+    @Override
+    public INMSEntityBuilder setCameraDistance(float bonus) {
+        return this;
+    }
+
+    @Override
+    public INMSEntityBuilder setExplosionKnockBackResistance(float bonus) {
+        return this;
+    }
+
+    @Override
+    public INMSEntityBuilder setFallDamageMultiplier(float bonus) {
         try {
-            entity.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(bonus);
+            entity.getAttribute(Attribute.GENERIC_FALL_DAMAGE_MULTIPLIER).setBaseValue(bonus);
         } catch (NullPointerException ignore) {
         }
         return this;
@@ -88,18 +103,18 @@ public class EntityBuilder implements INMSEntityBuilder {
     }
 
     @Override
-    public INMSEntityBuilder setKnockBackResistance(float bonus) {
+    public INMSEntityBuilder setGravity(float bonus) {
         try {
-            entity.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(bonus);
+            entity.getAttribute(Attribute.GENERIC_GRAVITY).setBaseValue(bonus);
         } catch (NullPointerException ignore) {
         }
         return this;
     }
 
     @Override
-    public INMSEntityBuilder setLuck(float bonus) {
+    public INMSEntityBuilder setKnockBackResistance(float bonus) {
         try {
-            entity.getAttribute(Attribute.GENERIC_LUCK).setBaseValue(bonus);
+            entity.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(bonus);
         } catch (NullPointerException ignore) {
         }
         return this;
@@ -133,7 +148,7 @@ public class EntityBuilder implements INMSEntityBuilder {
     }
 
     @Override
-    public INMSEntityBuilder setHorseJumpStrength(float bonus) {
+    public INMSEntityBuilder setJumpStrength(float bonus) {
         try {
             entity.getAttribute(Attribute.GENERIC_JUMP_STRENGTH).setBaseValue(bonus);
         } catch (NullPointerException ignore) {
@@ -143,33 +158,68 @@ public class EntityBuilder implements INMSEntityBuilder {
 
     @Override
     public INMSEntityBuilder setEntityScale(float bonus) {
-        return this;
-    }
-
-    @Override
-    public INMSEntityBuilder setEntityInteractWithBlockDistance(float bonus) {
-        return this;
-    }
-
-    @Override
-    public INMSEntityBuilder setEntityInteractWithLivingEntityDistance(float bonus) {
+        try {
+            entity.getAttribute(Attribute.GENERIC_SCALE).setBaseValue(bonus);
+        } catch (NullPointerException ignore) {
+        }
         return this;
     }
 
     @Override
     public INMSEntityBuilder setStepHeight(float height) {
+        try {
+            entity.getAttribute(Attribute.GENERIC_STEP_HEIGHT).setBaseValue(height);
+        } catch (NullPointerException ignore) {
+        }
         return this;
     }
 
     @Override
-    public INMSEntityBuilder spawnZombieReinforcements(boolean spawn) {
-        entity.getAttribute(Attribute.ZOMBIE_SPAWN_REINFORCEMENTS).setBaseValue(spawn ? 1.0 : 0.0);
+    public INMSEntityBuilder spawnReinforcements(float spawn) {
+        try {
+            entity.getAttribute(Attribute.ZOMBIE_SPAWN_REINFORCEMENTS).setBaseValue(spawn);
+        } catch (NullPointerException ignore) {
+        }
         return this;
     }
 
     @Override
-    public INMSEntityBuilder spawnZombieReinforcements(double spawn) {
-        entity.getAttribute(Attribute.ZOMBIE_SPAWN_REINFORCEMENTS).setBaseValue(spawn);
+    public INMSEntityBuilder setMovementEfficiency(float bonus) {
         return this;
     }
+
+    @Override
+    public INMSEntityBuilder setOxygenBonus(float bonus) {
+        return this;
+    }
+
+    @Override
+    public INMSEntityBuilder setSafeFallDistance(float bonus) {
+        try {
+            entity.getAttribute(Attribute.GENERIC_SAFE_FALL_DISTANCE).setBaseValue(bonus);
+        } catch (NullPointerException ignore) {
+        }
+        return this;
+    }
+
+    @Override
+    public INMSEntityBuilder setTemptRange(float bonus) {
+        return this;
+    }
+
+    @Override
+    public INMSEntityBuilder setWaterMoveEfficiency(float bonus) {
+        return this;
+    }
+
+    @Override
+    public INMSEntityBuilder setWaypointReceiveRange(float bonus) {
+        return this;
+    }
+
+    @Override
+    public INMSEntityBuilder setWaypointTransmitRange(float bonus) {
+        return this;
+    }
+
 }

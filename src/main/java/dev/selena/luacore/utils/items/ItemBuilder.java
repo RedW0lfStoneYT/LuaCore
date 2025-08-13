@@ -10,12 +10,11 @@ import dev.selena.luacore.utils.nbt.NBTConstants;
 import dev.selena.luacore.utils.nbt.NBTUtils;
 import dev.selena.luacore.utils.text.ContentUtils;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.Color;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -53,6 +52,7 @@ public class ItemBuilder {
     private ArmorTrim trim;
     private PlayerProfile skullProfile;
     private Player placeholderPlayer;
+    private int maxStackSize = -1;
 
 
     /**
@@ -87,6 +87,17 @@ public class ItemBuilder {
      */
     public ItemBuilder setPlaceholderPlayer(Player player) {
         this.placeholderPlayer = player;
+        return this;
+    }
+
+    /**
+     * Used for setting the max stack size of an item<br>
+     * NOTE: THIS MIGHT MAKE THE LIBRARY NOT WORK ON VERSIONS THAT DO NOT HAVE setMaxSize(int)
+     * @param maxStackSize The max stack size
+     * @return This instance to continue building
+     */
+    public ItemBuilder setMaxStackSize(int maxStackSize) {
+        this.maxStackSize = maxStackSize;
         return this;
     }
 
@@ -413,7 +424,8 @@ public class ItemBuilder {
         }
         if (enchants != null && !enchants.isEmpty()) {
             for (String enchant : enchants.keySet()) {
-                Enchantment enchantment = EnchantmentWrapper.getByKey(NamespacedKey.minecraft(enchant));
+                Enchantment enchantment = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).get(NamespacedKey.minecraft(enchant));
+//                Enchantment enchantment = EnchantmentWrapper.getByKey(NamespacedKey.minecraft(enchant));
                 assert enchantment != null;
                 meta.addEnchant(enchantment, enchants.get(enchant), true);
             }
@@ -424,6 +436,9 @@ public class ItemBuilder {
             meta.addEnchant(Enchantment.POWER, 1, true);
         }
 
+        if (maxStackSize > 0) {
+            meta.setMaxStackSize(maxStackSize);
+        }
 
         item.setItemMeta(meta);
 

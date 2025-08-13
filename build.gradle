@@ -3,11 +3,11 @@ plugins {
 //    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'com.gradleup.shadow' version '9.0.1'
     id 'maven-publish'
-    id("io.papermc.paperweight.userdev") version "1.7.7" apply false
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.18" apply false
 }
 
 group 'dev.selena.lua'
-version '1.2.1-Dev2-SNAPSHOT'
+version '1.2.1-Dev3-SNAPSHOT'
 apply plugin: 'java'
 apply plugin: 'com.gradleup.shadow'
 defaultTasks('build')
@@ -56,7 +56,8 @@ static NMSVersion toNms(String nms, String server, int javaVersion) {
 List<NMSVersion> SUPPORTED_VERSIONS = [
 toNms("NMS_1_20_R2", "1.20.2-R0.1-SNAPSHOT", 21),
 toNms("NMS_1_20_R3", "1.20.4-R0.1-SNAPSHOT", 21),
-toNms("NMS_1_20_6", "1.20.6-R0.1-SNAPSHOT", 21)
+toNms("NMS_1_20_6", "1.20.6-R0.1-SNAPSHOT", 21),
+toNms("NMS_1_21_5", "1.21.5-R0.1-SNAPSHOT", 21)
 ]
 
 SUPPORTED_VERSIONS.each { it ->
@@ -69,9 +70,10 @@ SUPPORTED_VERSIONS.each { it ->
         apply plugin: 'com.gradleup.shadow'
         repositories {
             mavenLocal()
+            mavenCentral()
             maven {
-                url = "https://papermc.io/repo/repository/maven-public/"
-            } // Paper
+                url = "https://repo.papermc.io/repository/maven-public/"
+            }
             maven {
                 url = "https://repo.mineinabyss.com/releases"
             }
@@ -80,7 +82,7 @@ SUPPORTED_VERSIONS.each { it ->
             //
 //            compileOnly "org.spigotmc:spigot:${server}:remapped-mojang"
             paperweight.paperDevBundle(server)
-            compileOnly "io.papermc.paper:paper-api:${server}"
+//            compileOnly "io.papermc.paper:paper-api:${server}"
             implementation(project(path: ":Compatibility", configuration: 'shadow'))
         }
         java {
@@ -97,6 +99,7 @@ subprojects {
     apply plugin: "java"
     apply plugin: "com.gradleup.shadow"
     repositories {
+        mavenCentral()
         maven {
             url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
         }

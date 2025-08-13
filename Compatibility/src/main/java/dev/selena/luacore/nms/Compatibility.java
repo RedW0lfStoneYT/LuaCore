@@ -16,8 +16,12 @@ public class Compatibility {
         String versionString = "NOT_SUPPORTED";
         if (ver.length >= 4)
             versionString = ver[3];
-        else
-            versionString = Bukkit.getBukkitVersion().split("-")[0];
+        else {
+            String temp = Bukkit.getBukkitVersion().split("-")[0];
+            if (temp.split("\\.").length > 1)
+                temp = "v" + temp.replace(".", "_");
+            versionString = temp;
+        }
         return versionString;
     }
 }

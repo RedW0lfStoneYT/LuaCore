@@ -18,4 +18,6 @@ include 'Compatibility:NMS_1_20_R2'
 findProject(':Compatibility:NMS_1_20_R2')?.name = 'NMS_1_20_R2'
 include 'Compatibility:NMS_1_20_6'
 findProject(':Compatibility:NMS_1_20_6')?.name = 'NMS_1_20_6'
+include 'Compatibility:NMS_1_21_5'
+findProject(':Compatibility:NMS_1_21_5')?.name = 'NMS_1_21_5'
 

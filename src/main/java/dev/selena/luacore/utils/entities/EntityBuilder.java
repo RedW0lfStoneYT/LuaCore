@@ -36,40 +36,55 @@ public class EntityBuilder {
             armorToughnessBonus,
             attackDamageBonus,
             attackKnockBack,
-            attackSpeed,
+            burningTime,
+            cameraDistance,
+            explosionKnockbackResistance,
+            fallDamageMultiplier,
+            gravity,
+            spawnReinforcementsChance,
+            movementEfficiency,
+            oxygenBonus,
+            safeFallDistance,
+            temptRange,
+            waterMovementEfficiency,
+            waypointReceiveRange,
+            waypointTransmitRange,
             flyingSpeed,
             followRange,
             knockBackResistance,
-            luck,
             maxAbsorption,
             maxHealth,
             movementSpeed,
-            horseJumpStrength,
-            // Preparing for 1.20.5
+            jumpStrength,
             entityScale,
-            entityInteractWithBlockDistance,
-            entityInteractWithEntityDistance,
             stepHeight;
     private boolean armorBonus_isCustom = false,
             armorToughnessBonus_isCustom = false,
             attackDamageBonus_isCustom = false,
             attackKnockBack_isCustom = false,
-            attackSpeed_isCustom = false,
             flyingSpeed_isCustom = false,
             followRange_isCustom = false,
             knockBackResistance_isCustom = false,
-            luck_isCustom = false,
             maxAbsorption_isCustom = false,
             maxHealth_isCustom = false,
             movementSpeed_isCustom = false,
-            horseJumpStrength_isCustom = false,
+            jumpStrength_isCustom = false,
             // Preparing for 1.20. = false5
             entityScale_isCustom = false,
-            entityInteractWithBlockDistance_isCustom = false,
-            entityInteractWithEntityDistance_isCustom = false,
             stepHeight_isCustom = false,
-            zombieReinforcements_isCustom = false;
-    private boolean zombieReinforcements;
+            burningTime_isCustom = false,
+            cameraDistance_isCustom = false,
+            explosionKnockbackResistance_isCustom = false,
+            fallDamageMultiplier_isCustom = false,
+            gravity_isCustom = false,
+            spawnReinforcementsChance_isCustom = false,
+            movementEfficiency_isCustom = false,
+            oxygenBonus_isCustom = false,
+            safeFallDistance_isCustom = false,
+            temptRange_isCustom = false,
+            waterMovementEfficiency_isCustom = false,
+            waypointReceiveRange_isCustom = false,
+            waypointTransmitRange_isCustom = false;
     private EntityType entityType;
     private String displayName;
     private List<PotionEffect> potionEffects;
@@ -285,18 +300,6 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the attack speed attribute (0.0 to 1024.0, default 4)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
-     * @param attackSpeed The value for the attribute
-     * @return The current builder instance
-     */
-    public EntityBuilder setAttackSpeed(float attackSpeed) {
-        this.attackSpeed = attackSpeed;
-        this.attackSpeed_isCustom = true;
-        return this;
-    }
-
-    /**
      * Used for setting the flight speed attribute (0.0 to 1024.0, default 0.4)
      * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param flyingSpeed The value for the attribute
@@ -329,18 +332,6 @@ public class EntityBuilder {
     public EntityBuilder setKnockBackResistance(float knockBackResistance) {
         this.knockBackResistance = knockBackResistance;
         this.knockBackResistance_isCustom = true;
-        return this;
-    }
-
-    /**
-     * Used for setting the luck attribute (-1024.0 to 1024.0, default 0.0)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
-     * @param luck The value for the attribute
-     * @return The current builder instance
-     */
-    public EntityBuilder setLuck(float luck) {
-        this.luck = luck;
-        this.luck_isCustom = true;
         return this;
     }
 
@@ -383,12 +374,12 @@ public class EntityBuilder {
     /**
      * Used for setting the horse jump strength attribute (0.0 to 2.0, default 0.7)
      * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
-     * @param horseJumpStrength The value for the attribute
+     * @param jumpStrength The value for the attribute
      * @return The current builder instance
      */
-    public EntityBuilder setHorseJumpStrength(float horseJumpStrength) {
-        this.horseJumpStrength = horseJumpStrength;
-        this.horseJumpStrength_isCustom = true;
+    public EntityBuilder setJumpStrength(float jumpStrength) {
+        this.jumpStrength = jumpStrength;
+        this.jumpStrength_isCustom = true;
         return this;
     }
 
@@ -405,30 +396,6 @@ public class EntityBuilder {
     }
 
     /**
-     * Used to set the entity interaction with block distance attribute (0.0 to 64, default 4.5)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
-     * @param entityInteractWithBlockDistance The value for the attribute
-     * @return The current builder instance
-     */
-    public EntityBuilder setEntityInteractWithBlockDistance(float entityInteractWithBlockDistance) {
-        this.entityInteractWithBlockDistance = entityInteractWithBlockDistance;
-        this.entityInteractWithBlockDistance_isCustom = true;
-        return this;
-    }
-
-    /**
-     * Used to set the entity interaction with entity distance attribute (0.0 to 64.0, default 3.0)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
-     * @param entityInteractWithEntityDistance The value for the attribute
-     * @return The current builder instance
-     */
-    public EntityBuilder setEntityInteractWithEntityDistance(float entityInteractWithEntityDistance) {
-        this.entityInteractWithEntityDistance = entityInteractWithEntityDistance;
-        this.entityInteractWithEntityDistance_isCustom = true;
-        return this;
-    }
-
-    /**
      * Used for setting the entity step height attribute (0.0 to 10.0, default 0.6)
      * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      * @param stepHeight The value for the attribute
@@ -441,16 +408,161 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the zombie reinforcements attribute (true or false, default false)
+     * Used for setting the reinforcements spawn chance attribute
      * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
-     * @param zombieReinforcements The value for the attribute
+     * @param reinforcementsChance The value for the attribute
      * @return The current builder instance
      */
-    public EntityBuilder setZombieReinforcements(boolean zombieReinforcements) {
-        this.zombieReinforcements = zombieReinforcements;
-        this.zombieReinforcements_isCustom = true;
+    public EntityBuilder setSpawnReinforcements(float reinforcementsChance) {
+        this.spawnReinforcementsChance = reinforcementsChance;
+        this.spawnReinforcementsChance_isCustom = true;
         return this;
     }
+
+    /**
+     * Used for setting the burn timer multiplier attribute
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     * @param value The value for the attribute
+     * @return The current builder instance
+     */
+    public EntityBuilder setBurningTimer(float value) {
+        this.burningTime = value;
+        this.burningTime_isCustom = true;
+        return this;
+    }
+
+    /**
+     * Used for setting the camera distance attribute
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     * @param value The value for the attribute
+     * @return The current builder instance
+     */
+    public EntityBuilder setCameraDistance(float value) {
+        this.cameraDistance = value;
+        this.cameraDistance_isCustom = true;
+        return this;
+    }
+
+    /**
+     * Used for setting the explosion knockback resistance attribute
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     * @param value The value for the attribute
+     * @return The current builder instance
+     */
+    public EntityBuilder setExplosionKnockbackResistance(float value) {
+        this.explosionKnockbackResistance = value;
+        this.explosionKnockbackResistance_isCustom = true;
+        return this;
+    }
+
+    /**
+     * Used for setting the fall damage multiplier attribute
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     * @param value The value for the attribute
+     * @return The current builder instance
+     */
+    public EntityBuilder setFallDamageMultiplier(float value) {
+        this.fallDamageMultiplier = value;
+        this.fallDamageMultiplier_isCustom = true;
+        return this;
+    }
+
+    /**
+     * Used for setting the gravity attribute
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     * @param value The value for the attribute
+     * @return The current builder instance
+     */
+    public EntityBuilder setGravity(float value) {
+        this.gravity = value;
+        this.gravity_isCustom = true;
+        return this;
+    }
+
+    /**
+     * Used for setting the movement efficiency attribute
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     * @param value The value for the attribute
+     * @return The current builder instance
+     */
+    public EntityBuilder setMovementEfficiency(float value) {
+        this.movementEfficiency = value;
+        this.movementEfficiency_isCustom = true;
+        return this;
+    }
+
+    /**
+     * Used for setting the oxygen bonus attribute
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     * @param value The value for the attribute
+     * @return The current builder instance
+     */
+    public EntityBuilder setOxygenBonus(float value) {
+        this.oxygenBonus = value;
+        this.oxygenBonus_isCustom = true;
+        return this;
+    }
+
+    /**
+     * Used for setting the safe fall distance attribute
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     * @param value The value for the attribute
+     * @return The current builder instance
+     */
+    public EntityBuilder setSafeFallDistance(float value) {
+        this.safeFallDistance = value;
+        this.safeFallDistance_isCustom = true;
+        return this;
+    }
+
+    /**
+     * Used for setting the temptation range attribute
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     * @param value The value for the attribute
+     * @return The current builder instance
+     */
+    public EntityBuilder setTemptRange(float value) {
+        this.temptRange = value;
+        this.temptRange_isCustom = true;
+        return this;
+    }
+
+    /**
+     * Used for setting the water movement efficiency attribute
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     * @param value The value for the attribute
+     * @return The current builder instance
+     */
+    public EntityBuilder setWaterMovementEfficiency(float value) {
+        this.waterMovementEfficiency = value;
+        this.waterMovementEfficiency_isCustom = true;
+        return this;
+    }
+
+    /**
+     * Used for setting the waypoint receive range attribute
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     * @param value The value for the attribute
+     * @return The current builder instance
+     */
+    public EntityBuilder setWaypointReceiveRange(float value) {
+        this.waypointReceiveRange = value;
+        this.waypointReceiveRange_isCustom = true;
+        return this;
+    }
+
+    /**
+     * Used for setting the waypoint transmit range attribute
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     * @param value The value for the attribute
+     * @return The current builder instance
+     */
+    public EntityBuilder setWaypointTransmitRange(float value) {
+        this.waypointTransmitRange = value;
+        this.waypointTransmitRange_isCustom = true;
+        return this;
+    }
+
 
     /**
      * Used for setting the type of entity to spawn
@@ -612,20 +724,29 @@ public class EntityBuilder {
             if (armorToughnessBonus_isCustom) nmsBuilder.setArmorToughnessBonus(armorToughnessBonus);
             if (attackDamageBonus_isCustom) nmsBuilder.setAttackDamageBonus(attackDamageBonus);
             if (attackKnockBack_isCustom) nmsBuilder.setAttackKnockBack(attackKnockBack);
-            if (attackSpeed_isCustom) nmsBuilder.setAttackSpeed(attackSpeed);
             if (flyingSpeed_isCustom) nmsBuilder.setFlyingSpeed(flyingSpeed);
             if (followRange_isCustom) nmsBuilder.setFollowRange(followRange);
             if (knockBackResistance_isCustom) nmsBuilder.setKnockBackResistance(knockBackResistance);
-            if (luck_isCustom) nmsBuilder.setLuck(luck);
             if (maxAbsorption_isCustom) nmsBuilder.setMaxAbsorption(maxAbsorption);
             if (maxHealth_isCustom) nmsBuilder.setMaxHealth(maxHealth);
             if (movementSpeed_isCustom) nmsBuilder.setMovementSpeed(movementSpeed);
-            if (horseJumpStrength_isCustom) nmsBuilder.setHorseJumpStrength(horseJumpStrength);
+            if (jumpStrength_isCustom) nmsBuilder.setJumpStrength(jumpStrength);
             if (entityScale_isCustom) nmsBuilder.setEntityScale(entityScale);
-            if (entityInteractWithBlockDistance_isCustom) nmsBuilder.setEntityInteractWithBlockDistance(entityInteractWithBlockDistance);
-            if (entityInteractWithEntityDistance_isCustom) nmsBuilder.setEntityInteractWithLivingEntityDistance(entityInteractWithEntityDistance);
             if (stepHeight_isCustom) nmsBuilder.setStepHeight(stepHeight);
-            if (zombieReinforcements_isCustom) nmsBuilder.spawnZombieReinforcements(zombieReinforcements);
+            if (spawnReinforcementsChance_isCustom) nmsBuilder.spawnReinforcements(spawnReinforcementsChance);
+            if (burningTime_isCustom) nmsBuilder.setBurningTime(burningTime);
+            if (cameraDistance_isCustom) nmsBuilder.setCameraDistance(cameraDistance);
+            if (explosionKnockbackResistance_isCustom) nmsBuilder.setExplosionKnockBackResistance(explosionKnockbackResistance);
+            if (fallDamageMultiplier_isCustom) nmsBuilder.setFallDamageMultiplier(fallDamageMultiplier);
+            if (gravity_isCustom) nmsBuilder.setGravity(gravity);
+            if (movementEfficiency_isCustom) nmsBuilder.setMovementEfficiency(movementEfficiency);
+            if (oxygenBonus_isCustom) nmsBuilder.setOxygenBonus(oxygenBonus);
+            if (safeFallDistance_isCustom) nmsBuilder.setSafeFallDistance(safeFallDistance);
+            if (temptRange_isCustom) nmsBuilder.setTemptRange(temptRange);
+            if (waterMovementEfficiency_isCustom) nmsBuilder.setWaterMoveEfficiency(waterMovementEfficiency);
+            if (waypointReceiveRange_isCustom) nmsBuilder.setWaypointReceiveRange(waypointReceiveRange);
+            if (waypointTransmitRange_isCustom) nmsBuilder.setWaypointTransmitRange(waypointTransmitRange);
+
 
             entityLiving = nmsBuilder.getEntity();
             entityLiving.addPotionEffects(potionEffects);

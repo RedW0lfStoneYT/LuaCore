@@ -1,6 +1,7 @@
 package dev.selena.luacore.nms;
 
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 /**
  * Used for getting NMS version specific classes
@@ -13,5 +14,6 @@ public interface INMSVersionClass {
      * @return The builder
      */
     INMSEntityBuilder getEntityBuilder(LivingEntity entity);
+    INMSPlayerAttributeModifier getPlayerAttributeModifier(Player player);
 
 }
