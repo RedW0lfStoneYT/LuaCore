@@ -54,6 +54,12 @@ public class LuaCore {
     private static boolean nmsVersionSupported = true;
     @Getter
     private static Version nmsVersion;
+    @Getter
+    private static boolean defaultErrorTrace;
+    @Getter
+    private static boolean defaultWarnTrace;
+    @Getter
+    private static boolean defaultMessageTrace;
 
     /**
      * This needs to be called in the onEnable method of your plugin for it to work
@@ -66,7 +72,7 @@ public class LuaCore {
     }
 
     /**
-     * Method to setup the library with the required methods (setPlugin and setCoreLogger)
+     * Method to set up the library with the required methods (setPlugin and setCoreLogger)
      * @param plugin Your plugin instance
      */
     public static void setupCore(Plugin plugin) {
@@ -166,6 +172,36 @@ public class LuaCore {
     public static void setVerbose(boolean verbose) {
         LuaCore.verbose = verbose;
         LuaMessageUtils.verboseMessage("Verbose mode is enabled");
+    }
+
+    /**
+     * Used for setting the default {@link LuaMessageUtils#verboseError(String)} to have the call trace
+     * @param enabled Set to true if you want the default {@link LuaMessageUtils#verboseError(String)} to have the call trace
+     * @see LuaMessageUtils#verboseTracedError(String)
+     */
+    public static void setDefaultErrorTrace(boolean enabled) {
+        LuaCore.defaultErrorTrace = enabled;
+        LuaMessageUtils.verboseMessage("Verbose error call trace mode is enabled by default");
+    }
+
+    /**
+     * Used for setting the default {@link LuaMessageUtils#verboseWarn(String)} to have the call trace
+     * @param enabled Set to true if you want the default {@link LuaMessageUtils#verboseWarn(String)} to have the call trace
+     * @see LuaMessageUtils#verboseTracedWarn(String)
+     */
+    public static void setDefaultWarnTrace(boolean enabled) {
+        LuaCore.defaultWarnTrace = enabled;
+        LuaMessageUtils.verboseMessage("Verbose warn call trace mode is enabled by default");
+    }
+
+    /**
+     * Used for setting the default {@link LuaMessageUtils#verboseMessage(String)} to have the call trace
+     * @param enabled Set to true if you want the default {@link LuaMessageUtils#verboseMessage(String)} to have the call trace
+     * @see LuaMessageUtils#verboseTracedMessage(String) 
+     */
+    public static void setDefaultMessageTrace(boolean enabled) {
+        LuaCore.defaultMessageTrace = enabled;
+        LuaMessageUtils.verboseMessage("Verbose message call trace mode is enabled by default");
     }
 
     /**
