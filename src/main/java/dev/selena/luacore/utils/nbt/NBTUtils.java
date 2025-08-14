@@ -2,6 +2,7 @@ package dev.selena.luacore.utils.nbt;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.Strictness;
 import de.tr7zw.changeme.nbtapi.NBTCompound;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import dev.selena.luacore.LuaCore;
@@ -27,6 +28,7 @@ public class NBTUtils {
             .disableHtmlEscaping()
             .setPrettyPrinting()
             .serializeNulls()
+            .setStrictness(Strictness.LENIENT)
             .registerTypeHierarchyAdapter(ConfigurationSerializable.class, new ConfigurationSerializableAdapter())
             .registerTypeAdapter(Location.class, new SpigotTypeAdapter<>(Location::deserialize))
             .registerTypeAdapter(ItemStack.class, new ItemStackAdapter())
