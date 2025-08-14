@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'dev.selena.lua'
-version '1.2.1-Dev3-SNAPSHOT'
+version '1.2.1-Dev4-SNAPSHOT'
 apply plugin: 'java'
 apply plugin: 'com.gradleup.shadow'
 defaultTasks('build')
@@ -136,7 +136,7 @@ dependencies {
     implementation('com.iridium:IridiumColorAPI:1.0.9')
     compileOnly 'me.clip:placeholderapi:2.11.6'
     implementation 'org.luaj:luaj-jse:3.0.1'
-    implementation('com.google.code.gson:gson:2.10.1')
+    implementation('com.google.code.gson:gson:2.13.1')
     implementation("com.google.guava:guava:31.1-jre")
 //    compileOnly(project(path: ":Compatibility:NMS_1_20_R3", configuration: "reobf"))
 //    compileOnly(project(path: ":Compatibility:NMS_1_20_R2", configuration: "reobf"))
@@ -156,6 +156,12 @@ javadoc {
     options.addBooleanOption('html5', true)
     source = sourceSets.main.allJava
     classpath = configurations.compileClasspath
+    source += project(":Compatibility").sourceSets.main.allJava
+    classpath += project(":Compatibility").configurations.compileClasspath
+    classpath += project(":Compatibility").sourceSets.main.output
+    // IF I WANT TO INCLUDE ALL SUB PROJECTS
+//    source += files(subprojects.collect { it.sourceSets.main.allJava })
+//    classpath += files(subprojects.collect { it.configurations.compileClasspath })
     if (System.getenv("DEV_BUILD")) {
         destinationDir = file("/home/web/docs/beta/luacore")
     } else {
