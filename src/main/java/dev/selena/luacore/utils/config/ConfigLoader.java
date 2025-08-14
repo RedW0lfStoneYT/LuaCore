@@ -80,7 +80,10 @@ public class ConfigLoader {
             if (trimmed.startsWith("\"")) {
                 String fieldName = trimmed.substring(1, trimmed.indexOf("\"", 1));
                 if (comments.containsKey(fieldName)) {
-                    result.append("  // ").append(comments.get(fieldName)).append("\n");
+                    String commentText = comments.get(fieldName);
+                    for (String commentLine : commentText.split("\n")) {
+                        result.append("  // ").append(commentLine.trim()).append("\n");
+                    }
                 }
             }
             result.append(line).append("\n");
