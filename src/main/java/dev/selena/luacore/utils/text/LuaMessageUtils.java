@@ -186,6 +186,50 @@ public class LuaMessageUtils extends ContentUtils {
     }
 
     /**
+     * Used for announcing a message to a series of players.
+     * @param trigger The player that triggered it for placeholders (It will be the player used for PAPI placeholders)
+     * @param players The array of players you want to send the announcement to
+     * @param message The message you want to send to the players.
+     */
+    public static void announceTo(Player trigger, Player[] players, String ... message) {
+        announceTo(trigger, Arrays.asList(players), message);
+    }
+
+    /**
+     * Used for announcing a message to a series of players.
+     * @param trigger The player that triggered it for placeholders (It will be the player used for PAPI placeholders)
+     * @param players The iterable of players you want to send the announcement to
+     * @param message The message you want to send to the players.
+     */
+    public static void announceTo(Player trigger, Iterable<Player> players, String ... message) {
+        for (Player player : players) {
+            playerSend(player, PlaceholderAPI.setPlaceholders(trigger, Arrays.asList(message)).toArray());
+        }
+    }
+
+    /**
+     * Used for announcing a message to a series of players.<br>
+     * Each player will get the message with their own PAPI placeholders
+     * @param players The array of players you want to send the announcement to
+     * @param message The message you want to send to the players.
+     */
+    public static void announceTo(Player[] players, String ... message) {
+        announceTo(Arrays.asList(players), message);
+    }
+
+    /**
+     * Used for announcing a message to a series of players.<br>
+     * Each player will get the message with their own PAPI placeholders
+     * @param players The iterable of players you want to send the announcement to
+     * @param message The message you want to send to the players.
+     */
+    public static void announceTo(Iterable<Player> players, String ... message) {
+        for (Player player : players) {
+            playerSend(player, message);
+        }
+    }
+
+    /**
      * Used for sending a debug warning to the console with call trace<br>
      * Example output: package.name.ClassName:methodName:lineNumber -> warning
      * @param warning The warning message you want to send

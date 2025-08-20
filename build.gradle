@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'dev.selena.lua'
-version '1.2.1-Dev5-SNAPSHOT'
+version '1.2.1-Dev8-SNAPSHOT'
 apply plugin: 'java'
 apply plugin: 'com.gradleup.shadow'
 defaultTasks('build')

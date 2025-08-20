@@ -29,21 +29,8 @@ public class ContentUtils {
      * @return The newly colored string
      */
     public static String color(String message) {
-
         return IridiumColorAPI.process(message);
     }
-
-
-    /**
-     * Used for coloring string using Iridium
-     * then convert them to Components
-     * @param message The string content you want to color
-     * @return The newly colored Component
-     */
-    // Thanks spigot 1.20.2+ for getting rid of Components....
-//    public static Component colorStringToComponent(String message) {
-//        return Component.text(IridiumColorAPI.process(message));
-//    }
 
     /**
      * Colors a List using Iridium

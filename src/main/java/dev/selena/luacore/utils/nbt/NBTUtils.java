@@ -82,7 +82,7 @@ public class NBTUtils {
      * @param content The value of the data you want to store
      * @param nameSpaceKey where you should get the data from later
      */
-    public static void storeNBTContent(NBTCompound compoundTag, Object content, String nameSpaceKey) {
+    public static void storeNBTContent(ReadWriteNBT compoundTag, Object content, String nameSpaceKey) {
         LuaMessageUtils.json_dump(content);
         String json = serializeContent(content);
         compoundTag.setString(nameSpaceKey, json);
@@ -119,7 +119,7 @@ public class NBTUtils {
     /**
      * Gets custom NBT data
      * @param cls The class you want to map to
-     * @param nameSpaceKey The key you set in {@link #storeNBTContent(NBTCompound, Object, String)}
+     * @param nameSpaceKey The key you set in {@link #storeNBTContent(ReadWriteNBT, Object, String)}
      * @param compoundTag The NBTCompound you are storing the custom NBT in
      * @return Fully mapped class
      * @param <T> The class type
