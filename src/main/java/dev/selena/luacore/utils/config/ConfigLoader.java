@@ -2,6 +2,15 @@ package dev.selena.luacore.utils.config;
 
 import com.google.gson.*;
 import dev.selena.luacore.annotations.gson.Comment;
+import dev.selena.luacore.utils.text.LuaMessageUtils;
+import dev.selena.luacore.utils.typeadapters.*;
+import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.trim.ArmorTrim;
+import org.bukkit.inventory.meta.trim.TrimMaterial;
+import org.bukkit.util.BoundingBox;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,10 +26,18 @@ import java.util.Map;
  */
 public class ConfigLoader {
     private static final Gson gson = new GsonBuilder()
+//            .excludeFieldsWithoutExposeAnnotation()
             .disableHtmlEscaping()
             .setPrettyPrinting()
-            .excludeFieldsWithoutExposeAnnotation()
             .setStrictness(Strictness.LENIENT)
+            .enableComplexMapKeySerialization()
+            .registerTypeHierarchyAdapter(ConfigurationSerializable.class, new ConfigurationSerializableAdapter())
+            .registerTypeHierarchyAdapter(Attribute.class, new AttributeTypeAdapter())
+            .registerTypeAdapter(Location.class, new SpigotTypeAdapter<>(Location::deserialize))
+            .registerTypeAdapter(ItemStack.class, new ItemStackAdapter())
+            .registerTypeAdapter(ArmorTrim.class, new ArmorTrimTypeAdapter())
+            .registerTypeAdapter(Attribute.class, new AttributeTypeAdapter())
+            .registerTypeAdapter(BoundingBox.class, new SpigotTypeAdapter<>(BoundingBox::deserialize))
             .create();
 
     /**
@@ -62,7 +79,6 @@ public class ConfigLoader {
     public static String toJsonWithComments(Object obj, Gson gson) {
         Class<?> clazz = obj.getClass();
         String json = gson.toJson(obj);
-
         Map<String, String> comments = new HashMap<>();
         for (Field field : clazz.getDeclaredFields()) {
             Comment comment = field.getAnnotation(Comment.class);
