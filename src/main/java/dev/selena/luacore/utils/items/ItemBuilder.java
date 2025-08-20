@@ -1,19 +1,22 @@
 package dev.selena.luacore.utils.items;
 
 import de.tr7zw.changeme.nbtapi.NBT;
-import de.tr7zw.changeme.nbtapi.NBTCompound;
-import de.tr7zw.changeme.nbtapi.NBTItem;
 import de.tr7zw.changeme.nbtapi.NBTType;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import dev.selena.luacore.LuaCore;
+import dev.selena.luacore.exceptions.item.ItemBuilderException;
 import dev.selena.luacore.utils.nbt.NBTConstants;
 import dev.selena.luacore.utils.nbt.NBTUtils;
-import dev.selena.luacore.utils.text.ContentUtils;
+import dev.selena.luacore.utils.text.ComponentUtils;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -27,12 +30,15 @@ import org.bukkit.profile.PlayerProfile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
 /**
  * Used for easily creating custom items
  */
+@SuppressWarnings("unused")
 public class ItemBuilder {
 
     private Material type;
@@ -50,10 +56,25 @@ public class ItemBuilder {
     private Map<String, Float> floatNBT;
     private Map<String, Object> customNBT;
     private ArmorTrim trim;
-    private PlayerProfile skullProfile;
+    private SkullProfile skullProfile;
     private Player placeholderPlayer;
     private int maxStackSize = -1;
+    private Map<String, AttributeModifier> attributeModifiers;
 
+
+    public static class SkullProfile {
+
+        private final String textureUrl;
+        private final UUID textureUUID;
+        private final String textureName;
+
+        public SkullProfile(String textureUrl, UUID textureUUID, String textureName) {
+            this.textureUrl = textureUrl;
+            this.textureUUID = textureUUID;
+            this.textureName = textureName;
+        }
+
+    }
 
     /**
      * Start the creation of the ItemBuilder and setting the type
@@ -61,12 +82,6 @@ public class ItemBuilder {
      */
     public ItemBuilder(Material type) {
         this.type = type;
-        this.enchants = new TreeMap<>();
-        this.stringNBT = new TreeMap<>();
-        this.intNBT = new TreeMap<>();
-        this.booleanNBT = new TreeMap<>();
-        this.floatNBT = new TreeMap<>();
-        this.customNBT = new TreeMap<>();
         this.placeholderPlayer = null;
     }
 
@@ -175,6 +190,9 @@ public class ItemBuilder {
      * @return This instance to continue the building
      */
     public ItemBuilder addEnchant(String enchant, int level) {
+        if (this.enchants == null) {
+            this.enchants = new TreeMap<>();
+        }
         this.enchants.put(enchant,level);
         return this;
 
@@ -187,8 +205,7 @@ public class ItemBuilder {
      * @return This instance to continue the building
      */
     public ItemBuilder addEnchant(Enchantment enchant, int level) {
-        this.enchants.put(enchant.getKey().getKey(),level);
-        return this;
+        return this.addEnchant(enchant.getKey().getKey(),level);
 
     }
 
@@ -230,6 +247,9 @@ public class ItemBuilder {
      * @return This instance to continue the building
      */
     public ItemBuilder addNBTString(String key, String value) {
+        if (this.stringNBT == null) {
+            this.stringNBT = new TreeMap<>();
+        }
         this.stringNBT.put(key,value);
         return this;
     }
@@ -251,6 +271,9 @@ public class ItemBuilder {
      * @return This instance to continue the building
      */
     public ItemBuilder addNBTInt(String key, int value) {
+        if (this.intNBT == null) {
+            this.intNBT = new TreeMap<>();
+        }
         this.intNBT.put(key,value);
         return this;
     }
@@ -272,6 +295,9 @@ public class ItemBuilder {
      * @return This instance to continue the building
      */
     public ItemBuilder addNBTBoolean(String key, boolean value) {
+        if (this.booleanNBT == null) {
+            this.booleanNBT = new TreeMap<>();
+        }
         this.booleanNBT.put(key, value);
         return this;
     }
@@ -283,6 +309,9 @@ public class ItemBuilder {
      * @return This instance to continue the building
      */
     public ItemBuilder addNBTFloat(String key, float value) {
+        if (this.floatNBT == null) {
+            this.floatNBT = new TreeMap<>();
+        }
         this.floatNBT.put(key, value);
         return this;
     }
@@ -314,6 +343,9 @@ public class ItemBuilder {
      * @return This instance to continue the building
      */
     public ItemBuilder addCustomNBT(String nameSpace, Object content) {
+        if (this.customNBT == null) {
+            this.customNBT = new TreeMap<>();
+        }
         this.customNBT.put(nameSpace, content);
         return this;
     }
@@ -366,17 +398,31 @@ public class ItemBuilder {
     public ItemBuilder setSkullTexture(URL textureUrl) {
         return setSkullProfile(textureUrl, UUID.randomUUID(), null);
     }
+    public ItemBuilder setSkullTexture(String textureUrl) throws MalformedURLException {
+        return setSkullProfile(URI.create(textureUrl).toURL(), UUID.randomUUID(), null);
+    }
 
     /**
      * Used for setting the skulls {@link PlayerProfile} texture.
      * @param skullTextureUrl The skull texture (NOTE: MUST be a <a href="https://textures.minecraft.net" target="_blank">https://textures.minecraft.net</a> texture)
      * @param skullTextureUUID The UUID of the skull, used for internal minecraft stuff
-     * @param skullTextureName The texture name (from memory must be unique, but I haven't used this in a while)
+     * @param skullTextureName The name of the skull profile (can be null, but should be unique)
      * @return This instance to continue
      */
     public ItemBuilder setSkullProfile(@NotNull URL skullTextureUrl, @NotNull UUID skullTextureUUID, @Nullable String skullTextureName) {
-        skullProfile = LuaCore.getPlugin().getServer().createPlayerProfile(skullTextureUUID, skullTextureName);
-        skullProfile.getTextures().setSkin(skullTextureUrl);
+        skullProfile = new SkullProfile(skullTextureUrl.toString(), skullTextureUUID, skullTextureName);
+        return this;
+    }
+
+    /**
+     * Used for setting the skull profile using a URL, UUID and name
+     * @param url The URL of the skull texture (NOTE: MUST be a https://textures.minecraft.net texture)
+     * @param uuid The UUID of the skull, used for internal minecraft stuff
+     * @param name The name of the skull profile (can be null, but should be unique)
+     * @return This instance to continue
+     */
+    public ItemBuilder setSkullProfile(String url, UUID uuid, String name) {
+        skullProfile = new SkullProfile(url, uuid, name);
         return this;
     }
 
@@ -386,7 +432,47 @@ public class ItemBuilder {
      * @return This instance to continue
      */
     public ItemBuilder setSkullProfile(PlayerProfile skullProfile) {
-        this.skullProfile = skullProfile;
+        this.skullProfile = new SkullProfile(
+                skullProfile.getTextures().getSkin() == null ? "" : skullProfile.getTextures().getSkin().toString(),
+                skullProfile.getUniqueId(),
+                skullProfile.getName()
+        );
+        return this;
+    }
+
+    /**
+     * Used for setting the attribute modifiers map of the item
+     * @param attributeModifiers Map of {@link Attribute} modifiers where the key is the attribute key
+     *                           (e.g. "max_health") and the value is the {@link AttributeModifier}
+     * @return This instance to continue the building
+     */
+    public ItemBuilder setAttributeModifiers(Map<String, AttributeModifier> attributeModifiers) {
+        this.attributeModifiers = attributeModifiers;
+        return this;
+    }
+
+
+    /**
+     * Used for adding an attribute modifier to the item
+     * @param attribute The {@link Attribute} you want to add the modifier to
+     * @param modifier The {@link AttributeModifier} you want to add
+     * @return This instance to continue the building
+     */
+    public ItemBuilder addAttributeModifier(Attribute attribute, AttributeModifier modifier) {
+        return this.addAttributeModifier(attribute.getKey().getKey(), modifier);
+    }
+
+    /**
+     * Used for adding an attribute modifier to the item
+     * @param attributeKey The key of the attribute you want to add the modifier to (e.g. "max_health")
+     * @param modifier The {@link AttributeModifier} you want to add
+     * @return This instance to continue the building
+     */
+    public ItemBuilder addAttributeModifier(String attributeKey, AttributeModifier modifier) {
+        if (this.attributeModifiers == null) {
+            this.attributeModifiers = new HashMap<>();
+        }
+        this.attributeModifiers.put(attributeKey, modifier);
         return this;
     }
 
@@ -399,28 +485,31 @@ public class ItemBuilder {
         if (type == null)
             throw(new NullPointerException("Item cannot be null"));
 
-
         ItemStack item = new ItemStack(type);
-
         if (type == Material.PLAYER_HEAD) {
-            if (skullProfile != null && skullProfile.isComplete()) {
-                SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
+            if (skullProfile != null) {
+                try {
+                    PlayerProfile profile = LuaCore.getPlugin().getServer().createPlayerProfile(skullProfile.textureUUID, skullProfile.textureName);
+                    profile.getTextures().setSkin(URI.create(skullProfile.textureUrl).toURL());
+                    if (profile.isComplete()) {
 
-                skullMeta.setOwnerProfile(skullProfile);
-                item.setItemMeta(skullMeta);
+                        SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
+
+                        skullMeta.setOwnerProfile(profile);
+                        item.setItemMeta(skullMeta);
+                    }
+                } catch (MalformedURLException e) {
+                    throw new ItemBuilderException("Invalid player profile");
+                }
             }
         }
 
         item.setAmount(Math.max(1, amount));
         ItemMeta meta = item.getItemMeta();
         if (title != null)
-            meta.setDisplayName(PlaceholderAPI.setPlaceholders(placeholderPlayer, ContentUtils.color(title)));
+            meta.customName(ComponentUtils.color(PlaceholderAPI.setPlaceholders(placeholderPlayer, title)));
         if (lore != null) {
-            List<String> loreLines = new ArrayList<>();
-            for (String line : lore) {
-                loreLines.add(ContentUtils.color(line));
-            }
-            meta.setLore(PlaceholderAPI.setPlaceholders(placeholderPlayer, loreLines));
+            meta.lore(ComponentUtils.color(PlaceholderAPI.setPlaceholders(placeholderPlayer, List.of(lore))));
         }
         if (enchants != null && !enchants.isEmpty()) {
             for (String enchant : enchants.keySet()) {
@@ -440,42 +529,58 @@ public class ItemBuilder {
             meta.setMaxStackSize(maxStackSize);
         }
 
-        item.setItemMeta(meta);
-
-
-        NBTItem nbtItem = new NBTItem(item);
-
-        if (!stackable)
-            nbtItem.setUUID(NBTConstants.UNSTACKABLE.getNbtString(), UUID.randomUUID());
-
-        if (stringNBT != null && !stringNBT.isEmpty())
-            for (String key : stringNBT.keySet()) {
-                nbtItem.setString(key, stringNBT.get(key));
-            }
-
-        if (intNBT != null && !intNBT.isEmpty())
-            for (String key : intNBT.keySet()) {
-                nbtItem.setInteger(key, intNBT.get(key));
-            }
-        if (booleanNBT != null && !booleanNBT.isEmpty())
-            for (String key : booleanNBT.keySet()) {
-                nbtItem.setBoolean(key, booleanNBT.get(key));
-            }
-        if (floatNBT != null && !floatNBT.isEmpty())
-            for (String key : floatNBT.keySet()) {
-                nbtItem.setFloat(key, floatNBT.get(key));
-            }
-        if (customNBT != null && !customNBT.isEmpty()) {
-            LuaMessageUtils.verboseMessage("NBT Compound name: " + LuaCore.getCompountName());
-            for (String nameSpace : customNBT.keySet()) {
-                LuaMessageUtils.verboseMessage(nameSpace);
-                NBTCompound compound = nbtItem.getOrCreateCompound(LuaCore.getCompountName());
-
-                Object content = customNBT.get(nameSpace);
-                LuaMessageUtils.json_dump(content);
-                NBTUtils.storeNBTContent(compound, content, nameSpace);
+        if (attributeModifiers != null && !attributeModifiers.isEmpty()) {
+            for (Map.Entry<String, AttributeModifier> entry : attributeModifiers.entrySet()) {
+                NamespacedKey key = NamespacedKey.fromString(entry.getKey());
+                if (key == null) {
+                    throw new ItemBuilderException("Invalid attribute key: " + entry.getKey());
+                }
+                Attribute attribute = RegistryAccess.registryAccess().getRegistry(RegistryKey.ATTRIBUTE).get(key);
+                if (attribute == null) {
+                    throw new ItemBuilderException("Invalid attribute: " + entry.getKey());
+                }
+                meta.addAttributeModifier(attribute, entry.getValue());
             }
         }
+
+        item.setItemMeta(meta);
+
+        NBT.modify(item, nbtItem -> {
+
+            if (!stackable)
+                nbtItem.setUUID(NBTConstants.UNSTACKABLE.getNbtString(), UUID.randomUUID());
+
+            if (stringNBT != null && !stringNBT.isEmpty())
+                for (String key : stringNBT.keySet()) {
+                    nbtItem.setString(key, stringNBT.get(key));
+                }
+
+            if (intNBT != null && !intNBT.isEmpty())
+                for (String key : intNBT.keySet()) {
+                    nbtItem.setInteger(key, intNBT.get(key));
+                }
+            if (booleanNBT != null && !booleanNBT.isEmpty())
+                for (String key : booleanNBT.keySet()) {
+                    nbtItem.setBoolean(key, booleanNBT.get(key));
+                }
+            if (floatNBT != null && !floatNBT.isEmpty())
+                for (String key : floatNBT.keySet()) {
+                    nbtItem.setFloat(key, floatNBT.get(key));
+                }
+            if (customNBT != null && !customNBT.isEmpty()) {
+                LuaMessageUtils.verboseMessage("NBT Compound name: " + LuaCore.getCompountName());
+                for (String nameSpace : customNBT.keySet()) {
+                    LuaMessageUtils.verboseMessage(nameSpace);
+                    ReadWriteNBT compound = nbtItem.getOrCreateCompound(LuaCore.getCompountName());
+
+                    Object content = customNBT.get(nameSpace);
+                    LuaMessageUtils.json_dump(content);
+                    NBTUtils.storeNBTContent(compound, content, nameSpace);
+                }
+            }
+            if (!usable)
+                nbtItem.setBoolean("USABLE", false);
+        });
         if (itemColor != null && ItemUtils.isLeather(item)) {
             LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) item.getItemMeta();
             leatherArmorMeta.setColor(itemColor);
@@ -487,14 +592,7 @@ public class ItemBuilder {
             item.setItemMeta(armorMeta);
 
         }
-
-        if (!usable)
-            nbtItem.setBoolean("USABLE", false);
-
-
-
-
-        return nbtItem.getItem();
+        return item;
     }
 
     /**
