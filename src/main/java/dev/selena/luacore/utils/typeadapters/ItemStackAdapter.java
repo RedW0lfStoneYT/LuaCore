@@ -25,7 +25,8 @@ public class ItemStackAdapter implements JsonSerializer<ItemStack>, JsonDeserial
     @Override
     public ItemStack deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         Map<String, Object> map = NBTUtils.getGson().fromJson(json, TypeToken.get(Map.class).getType());
-        map.putIfAbsent("v", Bukkit.getUnsafe().getDataVersion());
+//        map.putIfAbsent("v", Bukkit.getUnsafe().getDataVersion());
+        map.remove("v");
 
         if(map.containsKey("meta")) {
             Map<String, Object> meta = (Map<String, Object>) map.get("meta");
@@ -40,6 +41,7 @@ public class ItemStackAdapter implements JsonSerializer<ItemStack>, JsonDeserial
             }
             return is;
         } else {
+            LuaMessageUtils.verboseMessage("ItemStack without meta: " + map);
             return ItemStack.deserialize(map);
         }
     }
@@ -48,7 +50,7 @@ public class ItemStackAdapter implements JsonSerializer<ItemStack>, JsonDeserial
     public JsonElement serialize(ItemStack src, Type typeOfSrc, JsonSerializationContext context) {
         Map<String, Object> map = src.serialize();
         LuaMessageUtils.json_dump("ItemStack map", map);
-        map.putIfAbsent("v", Bukkit.getUnsafe().getDataVersion());
+//        map.putIfAbsent("v", Bukkit.getUnsafe().getDataVersion());
         if(src.hasItemMeta()) {
             LuaMessageUtils.json_dump("Item Meta Json:", src.getItemMeta().serialize());
             map.put("meta", src.getItemMeta().serialize());
