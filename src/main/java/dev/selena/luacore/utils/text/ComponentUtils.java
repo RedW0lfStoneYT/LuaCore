@@ -33,15 +33,11 @@ public class ComponentUtils {
                 .collect(Collectors.toList());
     }
 
-
-
     public static String convertFromIridium(String input) {
         if (input == null || input.isEmpty()) return "";
-
         input = convertGradient(input);
         input = convertRainbow(input);
         input = convertSolid(input);
-
         return input;
     }
 

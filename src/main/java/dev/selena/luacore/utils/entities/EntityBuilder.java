@@ -24,7 +24,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * THIS CLASS IS NOT AT ALL READY YET PLEASE DO NOT USE
+ * THIS CLASS IS NOT AT ALL TESTED, USAGE IS AT YOUR OWN RISK.<br>
+ * PLEASE REPORT ANY BUGS ON THE <a href="https://github.com/RedW0lfStoneYT/LuaCore/issues">GITHUB ISSUE TRACKER</a>
  */
 
 public class EntityBuilder {
@@ -69,7 +70,6 @@ public class EntityBuilder {
             maxHealth_isCustom = false,
             movementSpeed_isCustom = false,
             jumpStrength_isCustom = false,
-            // Preparing for 1.20. = false5
             entityScale_isCustom = false,
             stepHeight_isCustom = false,
             burningTime_isCustom = false,
@@ -711,7 +711,6 @@ public class EntityBuilder {
         if (!entityType.isAlive())
             throw new EntityBuildException("Entity type must be living");
         AtomicReference<Entity> ent = new AtomicReference<>();
-        // Sadge I missed the functional entity creation stuff
         Entity entity = world.spawn(location, entityType.getEntityClass());
             LivingEntity entityLiving = (LivingEntity) entity;
             INMSEntityBuilder nmsBuilder = LuaCore.getNmsVersion().getClazz().getEntityBuilder(entityLiving);
@@ -789,8 +788,5 @@ public class EntityBuilder {
             throw new EntityBuildException("World cannot be null");
         return this.spawn(location, location.getWorld());
     }
-
-
-
 
 }
