@@ -3,12 +3,13 @@ package dev.selena.luacore.utils.text;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import dev.selena.luacore.LuaCore;
-import dev.selena.luacore.utils.nbt.NBTUtils;
+import dev.selena.luacore.utils.config.ConfigLoader;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.logging.Level;
 
@@ -18,30 +19,55 @@ import java.util.logging.Level;
  */
 public class LuaMessageUtils extends ContentUtils {
 
-    private static final Gson gson = NBTUtils.getGson();
+    private static final Gson gson = ConfigLoader.getGson();
 
 
     /**
-     * Dumps a Java class to console, this will only show values with the @Expose annotation.<br>
+     * Dumps a Java class to console<br>
      * NOTE: THIS IS A VERBOSE METHOD AND NEEDS {@link LuaCore#setVerbose(boolean)} SET TO TRUE
      * @param cls The Class instance you want to dump to console
      * @see LuaMessageUtils#json_dump(String, Object)
      */
-    public static void json_dump(Object cls) {
+    public static <T> void json_dump(T cls) {
         json_dump("", cls);
     }
 
     /**
-     * Dumps a Java class to console, this will only show values with the @Expose annotation.<br>
+     * Dumps a Java class to console<br>
+     * NOTE: THIS IS A VERBOSE METHOD AND NEEDS {@link LuaCore#setVerbose(boolean)} SET TO TRUE
+     * @param cls The Class instance you want to dump to console
+     * @see LuaMessageUtils#json_dump(Object)
+     */
+    public static <T> void json_dump(T cls, Type type) {
+        json_dump("", cls, type);
+    }
+
+    /**
+     * Dumps a Java class to console<br>
      * NOTE: THIS IS A VERBOSE METHOD AND NEEDS {@link LuaCore#setVerbose(boolean)} SET TO TRUE
      * @param prefix The prefix you want to add before the json dump
      * @param cls The Class instance you want to dump to console
      * @see LuaMessageUtils#json_dump(Object) 
      */
-    public static void json_dump(String prefix, Object cls) {
+    public static <T> void json_dump(String prefix, T cls) {
         if (!LuaCore.isVerbose())
             return;
         String classGson = gson.toJson(cls);
+        consoleSend(prefix + " \n" + gson.toJson(JsonParser.parseString(classGson)));
+    }
+
+    /**
+     * Dumps a Java class to console<br>
+     * NOTE: THIS IS A VERBOSE METHOD AND NEEDS {@link LuaCore#setVerbose(boolean)} SET TO TRUE
+     * @param prefix The prefix you want to add before the json dump
+     * @param cls The Class instance you want to dump to console
+     * @param type The type of the class you want to dump
+     * @see LuaMessageUtils#json_dump(Object)
+     */
+    public static <T> void json_dump(String prefix, T cls, Type type) {
+        if (!LuaCore.isVerbose())
+            return;
+        String classGson = gson.toJson(cls, type);
         consoleSend(prefix + " \n" + gson.toJson(JsonParser.parseString(classGson)));
     }
 

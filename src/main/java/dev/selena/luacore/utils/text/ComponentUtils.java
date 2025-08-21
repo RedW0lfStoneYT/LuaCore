@@ -17,6 +17,12 @@ public class ComponentUtils {
     private static final Pattern IRIDIUM_RAINBOW_PATTERN = Pattern.compile("<RAINBOW(!)?([0-9]{1,3})>(.*?)</RAINBOW>");
 
 
+    /**
+     * Converts a string to an Adventure Component with MiniMessage.
+     * This method supports Iridium's gradient, rainbow, and solid color formats too.
+     * @param input the string to convert
+     * @return a MiniMessage component with the converted colors
+     */
     public static Component color(String input) {
         if (input == null || input.isEmpty()) {
             return Component.empty();
@@ -27,12 +33,24 @@ public class ComponentUtils {
         return MINI_MESSAGE.deserialize("<italic:false>" + convertFromIridium(miniSource));
     }
 
+    /**
+     * Converts a list of strings to a list of Adventure Components with MiniMessage.
+     * This method supports Iridium's gradient, rainbow, and solid color formats too.
+     * @param strings the list of strings to convert
+     * @return a list of MiniMessage components with the converted colors
+     */
     public static List<Component> color(List<String> strings) {
         return strings.stream()
                 .map(ComponentUtils::color)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Converts a string from Iridium's color format to MiniMessage format.
+     * This method supports gradient, rainbow, and solid color formats.
+     * @param input the string to convert
+     * @return the converted string in MiniMessage format
+     */
     public static String convertFromIridium(String input) {
         if (input == null || input.isEmpty()) return "";
         input = convertGradient(input);
@@ -41,6 +59,11 @@ public class ComponentUtils {
         return input;
     }
 
+    /**
+     * Converts an Iridium gradient format to MiniMessage format.
+     * @param input the string containing the Iridium gradient format
+     * @return the converted string in MiniMessage format
+     */
     private static String convertGradient(String input) {
         Matcher matcher = IRIDIUM_GRADIENT_PATTERN.matcher(input);
         StringBuilder buffer = new StringBuilder();
@@ -55,6 +78,11 @@ public class ComponentUtils {
         return buffer.toString();
     }
 
+    /**
+     * Converts an Iridium rainbow format to MiniMessage format.
+     * @param input the string containing the Iridium rainbow format
+     * @return the converted string in MiniMessage format
+     */
     private static String convertRainbow(String input) {
         Matcher matcher = IRIDIUM_RAINBOW_PATTERN.matcher(input);
         StringBuilder buffer = new StringBuilder();
@@ -70,7 +98,11 @@ public class ComponentUtils {
         return buffer.toString();
     }
 
-
+    /**
+     * Converts an Iridium solid color format to MiniMessage format.
+     * @param input the string containing the Iridium solid color format
+     * @return the converted string in MiniMessage format
+     */
     private static String convertSolid(String input) {
         Matcher matcher = IRIDIUM_SOLID_PATTERN.matcher(input);
         StringBuilder buffer = new StringBuilder();

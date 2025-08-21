@@ -1,6 +1,8 @@
 package dev.selena.luacore.utils;
 
 import dev.selena.luacore.utils.text.LuaMessageUtils;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Map;
 import java.util.NavigableMap;
@@ -15,9 +17,13 @@ import java.util.function.Function;
  * The reward of any type
  */
 public class RandomCollection<E> {
-    protected final NavigableMap<Double, E> map = new TreeMap<Double, E>();
+    @Getter
+    protected final NavigableMap<Double, E> map = new TreeMap<>();
     private transient final Random random;
+    @Getter
     private final long randomSeed;
+    @Getter
+    @Setter
     private double total = 0;
 
     /**
@@ -82,6 +88,17 @@ public class RandomCollection<E> {
     }
 
     /**
+     * Used for setting the collection map with another existing map already formatted with the correct weights
+     * Mainly used for deserialization
+     * @param map The correctly formatted weight map
+     */
+    public void setAll(Map<Double, E> map) {
+        this.map.clear();
+        this.map.putAll(map);
+        this.total = map.keySet().toArray().length > 0 ? map.keySet().toArray(new Double[0])[map.size() - 1] : 0;
+    }
+
+    /**
      * Used for checking if the collection is empty
      * @return True if empty
      */
@@ -110,11 +127,11 @@ public class RandomCollection<E> {
      */
     public <T> RandomCollection<T> cloneTo(Class<T> elementType, Function<E, T> function) {
         RandomCollection<T> newCollection = new RandomCollection<>();
-        for (double weight : map.keySet()) {
-            E oldEntry = map.get(weight);
-            T newEntry = function.apply(oldEntry);
-            newCollection.map.put(weight, newEntry);
+        for (Map.Entry<Double, E> entry : map.entrySet()) {
+            T newEntry = function.apply(entry.getValue());
+            newCollection.add(entry.getKey(), newEntry);
         }
         return newCollection;
     }
+
 }
