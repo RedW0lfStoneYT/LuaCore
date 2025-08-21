@@ -17,7 +17,6 @@ public class PotionEffectAdapter implements JsonSerializer<PotionEffect>, JsonDe
     @Override
     public JsonElement serialize(PotionEffect src, Type typeOfSrc, JsonSerializationContext context) {
         Map<String, Object> map = src.serialize(); // Bukkit already has serialize()
-        LuaMessageUtils.json_dump("Serialize", map, Map.class);
         return context.serialize(map);
     }
 

@@ -49,10 +49,8 @@ public class ItemStackAdapter implements JsonSerializer<ItemStack>, JsonDeserial
     @Override
     public JsonElement serialize(ItemStack src, Type typeOfSrc, JsonSerializationContext context) {
         Map<String, Object> map = src.serialize();
-        LuaMessageUtils.json_dump("ItemStack map", map);
 //        map.putIfAbsent("v", Bukkit.getUnsafe().getDataVersion());
         if(src.hasItemMeta()) {
-            LuaMessageUtils.json_dump("Item Meta Json:", src.getItemMeta().serialize());
             map.put("meta", src.getItemMeta().serialize());
         }
         return NBTUtils.getGson().toJsonTree(map);
