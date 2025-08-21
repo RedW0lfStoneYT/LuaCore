@@ -1,17 +1,23 @@
 package dev.selena.luacore.utils.items;
 
+import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import org.bukkit.Material;
+import dev.selena.luacore.utils.text.LuaMessageUtils;
+import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.UUID;
 
 /**
  * Used for managing items, This should only be used in one plugin on your server.
  */
 public class ItemEvent implements Listener {
+
 
     /**
      * event to stop users from consuming items with the unusable tag
@@ -47,5 +53,37 @@ public class ItemEvent implements Listener {
             return;
         if (!nItem.getBoolean("USABLE"))
             event.setCancelled(true);
+    }
+
+    /**
+     * used for handling unstackable items
+     * @param event ItemSpawnEvent so any creation of Item entities with the "UNSTACKABLE" NBT tag will work
+     */
+    @EventHandler
+    public void itemSpawn(ItemSpawnEvent event) {
+        Item itemEnt = event.getEntity();
+        ItemStack itemStack = itemEnt.getItemStack();
+        if (itemStack.getType().isAir())
+            return;
+        NBT.modify(itemStack, itemNbt -> {
+           if (!itemNbt.hasCustomNbtData()) {
+               LuaMessageUtils.verboseMessage("No custom NBT");
+               return;
+           }
+           if (!itemNbt.hasTag("UNSTACKABLE")) {
+               LuaMessageUtils.verboseMessage("No USABLE tag");
+               return;
+           }
+           if (itemStack.getAmount() > 1) {
+               for (int i = 1; i < itemStack.getAmount(); i++) {
+                   ItemStack newItem = itemStack.clone();
+                   newItem.setAmount(1);
+                   itemEnt.getLocation().getWorld().dropItem(itemEnt.getLocation(), newItem).setVelocity(itemEnt.getVelocity());
+               }
+               itemStack.setAmount(1);
+           }
+           itemNbt.setUUID("UNSTACKABLE", UUID.randomUUID());
+        });
+        event.getEntity().setItemStack(itemStack);
     }
 }

@@ -2,7 +2,6 @@ package dev.selena.luacore.utils.lua;
 
 import dev.selena.luacore.exceptions.lua.NoReturnValueException;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
@@ -93,7 +92,7 @@ public class LuaValueMapper {
     }
 
 
-// Still can be improved I'm sure
+// Still can be improved, I'm sure
 
     /**
      * Used for accessing the fields of the class and populating the values
@@ -106,7 +105,6 @@ public class LuaValueMapper {
         LuaMessageUtils.verboseMessage("Attempting to access " + field.getName());
         Class<?> fieldType = field.getType();
         switch(fieldType.getName()) {
-            case "org.bukkit.World" -> field.set(clazz, Bukkit.getWorld(value.tojstring()));
             case "org.bukkit.Material" -> field.set(clazz, Material.getMaterial(value.tojstring()));
             default -> {
                 LuaMessageUtils.verboseMessage("Field type: " + fieldType.getName());

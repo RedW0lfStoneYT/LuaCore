@@ -22,7 +22,7 @@ public class UserDataManager {
     /**
      * The folder that the user data is stored in
      */
-    public static String folderName;
+    public String folderName;
     private final Map<UUID, Object> userMap;
 
     /**
@@ -31,7 +31,7 @@ public class UserDataManager {
      */
     @Beta
     public UserDataManager(String baseFolder) {
-        UserDataManager.folderName = baseFolder;
+        this.folderName = baseFolder;
         File folder = FileManager.folder(folderName);
         if (!folder.exists())
             folder.mkdirs();

@@ -7,7 +7,9 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * This class is required for any User folder class
@@ -47,9 +49,21 @@ public abstract class UserFolder {
      * @param <T> The class type
      */
     public <T> T loadData(@NotNull Class<T> clazz, @NotNull String fileName) {
+        return loadData(clazz, LuaCore.getUserDataManager(), fileName);
+    }
+
+    /**
+     * Used for setting up the GSON mapping classes for user data using a specified instance of UserDataManager
+     * @param clazz The class you want to map to
+     * @param dataManager The instance of UserDataManager
+     * @param fileName The file name relative to the users data folder
+     * @return The mapped class
+     * @param <T> The class type
+     */
+    public <T> T loadData(@NotNull Class<T> clazz, UserDataManager dataManager, @NotNull String fileName) {
         T data = null;
         try {
-            File file = FileManager.file(LuaCore.getUserDataManager().getRelativeUserFolderPath(uuid), fileName);
+            File file = FileManager.file(dataManager.getRelativeUserFolderPath(uuid), fileName);
             data = FileManager.loadFile(clazz, file);
             loadedFiles.put(clazz, new FileClass(fileName, data));
         } catch (Exception exception) {
@@ -66,6 +80,11 @@ public abstract class UserFolder {
         String fileName;
         Object data;
 
+        /**
+         * Used to create a new FileClass instance for user data
+         * @param name The name of the file
+         * @param data The data being parsed in
+         */
         public FileClass(String name, Object data) {
             fileName = name;
             this.data = data;

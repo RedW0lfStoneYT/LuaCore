@@ -16,10 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -32,6 +29,18 @@ public class LuaManager {
 
     private static final Globals globals = JsePlatform.standardGlobals();
 
+    /**
+     * Used for exposing classes to Lua files (Ideally call on startup)
+     * @param className The class name you want to expose
+     */
+    public static void exposeClass(String className) {
+        try {
+            Class<?> clazz = Class.forName(className);
+            globals.set(clazz.getSimpleName(), CoerceJavaToLua.coerce(clazz));
+        } catch (ClassNotFoundException e) {
+            LuaMessageUtils.consoleError("Class not found: " + className);
+        }
+    }
 
     /**
      * Used to run a lua script
@@ -64,13 +73,13 @@ public class LuaManager {
             return false;
         }
 
-        // Get the run function from the globals environment
-        LuaValue runFunction = globals.get(function);
 
 
         LuaTable argsTable = new LuaTable();
         for (LuaArgValue argValue : args) {
-            argsTable.set(argValue.name(), CoerceJavaToLua.coerce(argValue.value()));
+            LuaValue argObg = CoerceJavaToLua.coerce(argValue.value());
+            argsTable.set(argValue.name(), argObg);
+            LuaMessageUtils.verboseMessage(argValue.name() + " = " + argValue.value() + " of type: " + argObg.typename());
         }
         argsTable.set("scriptHelper", CoerceJavaToLua.coerce(new ScriptHelper()));
 
@@ -80,6 +89,8 @@ public class LuaManager {
         LuaValue[] parsedArgs = {argsTable};
 
 
+        // Get the run function from the globals environment
+        LuaValue runFunction = globals.get(function);
         try {
             runFunction.invoke(parsedArgs);
         } catch (Exception e) {
@@ -164,10 +175,13 @@ public class LuaManager {
      * This is partly based off <a href="https://gist.github.com/kamontat/c4435fd3e646ef61328f60c92bcec4ab">kamontat jar extraction</a>
      */
     public static void loadResourceFolder(String folderName) throws IOException {
+
         folderName = folderName.replace("/", File.separator).replace("\\", File.separator);
         final File jarFile = new File(LuaManager.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 
+        LuaMessageUtils.verboseMessage("Starting to load files from " + folderName);
         if(jarFile.isFile()) {  // Run with JAR file
+            LuaMessageUtils.verboseMessage("File is Jar");
             final JarFile jar = new JarFile(jarFile);
             final Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
             while(entries.hasMoreElements()) {
@@ -179,16 +193,16 @@ public class LuaManager {
                     LuaMessageUtils.verboseMessage(file.getPath());
                     LuaMessageUtils.verboseMessage(name);
 
-                    if (!next.isDirectory()) {
-                        file.getParentFile().mkdir();
+                    if (!next.isDirectory() && !file.exists()) {
+                        file.getParentFile().mkdirs();
                         file.createNewFile();
 
                         changeContents(jar, next, file);
 
                         LuaMessageUtils.verboseMessage("Found file: " + file.getName());
 
-                    } else {
-                        file.mkdir();
+                    } else if (!file.exists()) {
+                        file.mkdirs();
                         LuaMessageUtils.verboseMessage("Found subdirectory: " + file.getName());
                         new File(LuaCore.getPlugin().getDataFolder() + File.separator + folderName, file.getName()).mkdirs();
                     }

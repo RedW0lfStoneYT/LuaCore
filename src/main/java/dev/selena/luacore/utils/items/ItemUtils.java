@@ -92,6 +92,7 @@ public class ItemUtils {
      * @return True if the item is a chestplate
      */
     public static boolean isChestplate(ItemStack item) {
+
         String name = getLowerName(item);
         return name.endsWith("chestplate")
                 || name.endsWith("tunic");
@@ -177,14 +178,14 @@ public class ItemUtils {
     }
 
     private static String getLowerName(ItemStack item) {
-        return item.getType().name().toLowerCase();
+        return item == null || item.getType() == Material.AIR ? "" : item.getType().name().toLowerCase();
     }
 
     /**
-     * Used for removing x items from a players inventory or some form of stack
+     * Used for removing x items from a player inventory or some form of stack
      * @param item The item you want to remove from
-     * @param amount The amount of items you want to remove
-     * @return if the value is less than or equal to 0 it will return an Air ItemStack
+     * @param amount The number of items you want to remove
+     * @return if the value is less than or equal to 0, it will return an Air ItemStack
      */
     public static ItemStack deleteItem(ItemStack item, int amount) {
         if (amount <= 0) {

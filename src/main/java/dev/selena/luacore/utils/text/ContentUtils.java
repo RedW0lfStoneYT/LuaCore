@@ -3,7 +3,6 @@ package dev.selena.luacore.utils.text;
 
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import org.apache.commons.lang3.text.WordUtils;
-import org.bukkit.Color;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,18 +31,6 @@ public class ContentUtils {
     public static String color(String message) {
         return IridiumColorAPI.process(message);
     }
-
-
-    /**
-     * Used for coloring string using Iridium
-     * then convert them to Components
-     * @param message The string content you want to color
-     * @return The newly colored Component
-     */
-    // Thanks spigot 1.20.2+ for getting rid of Components....
-//    public static Component colorStringToComponent(String message) {
-//        return Component.text(IridiumColorAPI.process(message));
-//    }
 
     /**
      * Colors a List using Iridium

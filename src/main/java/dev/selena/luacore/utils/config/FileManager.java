@@ -1,7 +1,6 @@
 package dev.selena.luacore.utils.config;
 
 import dev.selena.luacore.LuaCore;
-import org.luaj.vm2.compiler.LuaC;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,15 +1,15 @@
-import org.gradle.jvm.toolchain.JavaLanguageVersion
-
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
+//    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'com.gradleup.shadow' version '9.0.1'
     id 'maven-publish'
-    id 'fr.flowarg.nmsremaphelper' version '1.0.2'
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.18" apply false
 }
 
 group 'dev.selena.lua'
-version '1.0.9.04'
+version '1.2.1'
 apply plugin: 'java'
+apply plugin: 'com.gradleup.shadow'
 defaultTasks('build')
 
 repositories {
@@ -31,51 +31,137 @@ repositories {
     }
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url = 'https://oss.sonatype.org/content/repositories/central' }
+    maven {
+        url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
+    }
+}
 
+// Ty oraxen dev team lol
+class NMSVersion {
+    String nmsVersion
+    String serverVersion
+    int javaVersion
+
+    NMSVersion(String nms, String server, int javaVersion) {
+        this.nmsVersion = nms
+        this.serverVersion = server
+        this.javaVersion = javaVersion
+    }
+}
+
+static NMSVersion toNms(String nms, String server, int javaVersion) {
+    return new NMSVersion(nms, server, javaVersion)
+}
+
+List<NMSVersion> SUPPORTED_VERSIONS = [
+toNms("NMS_1_20_R2", "1.20.2-R0.1-SNAPSHOT", 21),
+toNms("NMS_1_20_R3", "1.20.4-R0.1-SNAPSHOT", 21),
+toNms("NMS_1_20_6", "1.20.6-R0.1-SNAPSHOT", 21),
+toNms("NMS_1_21_5", "1.21.5-R0.1-SNAPSHOT", 21)
+]
+
+SUPPORTED_VERSIONS.each { it ->
+    def server = it.serverVersion
+    def javaV = it.javaVersion
+    project(":Compatibility:${it.nmsVersion}") {
+
+        apply plugin: "java"
+        apply plugin: "io.papermc.paperweight.userdev"
+        apply plugin: 'com.gradleup.shadow'
+        repositories {
+            mavenLocal()
+            mavenCentral()
+            maven {
+                url = "https://repo.papermc.io/repository/maven-public/"
+            }
+            maven {
+                url = "https://repo.mineinabyss.com/releases"
+            }
+        }
+        dependencies {
+            //
+//            compileOnly "org.spigotmc:spigot:${server}:remapped-mojang"
+            paperweight.paperDevBundle(server)
+//            compileOnly "io.papermc.paper:paper-api:${server}"
+            implementation(project(path: ":Compatibility", configuration: 'shadow'))
+        }
+        java {
+            toolchain.languageVersion.set(JavaLanguageVersion.of(javaV))
+        }
+
+
+
+
+    }
+}
+
+subprojects {
+    apply plugin: "java"
+    apply plugin: "com.gradleup.shadow"
+    repositories {
+        mavenCentral()
+        maven {
+            url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+        }
+    }
+    dependencies {
+        compileOnly 'org.projectlombok:lombok:1.18.30'
+        annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    }
 }
 
 dependencies {
     // Tests
-    testImplementation 'com.github.seeseemelk:MockBukkit-v1.20:3.24.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
-    testImplementation 'junit:junit:4.13.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
-    implementation 'org.slf4j:slf4j-simple:2.0.5'
-    testImplementation('org.mockito:mockito-inline:5.2.0')
-    testImplementation('org.mockito:mockito-junit-jupiter:5.2.0')
+    // https://mvnrepository.com/artifact/org.mockbukkit.mockbukkit/mockbukkit-v1.21
+    testImplementation 'org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.72.6'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+    // https://mvnrepository.com/artifact/org.mockito/mockito-core
+    testImplementation 'org.mockito:mockito-core:5.18.0'
+    testImplementation('org.mockito:mockito-junit-jupiter:5.18.0')
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 
-
-    implementation 'org.luaj:luaj-jse:3.0.1'
-    implementation('com.google.code.gson:gson:2.10.1')
-    implementation("com.google.guava:guava:31.1-jre")
-    compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
-    implementation("de.tr7zw:item-nbt-api:2.12.2")
-    implementation 'io.github.classgraph:classgraph:4.8.162'
-    implementation('com.iridium:IridiumColorAPI:1.0.6')
-    implementation 'org.apache.commons:commons-lang3:3.13.0'
-    implementation('org.jetbrains:annotations:24.0.1')
+    implementation 'commons-lang:commons-lang:2.6'
+    compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
+    compileOnly('org.jetbrains:annotations:24.0.1')
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    compileOnly 'org.apache.commons:commons-lang3:3.13.0'
+    compileOnly 'io.github.classgraph:classgraph:4.8.162'
     // TODO make this functional
-    compileOnly "dev.jorel:commandapi-bukkit-core:9.3.0"
+    implementation "dev.jorel:commandapi-bukkit-shade:10.1.2"
+    // Shadowed dependencies
+    implementation("de.tr7zw:item-nbt-api:2.15.0")
+    implementation('com.iridium:IridiumColorAPI:1.0.9')
+    compileOnly 'me.clip:placeholderapi:2.11.6'
+    implementation 'org.luaj:luaj-jse:3.0.1'
+    implementation('com.google.code.gson:gson:2.13.1')
+    implementation("com.google.guava:guava:31.1-jre")
+//    compileOnly(project(path: ":Compatibility:NMS_1_20_R3", configuration: "reobf"))
+//    compileOnly(project(path: ":Compatibility:NMS_1_20_R2", configuration: "reobf"))
+    compileOnly(project(path: ":Compatibility", configuration: 'shadow'))
+    SUPPORTED_VERSIONS.each { compileOnly(project(path: ":Compatibility:${it.nmsVersion}", configuration: "reobf")) }
 
+    testImplementation(project(path: ":Compatibility", configuration: 'shadow'))
+    SUPPORTED_VERSIONS.each { testImplementation(project(path: ":Compatibility:${it.nmsVersion}", configuration: "reobf")) }
 
 }
 
-nmsremaphelper {
-    spigotVersion = "1.20.4-R0.1-SNAPSHOT"
-}
 
 build {
     dependsOn(shadowJar, test)
 }
-
-
-
 javadoc {
+    options.addBooleanOption('html5', true)
     source = sourceSets.main.allJava
     classpath = configurations.compileClasspath
+    source += project(":Compatibility").sourceSets.main.allJava
+    classpath += project(":Compatibility").configurations.compileClasspath
+    classpath += project(":Compatibility").sourceSets.main.output
+    // IF I WANT TO INCLUDE ALL SUB PROJECTS
+//    source += files(subprojects.collect { it.sourceSets.main.allJava })
+//    classpath += files(subprojects.collect { it.configurations.compileClasspath })
     if (System.getenv("DEV_BUILD")) {
         destinationDir = file("/home/web/docs/beta/luacore")
     } else {
@@ -84,45 +170,22 @@ javadoc {
 
 }
 
+tasks.register('darkJavadoc') {
+    dependsOn tasks.javadoc
+    doLast {
+        def cssFile = file("${tasks.javadoc.destinationDir}/stylesheet.css")
+        cssFile.append("\n/* Dark mode overrides */\n")
+        cssFile.append(file("$projectDir/dark.css").text)
+    }
+}
+
 
 
 java {
     withSourcesJar()
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
-shadowJar {
-
-    dependsOn(jar)
-    if (System.getenv("BUILD_NUMBER") == null) {
-        archiveFileName.set(rootProject.name + "-" + version + ".jar")
-    } else {
-        archiveFileName.set(rootProject.name + "-" + version + "-b" + System.getenv("BUILD_NUMBER") + ".jar")
-    }
-
-    dependencies {
-        include(dependency('com.google.code.gson:gson'))
-        include(dependency('de.tr7zw:item-nbt-api'))
-        include(dependency('com.google.guava:guava'))
-        include(dependency('org.luaj:luaj-jse'))
-        include(dependency('io.github.classgraph:classgraph'))
-        include(dependency('com.iridium:IridiumColorAPI'))
-        include(dependency('org.apache.commons:commons-lang3:3.13.0'))
-    }
-    relocate "com.google", "dev.selena.libs"
-    relocate "de.tr7zw.changeme", "dev.selena.libs"
-    relocate "org.luaj", "dev.selena.libs"
-    relocate "io.github", "dev.selena.libs"
-    relocate "com.iridium", "dev.selena.libs"
-
-    zip64 true
-    subprojects.each { subproject ->
-        from subproject.sourceSets.main.output.classesDirs
-        from subproject.sourceSets.main.output.resourcesDir
-    }
-
-    configurations = [project.configurations.getByName("runtimeClasspath")]
-}
 
 publishing {
     repositories {
@@ -142,10 +205,9 @@ publishing {
     publications {
         maven(MavenPublication) {
             from components.java
-
             groupId = group
             artifactId = rootProject.name
-            version = version
+            version = rootProject.version
 
         }
     }
@@ -153,4 +215,46 @@ publishing {
 
 test {
     useJUnitPlatform()
+}
+
+
+
+shadowJar {
+    dependsOn(jar, ":Compatibility:shadowJar")
+    SUPPORTED_VERSIONS.each { dependsOn(":Compatibility:${it.nmsVersion}:reobfJar") }
+    if (System.getenv("BUILD_NUMBER") == null) {
+        archiveFileName.set(rootProject.name + "-" + rootProject.version + ".jar")
+    } else {
+        archiveFileName.set(rootProject.name + "-" + rootProject.version + "-b" + System.getenv("BUILD_NUMBER") + ".jar")
+    }
+
+    dependencies {
+        include(dependency('com.google.code.gson:gson'))
+        include(dependency('de.tr7zw:item-nbt-api'))
+        include(dependency('com.google.guava:guava'))
+        include(dependency('org.luaj:luaj-jse'))
+        include(dependency('io.github.classgraph:classgraph'))
+        include(dependency('com.iridium:IridiumColorAPI'))
+        include(dependency('dev.jorel:commandapi-bukkit-shade'))
+        include(dependency('org.apache.commons:commons-lang3:3.13.0'))
+        SUPPORTED_VERSIONS.forEach { include(project(path: ":Compatibility:${it.nmsVersion}")) }
+        include(project(":Compatibility"))
+    }
+    def libs = "dev.selena.libs"
+    relocate("javax.annotation", libs)
+    relocate("org.checkerframework", libs)
+    relocate "com.google", libs
+    relocate "de.tr7zw.changeme", libs
+    relocate "org.luaj", libs
+    relocate "io.github", libs
+    relocate "com.iridium", libs
+    relocate "dev.jorel.commandapi", libs
+//
+    zip64 true
+    subprojects.each { subproject ->
+        from subproject.sourceSets.main.output.classesDirs
+        from subproject.sourceSets.main.output.resourcesDir
+    }
+//
+//    configurations = [project.configurations.getByName("runtimeClasspath")]
 }

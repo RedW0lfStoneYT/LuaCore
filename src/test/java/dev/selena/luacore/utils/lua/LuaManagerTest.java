@@ -1,37 +1,41 @@
 package dev.selena.luacore.utils.lua;
 
-import be.seeseemelk.mockbukkit.MockBukkit;
 import dev.selena.luacore.LuaCore;
-import dev.selena.luacore.utils.config.FileManager;
+import dev.selena.luacore.utils.data.UserDataManager;
 import dev.selena.test.utils.MockUtils;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
+import net.kyori.adventure.text.Component;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.junit.Before;
-import org.junit.ClassRule;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
+import org.mockbukkit.mockbukkit.MockBukkit;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LuaManagerTest {
 
-    @ClassRule
-    public static TemporaryFolder temporaryFolder = new TemporaryFolder();
+    private static Path temporaryFolderPath;
 
     @BeforeAll
-    public static void setUp() throws IOException, URISyntaxException {
-        temporaryFolder.create();
-        MockUtils.setUp().mockDataFolder(temporaryFolder.getRoot()).mockLogger();
+    static void setUp() throws Exception {
+        temporaryFolderPath = Files.createTempDirectory("test-data");
+        MockUtils.setUp()
+                .mockDataFolder(temporaryFolderPath.toFile())
+                .mockLogger()
+                .withDataFolder();
+    }
 
+    @AfterAll
+    static void tearDown() {
+        MockBukkit.unmock();
+        MockUtils.tearDownStaticMocks();
     }
 
     @Test
@@ -57,7 +61,7 @@ class LuaManagerTest {
         boolean ranFine = LuaManager.runEvent("test", "RunTests.lua",
                 new LuaArgValue("test", "abc"),
                 new LuaArgValue("test2", "def"),
-                new LuaArgValue("event", new PlayerJoinEvent(MockUtils.getPluginMock().getServer().getPlayer("GAY"), "GAY")));
+                new LuaArgValue("event", new PlayerJoinEvent(MockUtils.getPluginMock().getServer().getPlayer("GAY"), Component.text("GAY"))));
         assertTrue(ranFine);
     }
 
@@ -77,7 +81,7 @@ class LuaManagerTest {
         boolean ranFine = LuaManager.runEvent("test", "RunTe.lua",
                 new LuaArgValue("test", "abc"),
                 new LuaArgValue("test2", "def"),
-                new LuaArgValue("event", new PlayerJoinEvent(MockUtils.getPluginMock().getServer().getPlayer("GAY"), "GAY")));
+                new LuaArgValue("event", new PlayerJoinEvent(MockUtils.getPluginMock().getServer().getPlayer("GAY"), Component.text("GAY"))));
         assertFalse(ranFine);
     }
 
@@ -97,7 +101,7 @@ class LuaManagerTest {
         boolean ranFine = LuaManager.runEvent("test", "RunTestsNoEvent.lua",
                 new LuaArgValue("test", "abc"),
                 new LuaArgValue("test2", "def"),
-                new LuaArgValue("event", new PlayerJoinEvent(MockUtils.getPluginMock().getServer().getPlayer("GAY"), "GAY")));
+                new LuaArgValue("event", new PlayerJoinEvent(MockUtils.getPluginMock().getServer().getPlayer("GAY"), Component.text("GAY"))));
         assertFalse(ranFine);
     }
 

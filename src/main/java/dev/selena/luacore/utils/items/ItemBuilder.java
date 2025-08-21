@@ -1,27 +1,47 @@
 package dev.selena.luacore.utils.items;
 
-import de.tr7zw.changeme.nbtapi.NBTCompound;
-import de.tr7zw.changeme.nbtapi.NBTItem;
+import de.tr7zw.changeme.nbtapi.NBT;
+import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import dev.selena.luacore.LuaCore;
-import dev.selena.luacore.utils.text.ContentUtils;
-import dev.selena.luacore.utils.text.LuaMessageUtils;
+import dev.selena.luacore.exceptions.item.ItemBuilderException;
+import dev.selena.luacore.utils.nbt.NBTConstants;
+import dev.selena.luacore.utils.nbt.NBTUtils;
+import dev.selena.luacore.utils.text.ComponentUtils;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
+import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentWrapper;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.inventory.meta.trim.ArmorTrim;
+import org.bukkit.profile.PlayerProfile;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Used for easily creating custom items
  */
+@SuppressWarnings("unused")
 public class ItemBuilder {
 
     private Material type;
@@ -36,9 +56,28 @@ public class ItemBuilder {
     private Map<String, String> stringNBT;
     private Map<String, Integer> intNBT;
     private Map<String, Boolean> booleanNBT;
+    private Map<String, Float> floatNBT;
     private Map<String, Object> customNBT;
     private ArmorTrim trim;
+    private SkullProfile skullProfile;
+    private Player placeholderPlayer;
+    private int maxStackSize = -1;
+    private Map<String, AttributeModifier> attributeModifiers;
 
+
+    public static class SkullProfile {
+
+        private final String textureUrl;
+        private final UUID textureUUID;
+        private final String textureName;
+
+        public SkullProfile(String textureUrl, UUID textureUUID, String textureName) {
+            this.textureUrl = textureUrl;
+            this.textureUUID = textureUUID;
+            this.textureName = textureName;
+        }
+
+    }
 
     /**
      * Start the creation of the ItemBuilder and setting the type
@@ -46,11 +85,7 @@ public class ItemBuilder {
      */
     public ItemBuilder(Material type) {
         this.type = type;
-        this.enchants = new TreeMap<>();
-        this.stringNBT = new TreeMap<>();
-        this.intNBT = new TreeMap<>();
-        this.booleanNBT = new TreeMap<>();
-        this.customNBT = new TreeMap<>();
+        this.placeholderPlayer = null;
     }
 
     /**
@@ -59,7 +94,28 @@ public class ItemBuilder {
      * @see ItemBuilder(Material)
      */
     public ItemBuilder() {
-        this(null);
+        this((Material) null);
+    }
+
+    /**
+     * Used for placeholderAPI stuff
+     * @param player The player for the placeholders
+     * @return This instance to continue the building
+     */
+    public ItemBuilder setPlaceholderPlayer(Player player) {
+        this.placeholderPlayer = player;
+        return this;
+    }
+
+    /**
+     * Used for setting the max stack size of an item<br>
+     * NOTE: THIS MIGHT MAKE THE LIBRARY NOT WORK ON VERSIONS THAT DO NOT HAVE setMaxSize(int)
+     * @param maxStackSize The max stack size
+     * @return This instance to continue building
+     */
+    public ItemBuilder setMaxStackSize(int maxStackSize) {
+        this.maxStackSize = maxStackSize;
+        return this;
     }
 
     /**
@@ -100,7 +156,7 @@ public class ItemBuilder {
      * @see #setLore(String...) 
      */
     public ItemBuilder setLore(List<String> lore) {
-        this.lore = lore.toArray(new String[0]);
+        this.lore = lore.toArray(String[]::new);
         return this;
     }
 
@@ -110,8 +166,22 @@ public class ItemBuilder {
      * @return This instance to continue the building
      * @see #addEnchant(String, int)
      */
-    public ItemBuilder setEnchants(Map<String, Integer> enchants) {
+    public ItemBuilder setEnchantsFromKey(Map<String, Integer> enchants) {
         this.enchants = enchants;
+        return this;
+    }
+
+    /**
+     * Used for setting the enchantment map using spigot Enchantments
+     * @param enchantments The map of enchantments you want to set
+     * @return This instance to continue the building
+     */
+    public ItemBuilder setEnchantsFromEnchantments(Map<Enchantment, Integer> enchantments) {
+        Map<String, Integer> newMap = new HashMap<>();
+        for(Enchantment enchant : enchantments.keySet()) {
+            newMap.put(enchant.getKey().getKey(), enchantments.get(enchant));
+        }
+        this.enchants = newMap;
         return this;
     }
 
@@ -122,8 +192,22 @@ public class ItemBuilder {
      * @return This instance to continue the building
      */
     public ItemBuilder addEnchant(String enchant, int level) {
+        if (this.enchants == null) {
+            this.enchants = new TreeMap<>();
+        }
         this.enchants.put(enchant,level);
         return this;
+
+    }
+
+    /**
+     * Used for adding an enchantment
+     * @param enchant The enchantment you want to add
+     * @param level Level of the enchantment
+     * @return This instance to continue the building
+     */
+    public ItemBuilder addEnchant(Enchantment enchant, int level) {
+        return this.addEnchant(enchant.getKey().getKey(),level);
 
     }
 
@@ -165,6 +249,9 @@ public class ItemBuilder {
      * @return This instance to continue the building
      */
     public ItemBuilder addNBTString(String key, String value) {
+        if (this.stringNBT == null) {
+            this.stringNBT = new TreeMap<>();
+        }
         this.stringNBT.put(key,value);
         return this;
     }
@@ -186,6 +273,9 @@ public class ItemBuilder {
      * @return This instance to continue the building
      */
     public ItemBuilder addNBTInt(String key, int value) {
+        if (this.intNBT == null) {
+            this.intNBT = new TreeMap<>();
+        }
         this.intNBT.put(key,value);
         return this;
     }
@@ -207,7 +297,34 @@ public class ItemBuilder {
      * @return This instance to continue the building
      */
     public ItemBuilder addNBTBoolean(String key, boolean value) {
+        if (this.booleanNBT == null) {
+            this.booleanNBT = new TreeMap<>();
+        }
         this.booleanNBT.put(key, value);
+        return this;
+    }
+
+    /**
+     * Used for adding a boolean NBT value to the item
+     * @param key The key you will use to get the boolean later
+     * @param value The value you want to store
+     * @return This instance to continue the building
+     */
+    public ItemBuilder addNBTFloat(String key, float value) {
+        if (this.floatNBT == null) {
+            this.floatNBT = new TreeMap<>();
+        }
+        this.floatNBT.put(key, value);
+        return this;
+    }
+
+    /**
+     * Used for setting the values of the NBT float map
+     * @param floatNBT The map of floats you want to store
+     * @return This instance to continue the building
+     */
+    public ItemBuilder setFloatNBT(Map<String, Float> floatNBT) {
+        this.floatNBT = floatNBT;
         return this;
     }
 
@@ -228,6 +345,9 @@ public class ItemBuilder {
      * @return This instance to continue the building
      */
     public ItemBuilder addCustomNBT(String nameSpace, Object content) {
+        if (this.customNBT == null) {
+            this.customNBT = new TreeMap<>();
+        }
         this.customNBT.put(nameSpace, content);
         return this;
     }
@@ -273,6 +393,92 @@ public class ItemBuilder {
     }
 
     /**
+     * Used for setting the skull texture (Won't work if the material isn't {@link Material#PLAYER_HEAD})
+     * @param textureUrl The skull texture (NOTE: MUST be a <a href="https://textures.minecraft.net" target="_blank">https://textures.minecraft.net</a> texture)
+     * @return This instance to continue
+     */
+    public ItemBuilder setSkullTexture(URL textureUrl) {
+        return setSkullProfile(textureUrl, UUID.randomUUID(), null);
+    }
+    public ItemBuilder setSkullTexture(String textureUrl) throws MalformedURLException {
+        return setSkullProfile(URI.create(textureUrl).toURL(), UUID.randomUUID(), null);
+    }
+
+    /**
+     * Used for setting the skulls {@link PlayerProfile} texture.
+     * @param skullTextureUrl The skull texture (NOTE: MUST be a <a href="https://textures.minecraft.net" target="_blank">https://textures.minecraft.net</a> texture)
+     * @param skullTextureUUID The UUID of the skull, used for internal minecraft stuff
+     * @param skullTextureName The name of the skull profile (can be null, but should be unique)
+     * @return This instance to continue
+     */
+    public ItemBuilder setSkullProfile(@NotNull URL skullTextureUrl, @NotNull UUID skullTextureUUID, @Nullable String skullTextureName) {
+        skullProfile = new SkullProfile(skullTextureUrl.toString(), skullTextureUUID, skullTextureName);
+        return this;
+    }
+
+    /**
+     * Used for setting the skull profile using a URL, UUID and name
+     * @param url The URL of the skull texture (NOTE: MUST be a https://textures.minecraft.net texture)
+     * @param uuid The UUID of the skull, used for internal minecraft stuff
+     * @param name The name of the skull profile (can be null, but should be unique)
+     * @return This instance to continue
+     */
+    public ItemBuilder setSkullProfile(String url, UUID uuid, String name) {
+        skullProfile = new SkullProfile(url, uuid, name);
+        return this;
+    }
+
+    /**
+     * Used for setting the skulls {@link PlayerProfile}
+     * @param skullProfile The {@link PlayerProfile} you want to set for the skull
+     * @return This instance to continue
+     */
+    public ItemBuilder setSkullProfile(PlayerProfile skullProfile) {
+        this.skullProfile = new SkullProfile(
+                skullProfile.getTextures().getSkin() == null ? "" : skullProfile.getTextures().getSkin().toString(),
+                skullProfile.getUniqueId(),
+                skullProfile.getName()
+        );
+        return this;
+    }
+
+    /**
+     * Used for setting the attribute modifiers map of the item
+     * @param attributeModifiers Map of {@link Attribute} modifiers where the key is the attribute key
+     *                           (e.g. "max_health") and the value is the {@link AttributeModifier}
+     * @return This instance to continue the building
+     */
+    public ItemBuilder setAttributeModifiers(Map<String, AttributeModifier> attributeModifiers) {
+        this.attributeModifiers = attributeModifiers;
+        return this;
+    }
+
+
+    /**
+     * Used for adding an attribute modifier to the item
+     * @param attribute The {@link Attribute} you want to add the modifier to
+     * @param modifier The {@link AttributeModifier} you want to add
+     * @return This instance to continue the building
+     */
+    public ItemBuilder addAttributeModifier(Attribute attribute, AttributeModifier modifier) {
+        return this.addAttributeModifier(attribute.getKey().getKey(), modifier);
+    }
+
+    /**
+     * Used for adding an attribute modifier to the item
+     * @param attributeKey The key of the attribute you want to add the modifier to (e.g. "max_health")
+     * @param modifier The {@link AttributeModifier} you want to add
+     * @return This instance to continue the building
+     */
+    public ItemBuilder addAttributeModifier(String attributeKey, AttributeModifier modifier) {
+        if (this.attributeModifiers == null) {
+            this.attributeModifiers = new HashMap<>();
+        }
+        this.attributeModifiers.put(attributeKey, modifier);
+        return this;
+    }
+
+    /**
      * Used for creating the previously created ItemStack
      * @return The built ItemStack
      */
@@ -281,64 +487,98 @@ public class ItemBuilder {
         if (type == null)
             throw(new NullPointerException("Item cannot be null"));
 
-
         ItemStack item = new ItemStack(type);
+        if (type == Material.PLAYER_HEAD) {
+            if (skullProfile != null) {
+                try {
+                    PlayerProfile profile = LuaCore.getPlugin().getServer().createPlayerProfile(skullProfile.textureUUID, skullProfile.textureName);
+                    profile.getTextures().setSkin(URI.create(skullProfile.textureUrl).toURL());
+                    if (profile.isComplete()) {
+
+                        SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
+
+                        skullMeta.setOwnerProfile(profile);
+                        item.setItemMeta(skullMeta);
+                    }
+                } catch (MalformedURLException e) {
+                    throw new ItemBuilderException("Invalid player profile");
+                }
+            }
+        }
 
         item.setAmount(Math.max(1, amount));
         ItemMeta meta = item.getItemMeta();
         if (title != null)
-            meta.setDisplayName(ContentUtils.color(title));
+            meta.customName(ComponentUtils.color(PlaceholderAPI.setPlaceholders(placeholderPlayer, title)));
         if (lore != null) {
-            List<String> loreLines = new ArrayList<>();
-            for (String line : lore) {
-                loreLines.add(ContentUtils.color(line));
-            }
-            meta.setLore(loreLines);
+            meta.lore(ComponentUtils.color(PlaceholderAPI.setPlaceholders(placeholderPlayer, List.of(lore))));
         }
         if (enchants != null && !enchants.isEmpty()) {
             for (String enchant : enchants.keySet()) {
-                Enchantment enchantment = EnchantmentWrapper.getByKey(NamespacedKey.minecraft(enchant));
-                assert enchantment != null;
-                meta.addEnchant(enchantment, enchants.get(enchant), true);
+              Enchantment enchantment = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).get(NamespacedKey.minecraft(enchant));
+              assert enchantment != null;
+              meta.addEnchant(enchantment, enchants.get(enchant), true);
             }
         }
 
         if (glowing && (enchants == null || enchants.isEmpty())) {
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            meta.addEnchant(Enchantment.ARROW_DAMAGE, 1, true);
+            meta.addEnchant(Enchantment.POWER, 1, true);
         }
 
+        if (maxStackSize > 0) {
+            meta.setMaxStackSize(maxStackSize);
+        }
+
+        if (attributeModifiers != null && !attributeModifiers.isEmpty()) {
+            for (Map.Entry<String, AttributeModifier> entry : attributeModifiers.entrySet()) {
+                NamespacedKey key = NamespacedKey.fromString(entry.getKey());
+                if (key == null) {
+                    throw new ItemBuilderException("Invalid attribute key: " + entry.getKey());
+                }
+                Attribute attribute = RegistryAccess.registryAccess().getRegistry(RegistryKey.ATTRIBUTE).get(key);
+                if (attribute == null) {
+                    throw new ItemBuilderException("Invalid attribute: " + entry.getKey());
+                }
+                meta.addAttributeModifier(attribute, entry.getValue());
+            }
+        }
 
         item.setItemMeta(meta);
 
+        NBT.modify(item, nbtItem -> {
 
-        NBTItem nbtItem = new NBTItem(item);
+            if (!stackable)
+                nbtItem.setUUID(NBTConstants.UNSTACKABLE.getNbtString(), UUID.randomUUID());
 
-        if (!stackable)
-            nbtItem.setUUID("UNSTACKABLE", UUID.randomUUID());
+            if (stringNBT != null && !stringNBT.isEmpty())
+                for (String key : stringNBT.keySet()) {
+                    nbtItem.setString(key, stringNBT.get(key));
+                }
 
-        if (stringNBT != null && !stringNBT.isEmpty())
-            for (String key : stringNBT.keySet()) {
-                nbtItem.setString(key, stringNBT.get(key));
+            if (intNBT != null && !intNBT.isEmpty())
+                for (String key : intNBT.keySet()) {
+                    nbtItem.setInteger(key, intNBT.get(key));
+                }
+            if (booleanNBT != null && !booleanNBT.isEmpty())
+                for (String key : booleanNBT.keySet()) {
+                    nbtItem.setBoolean(key, booleanNBT.get(key));
+                }
+            if (floatNBT != null && !floatNBT.isEmpty())
+                for (String key : floatNBT.keySet()) {
+                    nbtItem.setFloat(key, floatNBT.get(key));
+                }
+            if (customNBT != null && !customNBT.isEmpty()) {
+                for (String nameSpace : customNBT.keySet()) {
+                    ReadWriteNBT compound = nbtItem.getOrCreateCompound(LuaCore.getCompountName());
+
+                    Object content = customNBT.get(nameSpace);
+                    NBTUtils.storeNBTContent(compound, content, nameSpace);
+                }
             }
-
-        if (intNBT != null && !intNBT.isEmpty())
-            for (String key : intNBT.keySet()) {
-                nbtItem.setInteger(key, intNBT.get(key));
-            }
-        if (booleanNBT != null && !booleanNBT.isEmpty())
-            for (String key : booleanNBT.keySet()) {
-                nbtItem.setBoolean(key, booleanNBT.get(key));
-            }
-        if (customNBT != null && !customNBT.isEmpty()) {
-            for (String nameSpace : customNBT.keySet()) {
-                LuaMessageUtils.verboseMessage("NBT Compound name: " + LuaCore.getCompountName());
-                NBTCompound compound = nbtItem.getOrCreateCompound(LuaCore.getCompountName());
-
-                Object content = customNBT.get(nameSpace);
-                NBTUtils.storeNBTContent(compound, content, nameSpace);
-            }
-        }
+            if (!usable)
+                nbtItem.setBoolean("USABLE", false);
+        });
         if (itemColor != null && ItemUtils.isLeather(item)) {
             LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) item.getItemMeta();
             leatherArmorMeta.setColor(itemColor);
@@ -348,16 +588,127 @@ public class ItemBuilder {
             ArmorMeta armorMeta = (ArmorMeta) item.getItemMeta();
             armorMeta.setTrim(trim);
             item.setItemMeta(armorMeta);
-
         }
-
-        if (!usable)
-            nbtItem.setBoolean("USABLE", false);
-
-
-
-
-        return nbtItem.getItem();
+        return item;
     }
+
+    /**
+     * Used for creating an instance of ItemBuilder from an ItemStack
+     * @param item The ItemStack you want to convert to ItemBuilder
+     * @return A fresh instance of ItemBuilder
+     */
+    public static ItemBuilder fromItemStack(ItemStack item) {
+        // 1) get the serializable map
+        Map<String, Object> data = item.serialize();
+
+        // 2) hand it to a new map-based constructor
+        return new ItemBuilder(data);
+    }
+
+
+    /**
+     * Used for creating an instance of ItemBuilder from a serializable map
+     * @param data The map you want to convert to ItemBuilder
+     */
+    @SuppressWarnings("unchecked")
+    public ItemBuilder(Map<String, Object> data) {
+        this(Material.matchMaterial((String) data.get("id")));
+
+        Number cnt = (Number) data.get("count");
+        if (cnt != null) {
+            this.setAmount(cnt.intValue());
+        }
+        Map<String, Object> meta = (Map<String, Object>) data.get("meta");
+        if (meta != null) {
+            Object rawTitle = meta.get("display-name");
+            if (rawTitle instanceof String jsonTitle) {
+                Component comp = GsonComponentSerializer.gson().deserialize(jsonTitle);
+                String legacy = LegacyComponentSerializer.legacySection().serialize(comp);
+                this.setTitle(legacy);
+            }
+
+            Object rawLore = meta.get("lore");
+            if (rawLore instanceof List<?> loreList) {
+                List<String> lore = loreList.stream()
+                        .filter(String.class::isInstance)
+                        .map(String.class::cast)
+                        .map(jsonLine -> {
+                            Component c = GsonComponentSerializer.gson().deserialize(jsonLine);
+                            return LegacyComponentSerializer.legacySection().serialize(c);
+                        })
+                        .collect(Collectors.toList());
+                this.setLore(lore);
+            }
+
+            Object rawEnchants = meta.get("enchants");
+            if (rawEnchants instanceof Map<?, ?> enchMap) {
+                Map<Enchantment, Integer> enchants = new LinkedHashMap<>();
+                enchMap.forEach((k, v) -> {
+                    if (k instanceof String key && v instanceof Number num) {
+                        NamespacedKey nk = NamespacedKey.fromString(key);
+                        if (nk == null) nk = NamespacedKey.minecraft(key);
+                        Enchantment e = Enchantment.getByKey(nk);
+                        if (e != null) {
+                            enchants.put(e, num.intValue());
+                        }
+                    }
+                });
+                if (!enchants.isEmpty()) {
+                    this.setEnchantsFromEnchantments(enchants);
+                }
+            }
+
+            Object rawAttrs = meta.get("attribute-modifiers");
+            if (rawAttrs instanceof Map<?, ?> attrMap) {
+                Map<String, AttributeModifier> mods = new LinkedHashMap<>();
+                attrMap.forEach((attrKeyObj, listObj) -> {
+                    if (attrKeyObj instanceof String attrKey && listObj instanceof List<?> list) {
+                        for (Object o : list) {
+                            if (o instanceof Map<?, ?> m) {
+                                double amount = ((Number) m.get("amount")).doubleValue();
+                                String slot = (String) m.get("slot");
+                                int op = ((Number) m.get("operation")).intValue();
+                                String keyStr = (String) m.get("key");
+                                NamespacedKey modKey = NamespacedKey.fromString(keyStr);
+                                if (modKey == null) modKey = NamespacedKey.minecraft(keyStr);
+
+                                Attribute attribute = RegistryAccess.registryAccess().getRegistry(RegistryKey.ATTRIBUTE).get(NamespacedKey.fromString(attrKey));
+
+                                EquipmentSlot eqSlot = EquipmentSlot.valueOf(slot.toUpperCase());
+                                AttributeModifier.Operation operation = AttributeModifier.Operation.values()[op];
+                                AttributeModifier modifier = new AttributeModifier(
+                                        modKey, amount, operation, eqSlot.getGroup()
+                                );
+                                mods.put(modKey.getKey(), modifier);
+                            }
+                        }
+                    }
+                });
+                if (!mods.isEmpty()) {
+                    this.setAttributeModifiers(mods);
+                }
+            }
+
+            Object rawTrim = meta.get("trim");
+            if (rawTrim instanceof Map<?, ?> trimMap) {
+                String matKey = (String) trimMap.get("material");
+                String patKey = (String) trimMap.get("pattern");
+                NamespacedKey mk = NamespacedKey.fromString(matKey);
+                NamespacedKey pk = NamespacedKey.fromString(patKey);
+                if (mk != null && pk != null) {
+                    this.setArmorTrim(new ArmorTrim(RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_MATERIAL).get(mk), RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_PATTERN).get(pk)));
+                }
+            }
+
+            Object rawColor = meta.get("color");
+            if (rawColor instanceof Map<?, ?> colorMap) {
+                int r = ((Number) colorMap.get("RED")).intValue();
+                int g = ((Number) colorMap.get("GREEN")).intValue();
+                int b = ((Number) colorMap.get("BLUE")).intValue();
+                this.setColor(Color.fromRGB(r, g, b));
+            }
+        }
+    }
+
 
 }

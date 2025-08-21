@@ -7,38 +7,51 @@ import dev.selena.luacore.exceptions.data.NotUserFolderException;
 import dev.selena.luacore.utils.config.ConfigLoader;
 import dev.selena.luacore.utils.config.FileManager;
 import dev.selena.test.utils.MockUtils;
-import org.junit.ClassRule;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.TemporaryFolder;
+import org.mockbukkit.mockbukkit.MockBukkit;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
 
-import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserDataManagerTest {
 
-    @ClassRule
-    public static TemporaryFolder temporaryFolder = new TemporaryFolder();
-    private final UserDataManager manager = LuaCore.getUserDataManager();
+    private static Path temporaryFolderPath;
+    private UserDataManager manager;  // NOT final, not initialized here
 
     @BeforeAll
-    public static void setUp() throws IOException, URISyntaxException {
-        temporaryFolder.create();
-        MockUtils.setUp().mockDataFolder(temporaryFolder.getRoot()).mockLogger().withDataFolder();
+    static void globalSetUp() throws Exception {
+        temporaryFolderPath = Files.createTempDirectory("test-data");
+        MockUtils.setUp()
+                .mockDataFolder(temporaryFolderPath.toFile())
+                .mockLogger()
+                .withDataFolder();
+    }
 
+    @BeforeEach
+    void setUp() {
+        manager = LuaCore.getUserDataManager();
+    }
+
+    @AfterAll
+    static void tearDown() {
+        MockBukkit.unmock();
+        MockUtils.tearDownStaticMocks();
     }
 
     @Test
     void getUserFolderPath() {
         String generated = manager.getUserFolderPath(UUID.fromString("5f87bb6c-38f4-4d94-93ab-73cd18986499"));
-        String base = temporaryFolder.getRoot().getPath() + File.separator + "data" + File.separator + "5f87bb6c-38f4-4d94-93ab-73cd18986499" + File.separator;
-        assertEquals(base , generated);
+        String base = temporaryFolderPath + File.separator + "data" + File.separator + "5f87bb6c-38f4-4d94-93ab-73cd18986499" + File.separator;
+        assertEquals(base, generated);
     }
 
     @Test
