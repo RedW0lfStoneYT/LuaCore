@@ -1,20 +1,26 @@
 package dev.selena.luacore.utils.nbt;
 
+import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
 import de.tr7zw.changeme.nbtapi.NBTCompound;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import dev.selena.luacore.LuaCore;
+import dev.selena.luacore.nms.ICustomGoalWrapper;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
-import dev.selena.luacore.utils.typeadapters.ConfigurationSerializableAdapter;
-import dev.selena.luacore.utils.typeadapters.ItemStackAdapter;
-import dev.selena.luacore.utils.typeadapters.SpigotTypeAdapter;
+import dev.selena.luacore.utils.typeadapters.*;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.trim.ArmorTrim;
+import org.bukkit.metadata.MetadataValue;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.BoundingBox;
 
+import java.lang.ref.SoftReference;
 import java.lang.reflect.Type;
+import java.util.Map;
 
 /**
  * NBT utility class mainly for serialization and storing custom nbt compounds
@@ -22,16 +28,29 @@ import java.lang.reflect.Type;
 public class NBTUtils {
 
     @Getter
-    private static final Gson gson = new GsonBuilder()
+    private static Gson gson = new GsonBuilder()
             .disableHtmlEscaping()
             .setPrettyPrinting()
-            .serializeNulls()
             .setStrictness(Strictness.LENIENT)
+            .enableComplexMapKeySerialization()
             .registerTypeHierarchyAdapter(ConfigurationSerializable.class, new ConfigurationSerializableAdapter())
+            .registerTypeHierarchyAdapter(Attribute.class, new AttributeTypeAdapter())
+            .registerTypeHierarchyAdapter(Attribute.class, new AttributeTypeAdapter())
+            .registerTypeHierarchyAdapter(SoftReference.class,
+                    (JsonSerializer<SoftReference<?>>) (src, typeOfSrc, context) -> src == null ? JsonNull.INSTANCE : context.serialize(src.get()))
+            // Specifically for EntityBuilder#setMetadataValue
+            .registerTypeAdapter(new TypeToken<Map<String, MetadataValue>>(){}.getType(), new MetadataMapAdapter(LuaCore.getPlugin()))
+            .registerTypeAdapter(ICustomGoalWrapper.class, new ICustomGoalWrapperAdapter())
+            .registerTypeAdapter(PotionEffect.class, new PotionEffectAdapter())
             .registerTypeAdapter(Location.class, new SpigotTypeAdapter<>(Location::deserialize))
             .registerTypeAdapter(ItemStack.class, new ItemStackAdapter())
+            .registerTypeAdapter(ArmorTrim.class, new ArmorTrimTypeAdapter())
+            .registerTypeAdapter(Attribute.class, new AttributeTypeAdapter())
             .registerTypeAdapter(BoundingBox.class, new SpigotTypeAdapter<>(BoundingBox::deserialize))
+            .registerTypeAdapterFactory(new RandomCollectionTypeAdapterFactory())
             .create();
+
+
 
 
     /**
@@ -83,7 +102,6 @@ public class NBTUtils {
      * @param nameSpaceKey where you should get the data from later
      */
     public static void storeNBTContent(ReadWriteNBT compoundTag, Object content, String nameSpaceKey) {
-        LuaMessageUtils.json_dump(content);
         String json = serializeContent(content);
         compoundTag.setString(nameSpaceKey, json);
     }
@@ -96,7 +114,6 @@ public class NBTUtils {
      * @param nameSpaceKey where you should get the data from later
      */
     public static void storeEntityNBTContent(ReadWriteNBT readWriteNBT, Object content, String nameSpaceKey) {
-        LuaMessageUtils.json_dump(content);
         String json = serializeContent(content);
         readWriteNBT.setString(nameSpaceKey, json);
     }
@@ -109,8 +126,7 @@ public class NBTUtils {
      * @param nameSpaceKey where you should get the data from later
      * @param type The object type you want to populate
      */
-    public static void storeEntityNBTContent(ReadWriteNBT readWriteNBT, Object content, String nameSpaceKey, Type type) {
-        LuaMessageUtils.json_dump(content);
+    public static <T> void storeEntityNBTContent(ReadWriteNBT readWriteNBT, T content, String nameSpaceKey, Type type) {
         String json = serializeContent(content, type);
         readWriteNBT.setString(nameSpaceKey, json);
     }
@@ -160,7 +176,7 @@ public class NBTUtils {
     public static <T> T getEntityNBTContent(Type type, String nameSpaceKey, ReadWriteNBT readWriteNBT) {
         if (readWriteNBT.hasTag(nameSpaceKey)) {
             String json = readWriteNBT.getString(nameSpaceKey);
-            LuaMessageUtils.verboseMessage("getEntityContent " + json);
+            LuaMessageUtils.verboseMessage("type: " + type.getTypeName() + " getEntityContent " + json);
             return deserializeContent(type, json);
         }
         LuaMessageUtils.verboseError(nameSpaceKey + " Does not exist");

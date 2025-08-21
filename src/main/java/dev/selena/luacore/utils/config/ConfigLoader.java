@@ -1,20 +1,25 @@
 package dev.selena.luacore.utils.config;
 
+import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
+import dev.selena.luacore.LuaCore;
 import dev.selena.luacore.annotations.gson.Comment;
-import dev.selena.luacore.utils.text.LuaMessageUtils;
+import dev.selena.luacore.nms.ICustomGoalWrapper;
 import dev.selena.luacore.utils.typeadapters.*;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.trim.ArmorTrim;
-import org.bukkit.inventory.meta.trim.TrimMaterial;
+import org.bukkit.metadata.MetadataValue;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.BoundingBox;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.ref.SoftReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
@@ -25,6 +30,7 @@ import java.util.Map;
  * Config loader used to load and save json config files
  */
 public class ConfigLoader {
+    @Getter
     private static final Gson gson = new GsonBuilder()
 //            .excludeFieldsWithoutExposeAnnotation()
             .disableHtmlEscaping()
@@ -33,11 +39,19 @@ public class ConfigLoader {
             .enableComplexMapKeySerialization()
             .registerTypeHierarchyAdapter(ConfigurationSerializable.class, new ConfigurationSerializableAdapter())
             .registerTypeHierarchyAdapter(Attribute.class, new AttributeTypeAdapter())
+            .registerTypeHierarchyAdapter(Attribute.class, new AttributeTypeAdapter())
+            .registerTypeHierarchyAdapter(SoftReference.class,
+                    (JsonSerializer<SoftReference<?>>) (src, typeOfSrc, context) -> src == null ? JsonNull.INSTANCE : context.serialize(src.get()))
+            // Specifically for EntityBuilder#setMetadataValue
+            .registerTypeAdapter(new TypeToken<Map<String, MetadataValue>>(){}.getType(), new MetadataMapAdapter(LuaCore.getPlugin()))
+            .registerTypeAdapter(ICustomGoalWrapper.class, new ICustomGoalWrapperAdapter())
+            .registerTypeAdapter(PotionEffect.class, new PotionEffectAdapter())
             .registerTypeAdapter(Location.class, new SpigotTypeAdapter<>(Location::deserialize))
             .registerTypeAdapter(ItemStack.class, new ItemStackAdapter())
             .registerTypeAdapter(ArmorTrim.class, new ArmorTrimTypeAdapter())
             .registerTypeAdapter(Attribute.class, new AttributeTypeAdapter())
             .registerTypeAdapter(BoundingBox.class, new SpigotTypeAdapter<>(BoundingBox::deserialize))
+            .registerTypeAdapterFactory(new RandomCollectionTypeAdapterFactory())
             .create();
 
     /**
@@ -106,8 +120,6 @@ public class ConfigLoader {
         }
         return result.toString();
     }
-
-
 
     /**
      * Saves a config object to the specified file in JSON format
