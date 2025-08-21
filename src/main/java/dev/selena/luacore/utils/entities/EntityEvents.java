@@ -1,7 +1,7 @@
 package dev.selena.luacore.utils.entities;
 
 import dev.selena.luacore.LuaCore;
-import dev.selena.luacore.LuaEntityDeathEvent;
+import dev.selena.luacore.utils.text.LuaMessageUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -19,15 +19,28 @@ public class EntityEvents implements Listener {
      */
     @EventHandler
     public void luaEntityDeathCall(EntityDeathEvent event) {
-        Entity dead = event.getEntity();
-        LuaEntity luaEntity = new LuaEntity(dead);
-        if (!luaEntity.isLuaEntity())
-            return;
-        if (luaEntity.getDrops() == null)
-            return;
-        LuaCore.getPlugin().getServer().getPluginManager().callEvent(new LuaEntityDeathEvent(luaEntity));
-        if (!luaEntity.getDrops().isEmpty())
-            event.getDrops().clear();
+        try {
+            Entity dead = event.getEntity();
+            LuaEntity luaEntity = new LuaEntity(dead);
+            if (!luaEntity.isLuaEntity()) {
+                LuaMessageUtils.verboseMessage("Not a LuaEntity: " + dead.getType().name() + " at " + dead.getLocation());
+                return;
+            }
+            if (luaEntity.getDrops() == null) {
+                LuaMessageUtils.verboseMessage("No Custom Drops for " + dead.getType().name() + " at " + dead.getLocation());
+                return;
+            }
+            if (luaEntity.getOwningPlugin() != LuaCore.getPlugin()) {
+                LuaMessageUtils.verboseError("Not the owning plugin!");
+                return;
+            }
+            LuaCore.getPlugin().getServer().getPluginManager().callEvent(new LuaEntityDeathEvent(luaEntity));
+            if (!luaEntity.getDrops().isEmpty() || !luaEntity.isUseVanillaDrops())
+                event.getDrops().clear();
+        } catch (Exception e) {
+            LuaMessageUtils.verboseError("An error occurred while processing LuaEntityDeathEvent: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**

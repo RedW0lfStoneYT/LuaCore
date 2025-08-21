@@ -1,7 +1,6 @@
-package dev.selena.luacore;
+package dev.selena.luacore.utils.entities;
 
 import dev.selena.luacore.utils.RandomCollection;
-import dev.selena.luacore.utils.entities.LuaEntity;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -45,6 +44,9 @@ public class LuaEntityDeathEvent extends Event implements Cancellable {
      * So long as the event isn't canceled, you will not need to call this method.
      */
     public void doDrops() {
+        if (dropCollection == null || dropCollection.isEmpty() || cancelled || luaEntity.isUseVanillaDrops()) {
+            return;
+        }
         for (int i = 0; i < dropAmount; i++) {
             Location location = spigotEntity.getLocation();
             location.getWorld().dropItem(location, dropCollection.getRandom());

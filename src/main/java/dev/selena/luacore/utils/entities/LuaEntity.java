@@ -9,8 +9,10 @@ import dev.selena.luacore.utils.items.ItemBuilder;
 import dev.selena.luacore.utils.nbt.NBTUtils;
 import dev.selena.luacore.utils.text.LuaMessageUtils;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Type;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -22,11 +24,13 @@ public class LuaEntity {
 
     @Getter
     private RandomCollection<ItemStack> drops;
-
     @Getter
     private Entity spigotEntity;
     @Getter
     private boolean luaEntity;
+    private String owningPlugin;
+    @Getter
+    private boolean useVanillaDrops;
 
     /**
      * used for setting up stuff for the LuaEntity
@@ -36,6 +40,7 @@ public class LuaEntity {
         spigotEntity = entity;
         NBT.modifyPersistentData(entity, nbtData -> {
             ReadWriteNBT compound = nbtData.getCompound(LuaCore.getCompountName());
+            owningPlugin = nbtData.getString("OwningPlugin");
             if (!isLuaEntity(entity))
                 return;
             if (!compound.hasTag("EntityDrops")) {
@@ -43,15 +48,22 @@ public class LuaEntity {
                 return;
             }
             luaEntity = true;
-            Type tokenType = new TypeToken<RandomCollection<ItemBuilder>>(){}.getType(); // THEN THIS MK SEE WHAT WORKS SILLY
-            setDrops(NBTUtils.getEntityNBTContent(tokenType, "EntityDrops", compound));
+            if (compound.hasTag("VanillaDrops")) {
+                useVanillaDrops = compound.getBoolean("VanillaDrops");
+                if (useVanillaDrops) {
+                    return;
+                }
+            } else {
+                useVanillaDrops = false;
+            }
+            Type dropsType = TypeToken.getParameterized(RandomCollection.class, ItemBuilder.class).getType();
+            setDrops(NBTUtils.getEntityNBTContent(dropsType, "EntityDrops", compound));
+
         });
     }
 
     private void setDrops(RandomCollection<ItemBuilder> collection) {
-        LuaMessageUtils.json_dump("Collection:", collection);
         drops = collection.cloneTo(ItemStack.class, ItemBuilder::build);
-        LuaMessageUtils.json_dump("Drops:", drops);
     }
 
     /**
@@ -74,6 +86,22 @@ public class LuaEntity {
             }
         });
         return returnValue.get();
+    }
+
+    /**
+     * Gets the owning plugin of the entity
+     * @return The owning plugin of the entity
+     */
+    public Plugin getOwningPlugin() {
+        if (owningPlugin == null) {
+            LuaMessageUtils.verboseWarn("Owning plugin is null for " + spigotEntity.getType().name());
+            return null;
+        }
+        Plugin plugin = Bukkit.getPluginManager().getPlugin(owningPlugin);
+        if (plugin == null) {
+            LuaMessageUtils.verboseWarn("Owning plugin is null for " + spigotEntity.getType().name() + " - " + owningPlugin);
+        }
+        return plugin;
     }
 
 }
