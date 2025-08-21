@@ -12,7 +12,6 @@ import java.util.Objects;
  */
 public class EntityBuilder implements INMSEntityBuilder {
 
-
     @Getter
     private final LivingEntity entity;
 

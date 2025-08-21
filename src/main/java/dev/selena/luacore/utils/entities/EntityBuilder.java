@@ -1,15 +1,19 @@
 package dev.selena.luacore.utils.entities;
 
+import com.google.gson.reflect.TypeToken;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import dev.selena.luacore.LuaCore;
 import dev.selena.luacore.exceptions.entity.EntityBuildException;
+import dev.selena.luacore.nms.ICustomGoalWrapper;
 import dev.selena.luacore.nms.INMSEntityBuilder;
+import dev.selena.luacore.nms.IPathfinderInjector;
 import dev.selena.luacore.utils.RandomCollection;
+import dev.selena.luacore.utils.data.TypedObject;
 import dev.selena.luacore.utils.items.ItemBuilder;
 import dev.selena.luacore.utils.items.ItemUtils;
 import dev.selena.luacore.utils.nbt.NBTUtils;
-import dev.selena.luacore.utils.text.ContentUtils;
+import dev.selena.luacore.utils.text.ComponentUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -19,72 +23,18 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * THIS CLASS IS NOT AT ALL TESTED, USAGE IS AT YOUR OWN RISK.<br>
+ * THIS CLASS IS <b>HIGHLY</b> EXPERIMENTAL, USAGE IS AT YOUR OWN RISK.<br>
  * PLEASE REPORT ANY BUGS ON THE <a href="https://github.com/RedW0lfStoneYT/LuaCore/issues">GITHUB ISSUE TRACKER</a>
  */
-
+@ApiStatus.Experimental
 public class EntityBuilder {
 
-    // TODO Add default value and range to all attribute documentation
-
-    private float
-            armorBonus,
-            armorToughnessBonus,
-            attackDamageBonus,
-            attackKnockBack,
-            burningTime,
-            cameraDistance,
-            explosionKnockbackResistance,
-            fallDamageMultiplier,
-            gravity,
-            spawnReinforcementsChance,
-            movementEfficiency,
-            oxygenBonus,
-            safeFallDistance,
-            temptRange,
-            waterMovementEfficiency,
-            waypointReceiveRange,
-            waypointTransmitRange,
-            flyingSpeed,
-            followRange,
-            knockBackResistance,
-            maxAbsorption,
-            maxHealth,
-            movementSpeed,
-            jumpStrength,
-            entityScale,
-            stepHeight;
-    private boolean armorBonus_isCustom = false,
-            armorToughnessBonus_isCustom = false,
-            attackDamageBonus_isCustom = false,
-            attackKnockBack_isCustom = false,
-            flyingSpeed_isCustom = false,
-            followRange_isCustom = false,
-            knockBackResistance_isCustom = false,
-            maxAbsorption_isCustom = false,
-            maxHealth_isCustom = false,
-            movementSpeed_isCustom = false,
-            jumpStrength_isCustom = false,
-            entityScale_isCustom = false,
-            stepHeight_isCustom = false,
-            burningTime_isCustom = false,
-            cameraDistance_isCustom = false,
-            explosionKnockbackResistance_isCustom = false,
-            fallDamageMultiplier_isCustom = false,
-            gravity_isCustom = false,
-            spawnReinforcementsChance_isCustom = false,
-            movementEfficiency_isCustom = false,
-            oxygenBonus_isCustom = false,
-            safeFallDistance_isCustom = false,
-            temptRange_isCustom = false,
-            waterMovementEfficiency_isCustom = false,
-            waypointReceiveRange_isCustom = false,
-            waypointTransmitRange_isCustom = false;
+    private Map<String, Float> attributes;
     private EntityType entityType;
     private String displayName;
     private List<PotionEffect> potionEffects;
@@ -97,11 +47,12 @@ public class EntityBuilder {
             offHandItem;
     private RandomCollection<ItemBuilder> drops;
     private Map<String, MetadataValue> metadataValues;
-    // Not to sure how well this will work yet, but it should allow the entity to keep the data on reload
-    private Map<String, Object> customNBTData;
-    // This will require NMS reflections woo :/
-    // But hey, the person calling this method will also need to
-    private Class<?> customPathfinderGoal;
+    private Map<String, TypedObject> customNBTData;
+    private Map<Integer, ICustomGoalWrapper> customPathfinderGoal;
+    private boolean hasAi = true;
+    private boolean silent = false;
+    private boolean vanillaDrops = true;
+    private boolean removeDefaultGoals = false;
 
 
     /**
@@ -113,6 +64,7 @@ public class EntityBuilder {
 
     /**
      * Used for creating an instance with EntityType
+     *
      * @param type The EntityType you want to spawn
      */
     public EntityBuilder(EntityType type) {
@@ -125,6 +77,7 @@ public class EntityBuilder {
 
     /**
      * Used for setting the list of potion effects
+     *
      * @param potionEffects The list of potion effects you want to set
      * @return The current builder instance
      */
@@ -135,6 +88,7 @@ public class EntityBuilder {
 
     /**
      * Used for adding a potion effect to the list of effects
+     *
      * @param effect The effect you want to add
      * @return The current builder instance
      */
@@ -145,16 +99,18 @@ public class EntityBuilder {
 
     /**
      * Used for adding an array of potion effects to the entity
+     *
      * @param effects The array of effects
      * @return The current builder instance
      */
-    public EntityBuilder addPotionEffects(PotionEffect ... effects) {
+    public EntityBuilder addPotionEffects(PotionEffect... effects) {
         this.potionEffects.addAll(Arrays.asList(effects));
         return this;
     }
 
     /**
      * Used for adding a list of potion effects to the entity
+     *
      * @param effects The list of effects you want to add
      * @return The current builder instance
      */
@@ -165,8 +121,9 @@ public class EntityBuilder {
 
     /**
      * Used for adding a drop to the collection
+     *
      * @param chance The weighted chance
-     * @param item The items you want added
+     * @param item   The items you want added
      * @return The current builder instance
      */
     public EntityBuilder addDrop(double chance, ItemBuilder item) {
@@ -176,6 +133,7 @@ public class EntityBuilder {
 
     /**
      * used to add a map of drops to the drop collection
+     *
      * @param drops The map of drops
      * @return The current builder instance
      */
@@ -186,8 +144,9 @@ public class EntityBuilder {
 
     /**
      * Used for adding a drop to the collection
+     *
      * @param chance The weighted chance
-     * @param item The items you want added
+     * @param item   The items you want added
      * @return The current builder instance
      */
     public EntityBuilder addDrop(double chance, ItemStack item) {
@@ -197,6 +156,7 @@ public class EntityBuilder {
 
     /**
      * used to add a map of drops to the drop collection
+     *
      * @param drops The map of drops
      * @return The current builder instance
      */
@@ -210,7 +170,8 @@ public class EntityBuilder {
     /**
      * Used for adding metadata to the entity (Not to sure if I can make it save on server restart)
      * (NOTE: I Suggest using {@link EntityBuilder#addCustomNBTData(String, Object)})
-     * @param key The key used for getting the metadata value
+     *
+     * @param key      The key used for getting the metadata value
      * @param metadata The metadata you want to store
      * @return The current builder instance
      */
@@ -222,6 +183,7 @@ public class EntityBuilder {
     /**
      * Used for adding a map of metadata values to the entity
      * (NOTE: I Suggest using {@link EntityBuilder#addCustomNBTDataValues(Map)})
+     *
      * @param metadataValues The map of metadata values
      * @return The current builder instance
      */
@@ -232,340 +194,365 @@ public class EntityBuilder {
 
     /**
      * Used for adding custom NBTData to the entity
+     *
      * @param key The key used to gather the data
      * @param cls The NBTData class (NOTE: can be essentially anything)
      * @return The current builder instance
      */
+    @Deprecated(forRemoval = true)
     public EntityBuilder addCustomNBTData(String key, Object cls) {
-        this.customNBTData.put(key, cls);
+        this.customNBTData.put(key, new TypedObject(cls, cls.getClass()));
+        return this;
+    }
+
+    /**
+     * Used for adding custom NBTData to the entity
+     * @param key The key used to gather the data
+     * @param typedObject The {@link TypedObject} you want to add
+     * @return The current builder instance
+     */
+    public EntityBuilder addCustomNBTData(String key, TypedObject typedObject) {
+        this.customNBTData.put(key, typedObject);
         return this;
     }
 
     /**
      * Used for adding a map of NBTData to add to the entity
+     *
      * @param values The map of NBTData classes
      * @return The current builder instance
      */
-    public EntityBuilder addCustomNBTDataValues(Map<String, Object> values) {
+    public EntityBuilder addCustomNBTDataValues(Map<String, TypedObject> values) {
         this.customNBTData.putAll(values);
         return this;
     }
 
     /**
-     * Used for setting the armor bonus attribute (0.0 to 30.0, default 0.0)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
-     * @param armorBonus The value for the attribute
+     * Used for setting the custom NBTData map
+     *
+     * @param customNBTData The map of custom NBTData
      * @return The current builder instance
      */
+    public EntityBuilder setCustomNBTData(Map<String, TypedObject> customNBTData) {
+        this.customNBTData = customNBTData;
+        return this;
+    }
+
+    /**
+     * Used for setting the armor bonus attribute (0.0 to 30.0, default 0.0)
+     *
+     * @param armorBonus The value for the attribute
+     * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     */
     public EntityBuilder setArmorBonus(float armorBonus) {
-        this.armorBonus = armorBonus;
-        this.armorBonus_isCustom = true;
+        addIfNull("armorBonus", armorBonus);
         return this;
     }
 
     /**
      * Used for setting the armor toughness bonus attribute (0.0 to 20.0, default 0.0)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param armorToughnessBonus The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setArmorToughnessBonus(float armorToughnessBonus) {
-        this.armorToughnessBonus = armorToughnessBonus;
-        this.armorToughnessBonus_isCustom = true;
+        addIfNull("armorToughnessBonus", armorToughnessBonus);
         return this;
     }
 
     /**
      * Used for setting the attack damage bonus (0.0 to 2048.0 default, 2.0)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param attackDamageBonus The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setAttackDamageBonus(float attackDamageBonus) {
-        this.attackDamageBonus = attackDamageBonus;
-        this.attackDamageBonus_isCustom = true;
+        addIfNull("attackDamageBonus", attackDamageBonus);
         return this;
     }
 
     /**
      * Used for setting the attack knock back attribute (0.0 to 5.0, default 0.0)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param attackKnockBack The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setAttackKnockBack(float attackKnockBack) {
-        this.attackKnockBack = attackKnockBack;
-        this.attackKnockBack_isCustom = true;
+        addIfNull("attackKnockBack", attackKnockBack);
         return this;
     }
 
     /**
      * Used for setting the flight speed attribute (0.0 to 1024.0, default 0.4)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param flyingSpeed The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setFlyingSpeed(float flyingSpeed) {
-        this.flyingSpeed = flyingSpeed;
-        this.flyingSpeed_isCustom = true;
+        addIfNull("flyingSpeed", flyingSpeed);
         return this;
     }
 
     /**
      * Used for setting the entity follow range attribute (0.0 to 2048, default 32.0)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param followRange The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setFollowRange(float followRange) {
-        this.followRange = followRange;
-        this.followRange_isCustom = true;
+        addIfNull("followRange", followRange);
         return this;
     }
 
     /**
      * Used for setting the knock back resistance attribute (0.0 to 1.0, default 0.0)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param knockBackResistance The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setKnockBackResistance(float knockBackResistance) {
-        this.knockBackResistance = knockBackResistance;
-        this.knockBackResistance_isCustom = true;
+        addIfNull("knockBackResistance", knockBackResistance);
         return this;
     }
 
     /**
      * Used for setting the maximum absorption attribute (0.0 to 2048.0, default 0.0)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param maxAbsorption The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setMaxAbsorption(float maxAbsorption) {
-        this.maxAbsorption = maxAbsorption;
-        this.maxAbsorption_isCustom = true;
+        addIfNull("maxAbsorption", maxAbsorption);
         return this;
     }
 
     /**
      * Used for setting the maximum health attribute (0.0 to 1024.0, default 20.0)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param maxHealth The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setMaxHealth(float maxHealth) {
-        this.maxHealth = maxHealth;
-        this.maxHealth_isCustom = true;
+        addIfNull("maxHealth", maxHealth);
         return this;
     }
 
     /**
      * Used for setting the entity movement speed attribute (0.0 to 1024.0, default depends on entity)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param movementSpeed The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setMovementSpeed(float movementSpeed) {
-        this.movementSpeed = movementSpeed;
-        this.movementSpeed_isCustom = true;
+        addIfNull("movementSpeed", movementSpeed);
         return this;
     }
 
     /**
      * Used for setting the horse jump strength attribute (0.0 to 2.0, default 0.7)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param jumpStrength The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setJumpStrength(float jumpStrength) {
-        this.jumpStrength = jumpStrength;
-        this.jumpStrength_isCustom = true;
+        addIfNull("jumpStrength", jumpStrength);
         return this;
     }
 
     /**
      * Used for setting the entity scale attribute (0.0625 to 16.0, default 1.0)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param entityScale The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setEntityScale(float entityScale) {
-        this.entityScale = entityScale;
-        this.entityScale_isCustom = true;
+        addIfNull("entityScale", entityScale);
         return this;
     }
 
     /**
      * Used for setting the entity step height attribute (0.0 to 10.0, default 0.6)
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param stepHeight The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setStepHeight(float stepHeight) {
-        this.stepHeight = stepHeight;
-        this.stepHeight_isCustom = true;
+        addIfNull("stepHeight", stepHeight);
         return this;
     }
 
     /**
      * Used for setting the reinforcements spawn chance attribute
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param reinforcementsChance The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setSpawnReinforcements(float reinforcementsChance) {
-        this.spawnReinforcementsChance = reinforcementsChance;
-        this.spawnReinforcementsChance_isCustom = true;
+        addIfNull("spawnReinforcements", reinforcementsChance);
         return this;
     }
 
     /**
      * Used for setting the burn timer multiplier attribute
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param value The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setBurningTimer(float value) {
-        this.burningTime = value;
-        this.burningTime_isCustom = true;
+        addIfNull("burningTimer", value);
         return this;
     }
 
     /**
      * Used for setting the camera distance attribute
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param value The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setCameraDistance(float value) {
-        this.cameraDistance = value;
-        this.cameraDistance_isCustom = true;
+        addIfNull("cameraDistance", value);
         return this;
     }
 
     /**
      * Used for setting the explosion knockback resistance attribute
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param value The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setExplosionKnockbackResistance(float value) {
-        this.explosionKnockbackResistance = value;
-        this.explosionKnockbackResistance_isCustom = true;
+        addIfNull("explosionKnockbackResistance", value);
         return this;
     }
 
     /**
      * Used for setting the fall damage multiplier attribute
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param value The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setFallDamageMultiplier(float value) {
-        this.fallDamageMultiplier = value;
-        this.fallDamageMultiplier_isCustom = true;
+        addIfNull("fallDamageMultiplier", value);
         return this;
     }
 
     /**
      * Used for setting the gravity attribute
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param value The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setGravity(float value) {
-        this.gravity = value;
-        this.gravity_isCustom = true;
+        addIfNull("gravity", value);
         return this;
     }
 
     /**
      * Used for setting the movement efficiency attribute
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param value The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setMovementEfficiency(float value) {
-        this.movementEfficiency = value;
-        this.movementEfficiency_isCustom = true;
+        addIfNull("movementEfficiency", value);
         return this;
     }
 
     /**
      * Used for setting the oxygen bonus attribute
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param value The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setOxygenBonus(float value) {
-        this.oxygenBonus = value;
-        this.oxygenBonus_isCustom = true;
+        addIfNull("oxygenBonus", value);
         return this;
     }
 
     /**
      * Used for setting the safe fall distance attribute
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param value The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setSafeFallDistance(float value) {
-        this.safeFallDistance = value;
-        this.safeFallDistance_isCustom = true;
+        addIfNull("safeFallDistance", value);
         return this;
     }
 
     /**
      * Used for setting the temptation range attribute
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param value The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setTemptRange(float value) {
-        this.temptRange = value;
-        this.temptRange_isCustom = true;
+        addIfNull("temptRange", value);
         return this;
     }
 
     /**
      * Used for setting the water movement efficiency attribute
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param value The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setWaterMovementEfficiency(float value) {
-        this.waterMovementEfficiency = value;
-        this.waterMovementEfficiency_isCustom = true;
+        addIfNull("waterMovementEfficiency", value);
         return this;
     }
 
     /**
      * Used for setting the waypoint receive range attribute
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param value The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setWaypointReceiveRange(float value) {
-        this.waypointReceiveRange = value;
-        this.waypointReceiveRange_isCustom = true;
+        addIfNull("waypointReceiveRange", value);
         return this;
     }
 
     /**
      * Used for setting the waypoint transmit range attribute
-     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
+     *
      * @param value The value for the attribute
      * @return The current builder instance
+     * @see <a href="https://minecraft.wiki/w/Attribute">Minecraft attributes wiki</a>
      */
     public EntityBuilder setWaypointTransmitRange(float value) {
-        this.waypointTransmitRange = value;
-        this.waypointTransmitRange_isCustom = true;
+        addIfNull("waypointTransmitRange", value);
         return this;
     }
 
-
     /**
      * Used for setting the type of entity to spawn
+     *
      * @param entityType The EntityType you want to spawn
      * @return The current builder instance
      */
@@ -576,6 +563,7 @@ public class EntityBuilder {
 
     /**
      * Used for setting the display name of the entity (Color is translated once applied so no need to do it before)
+     *
      * @param displayName The entity display name
      * @return The current builder instance
      */
@@ -586,6 +574,7 @@ public class EntityBuilder {
 
     /**
      * Used for setting the entity helmet
+     *
      * @param helmet The item you want to set for helmet
      * @return The current builder instance
      */
@@ -596,6 +585,7 @@ public class EntityBuilder {
 
     /**
      * Used for setting the entity chestplate
+     *
      * @param chestplate The item you want to set for the chestplate (NOTE: Must be a chestplate item)
      * @return The current builder instance
      */
@@ -606,6 +596,7 @@ public class EntityBuilder {
 
     /**
      * Used for setting the entity leggings
+     *
      * @param leggings The item you want to set for the leggings (NOTE: Must be a legging item)
      * @return The current builder instance
      */
@@ -616,6 +607,7 @@ public class EntityBuilder {
 
     /**
      * Used for setting the entity boots
+     *
      * @param boots The item you want to set for the boots (NOTE: Must be a boot item)
      * @return The current builder instance
      */
@@ -626,6 +618,7 @@ public class EntityBuilder {
 
     /**
      * Used for setting the item in the entities main hand
+     *
      * @param mainHandItem The item you want to place in the main hand
      * @return The current builder instance
      */
@@ -636,6 +629,7 @@ public class EntityBuilder {
 
     /**
      * Used for setting the item in the entities offhand
+     *
      * @param offHandItem The item you want to place in the offhand
      * @return The current builder instance
      */
@@ -646,6 +640,7 @@ public class EntityBuilder {
 
     /**
      * Used for setting the drop collection for entity death
+     *
      * @param drops The {@link RandomCollection} of ItemBuilder drops
      * @return The current builder instance
      */
@@ -656,6 +651,7 @@ public class EntityBuilder {
 
     /**
      * Used for setting the drop collection for entity death
+     *
      * @param itemStackDrops The {@link RandomCollection} of ItemStack drops
      * @return The current builder instance
      */
@@ -666,6 +662,7 @@ public class EntityBuilder {
 
     /**
      * Used for setting the map of metadata values (NOTE: I suggest using {@link EntityBuilder#setCustomNBTData(Map)})
+     *
      * @param metadataValues The map of metadata values
      * @return The current builder instance
      */
@@ -675,32 +672,89 @@ public class EntityBuilder {
     }
 
     /**
-     * Used for setting the custom NBTData map
-     * @param customNBTData The map of custom NBTData
-     * @return The current builder instance
-     */
-    public EntityBuilder setCustomNBTData(Map<String, Object> customNBTData) {
-        this.customNBTData = customNBTData;
-        return this;
-    }
-
-    /**
      * Used for setting a custom pathfinder goal
-     * NOTE: THIS IS NOT ADDED YET
+     * NOTE: THIS IS VERY EXPERIMENTAL AND MAY NOT WORK AS INTENDED
+     *
      * @param customPathfinderGoal The class of the pathfinder goal
      * @return The current builder instance
      */
-    public EntityBuilder setCustomPathfinderGoal(Class<?> customPathfinderGoal) {
+    @ApiStatus.Experimental
+    public EntityBuilder setCustomPathfinderGoal(Map<Integer, ICustomGoalWrapper> customPathfinderGoal) {
         this.customPathfinderGoal = customPathfinderGoal;
         return this;
     }
 
     /**
+     * Used for adding a custom pathfinder goal to the entity
+     * NOTE: THIS IS VERY EXPERIMENTAL AND MAY NOT WORK AS INTENDED
+     *
+     * @param priority The priority of the goal (lower number = higher priority)
+     * @param goalWrapper The wrapper for the custom goal
+     * @return The current builder instance
+     */
+    @ApiStatus.Experimental
+    public EntityBuilder addCustomPathfinderGoal(int priority, ICustomGoalWrapper goalWrapper) {
+        if (this.customPathfinderGoal == null) {
+            this.customPathfinderGoal = new HashMap<>();
+        }
+        this.customPathfinderGoal.put(priority, goalWrapper);
+        return this;
+    }
+
+    /**
+     * Used for setting if the entity has AI or not
+     * @param hasAi True if the entity has AI, false if it does not, true by default
+     * @return The current builder instance
+     */
+    public EntityBuilder setAi(boolean hasAi) {
+        this.hasAi = hasAi;
+        return this;
+    }
+
+    /**
+     * Used for setting if the entity is silent or not
+     * @param silent True if the entity is silent, false if it is not, false by default
+     * @return The current builder instance
+     */
+    public EntityBuilder setSilent(boolean silent) {
+        this.silent = silent;
+        return this;
+    }
+
+    /**
+     * Used for setting if the entity should use vanilla drops or not
+     * @param vanillaDrops True if the entity should use vanilla drops, false if it should not, false by default
+     * @return The current builder instance
+     */
+    public EntityBuilder setVanillaDrops(boolean vanillaDrops) {
+        this.vanillaDrops = vanillaDrops;
+        return this;
+    }
+
+    /**
+     * Used for setting if the entity should remove default goals or not
+     * @param removeDefaultGoals True if the entity should remove default goals, false if it should not, false by default
+     * @return The current builder instance
+     */
+    public EntityBuilder setRemoveDefaultGoals(boolean removeDefaultGoals) {
+        this.removeDefaultGoals = removeDefaultGoals;
+        return this;
+    }
+
+    private void addIfNull(String attribute, float value) {
+        if (this.attributes == null) {
+            this.attributes = new HashMap<>();
+        }
+        this.attributes.put(attribute, value);
+    }
+
+    /**
      * Used for spawning the entity in the world
-     * @see EntityBuilder#spawn(Location) 
+     *
      * @param location The location you want to spawn the entity
      * @param world The world you want to spawn the entity in
      * @return The entity that has just been spawned
+     * @see EntityBuilder#spawn(Location)
      */
     public Entity spawn(Location location, World world) {
 
@@ -710,78 +764,98 @@ public class EntityBuilder {
             throw new EntityBuildException("Entity type must be spawnable");
         if (!entityType.isAlive())
             throw new EntityBuildException("Entity type must be living");
-        AtomicReference<Entity> ent = new AtomicReference<>();
         Entity entity = world.spawn(location, entityType.getEntityClass());
-            LivingEntity entityLiving = (LivingEntity) entity;
-            INMSEntityBuilder nmsBuilder = LuaCore.getNmsVersion().getClazz().getEntityBuilder(entityLiving);
-            boolean hasName = this.displayName != null && !this.displayName.isEmpty();
-            entityLiving.setCustomNameVisible(hasName);
-            if (hasName)
-                entityLiving.setCustomName(ContentUtils.color(this.displayName));
+        LivingEntity entityLiving = (LivingEntity) entity;
+        INMSEntityBuilder nmsBuilder = LuaCore.getNmsVersion().getClazz().getEntityBuilder(entityLiving);
+        boolean hasName = this.displayName != null && !this.displayName.isEmpty();
+        entityLiving.setCustomNameVisible(hasName);
+        if (hasName)
+            entityLiving.customName(ComponentUtils.color(this.displayName));
+        if (attributes != null) {
+            attributes.forEach((key, value) -> {
+                switch (key) {
+                    case "armorBonus" -> nmsBuilder.setArmorBonus(value);
+                    case "armorToughnessBonus" -> nmsBuilder.setArmorToughnessBonus(value);
+                    case "attackDamageBonus" -> nmsBuilder.setAttackDamageBonus(value);
+                    case "attackKnockBack" -> nmsBuilder.setAttackKnockBack(value);
+                    case "flyingSpeed" -> nmsBuilder.setFlyingSpeed(value);
+                    case "followRange" -> nmsBuilder.setFollowRange(value);
+                    case "knockBackResistance" -> nmsBuilder.setKnockBackResistance(value);
+                    case "maxAbsorption" -> nmsBuilder.setMaxAbsorption(value);
+                    case "maxHealth" -> nmsBuilder.setMaxHealth(value);
+                    case "movementSpeed" -> nmsBuilder.setMovementSpeed(value);
+                    case "jumpStrength" -> nmsBuilder.setJumpStrength(value);
+                    case "entityScale" -> nmsBuilder.setEntityScale(value);
+                    case "stepHeight" -> nmsBuilder.setStepHeight(value);
+                    case "spawnReinforcementsChance" -> nmsBuilder.spawnReinforcements(value);
+                    case "burningTime" -> nmsBuilder.setBurningTime(value);
+                    case "cameraDistance" -> nmsBuilder.setCameraDistance(value);
+                    case "explosionKnockbackResistance" -> nmsBuilder.setExplosionKnockBackResistance(value);
+                    case "fallDamageMultiplier" -> nmsBuilder.setFallDamageMultiplier(value);
+                    case "gravity" -> nmsBuilder.setGravity(value);
+                    case "movementEfficiency" -> nmsBuilder.setMovementEfficiency(value);
+                    case "oxygenBonus" -> nmsBuilder.setOxygenBonus(value);
+                    case "safeFallDistance" -> nmsBuilder.setSafeFallDistance(value);
+                    case "temptRange" -> nmsBuilder.setTemptRange(value);
+                    case "waterMovementEfficiency" -> nmsBuilder.setWaterMoveEfficiency(value);
+                    case "waypointReceiveRange" -> nmsBuilder.setWaypointReceiveRange(value);
+                    case "waypointTransmitRange" -> nmsBuilder.setWaypointTransmitRange(value);
+                }
 
-            if (armorBonus_isCustom) nmsBuilder.setArmorBonus(armorBonus);
-            if (armorToughnessBonus_isCustom) nmsBuilder.setArmorToughnessBonus(armorToughnessBonus);
-            if (attackDamageBonus_isCustom) nmsBuilder.setAttackDamageBonus(attackDamageBonus);
-            if (attackKnockBack_isCustom) nmsBuilder.setAttackKnockBack(attackKnockBack);
-            if (flyingSpeed_isCustom) nmsBuilder.setFlyingSpeed(flyingSpeed);
-            if (followRange_isCustom) nmsBuilder.setFollowRange(followRange);
-            if (knockBackResistance_isCustom) nmsBuilder.setKnockBackResistance(knockBackResistance);
-            if (maxAbsorption_isCustom) nmsBuilder.setMaxAbsorption(maxAbsorption);
-            if (maxHealth_isCustom) nmsBuilder.setMaxHealth(maxHealth);
-            if (movementSpeed_isCustom) nmsBuilder.setMovementSpeed(movementSpeed);
-            if (jumpStrength_isCustom) nmsBuilder.setJumpStrength(jumpStrength);
-            if (entityScale_isCustom) nmsBuilder.setEntityScale(entityScale);
-            if (stepHeight_isCustom) nmsBuilder.setStepHeight(stepHeight);
-            if (spawnReinforcementsChance_isCustom) nmsBuilder.spawnReinforcements(spawnReinforcementsChance);
-            if (burningTime_isCustom) nmsBuilder.setBurningTime(burningTime);
-            if (cameraDistance_isCustom) nmsBuilder.setCameraDistance(cameraDistance);
-            if (explosionKnockbackResistance_isCustom) nmsBuilder.setExplosionKnockBackResistance(explosionKnockbackResistance);
-            if (fallDamageMultiplier_isCustom) nmsBuilder.setFallDamageMultiplier(fallDamageMultiplier);
-            if (gravity_isCustom) nmsBuilder.setGravity(gravity);
-            if (movementEfficiency_isCustom) nmsBuilder.setMovementEfficiency(movementEfficiency);
-            if (oxygenBonus_isCustom) nmsBuilder.setOxygenBonus(oxygenBonus);
-            if (safeFallDistance_isCustom) nmsBuilder.setSafeFallDistance(safeFallDistance);
-            if (temptRange_isCustom) nmsBuilder.setTemptRange(temptRange);
-            if (waterMovementEfficiency_isCustom) nmsBuilder.setWaterMoveEfficiency(waterMovementEfficiency);
-            if (waypointReceiveRange_isCustom) nmsBuilder.setWaypointReceiveRange(waypointReceiveRange);
-            if (waypointTransmitRange_isCustom) nmsBuilder.setWaypointTransmitRange(waypointTransmitRange);
+            });
+        }
 
 
-            entityLiving = nmsBuilder.getEntity();
-            entityLiving.addPotionEffects(potionEffects);
-            EntityEquipment equipment = entityLiving.getEquipment();
-            assert equipment != null;
-            equipment.setHelmet(helmet, true);
-            if (ItemUtils.isChestplate(chestplate))
-                equipment.setChestplate(chestplate, true);
-            if (ItemUtils.isLeggings(leggings))
-                equipment.setLeggings(leggings, true);
-            if (ItemUtils.isBoots(boots))
-                equipment.setBoots(boots, true);
-            equipment.setItemInMainHand(mainHandItem);
-            equipment.setItemInOffHand(offHandItem);
+        entityLiving = nmsBuilder.getEntity();
+        if (customPathfinderGoal != null && !customPathfinderGoal.isEmpty()) {
+            IPathfinderInjector injector = LuaCore.getNmsVersion().getClazz().getPathfinderInjector(entityLiving);
+            if (removeDefaultGoals) {
+                injector.clearPathfinders();
+            }
+            for (Map.Entry<Integer, ICustomGoalWrapper> entry : customPathfinderGoal.entrySet()) {
+                injector.addCustomPathfinder(entry.getKey(), entry.getValue());
+            }
+            entityLiving = injector.getEntity();
+        }
+        entityLiving.addPotionEffects(potionEffects);
+        EntityEquipment equipment = entityLiving.getEquipment();
+        assert equipment != null;
+        equipment.setHelmet(helmet, true);
+        if (ItemUtils.isChestplate(chestplate))
+            equipment.setChestplate(chestplate, true);
+        if (ItemUtils.isLeggings(leggings))
+            equipment.setLeggings(leggings, true);
+        if (ItemUtils.isBoots(boots))
+            equipment.setBoots(boots, true);
+        equipment.setItemInMainHand(mainHandItem);
+        equipment.setItemInOffHand(offHandItem);
 
         NBT.modifyPersistentData(entity, nbt -> {
+            nbt.setString("OwningPlugin", LuaCore.getPlugin().getName());
             ReadWriteNBT compound = nbt.getOrCreateCompound(LuaCore.getCompountName());
+            compound.setBoolean("VanillaDrops", vanillaDrops);
             compound.setBoolean("LuaCoreEntity", true);
             for (String nameSpace : customNBTData.keySet()) {
-                Object content = customNBTData.get(nameSpace);
-                NBTUtils.storeEntityNBTContent(compound, content, nameSpace);
+                TypedObject content = customNBTData.get(nameSpace);
+                NBTUtils.storeEntityNBTContent(compound, content.getValue(), nameSpace, content.getType());
             }
             if (!drops.isEmpty())
-                NBTUtils.storeEntityNBTContent(compound, drops, "EntityDrops");
+                NBTUtils.storeEntityNBTContent(compound, drops, "EntityDrops", TypeToken.getParameterized(RandomCollection.class, ItemBuilder.class).getType());
         });
         for (String metadataKey : metadataValues.keySet()) {
             entity.setMetadata(metadataKey, metadataValues.get(metadataKey));
         }
+        entity.setSilent(this.silent);
+        ((LivingEntity) entity).setAI(this.hasAi);
         return entity;
     }
 
     /**
      * Used for spawning the entity in the world
-     * @see EntityBuilder#spawn(Location, World) 
+     *
      * @param location The location you want to spawn the entity (World must not be null)
      * @return The entity that has just been spawned
+     * @see EntityBuilder#spawn(Location, World)
      */
     public Entity spawn(Location location) {
         if (location.getWorld() == null)
