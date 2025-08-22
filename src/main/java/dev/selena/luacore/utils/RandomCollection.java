@@ -1,13 +1,9 @@
 package dev.selena.luacore.utils;
 
-import dev.selena.luacore.utils.text.LuaMessageUtils;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -17,14 +13,16 @@ import java.util.function.Function;
  * The reward of any type
  */
 public class RandomCollection<E> {
+
+    protected transient NavigableMap<Double, E> map = new TreeMap<>();
     @Getter
-    protected final NavigableMap<Double, E> map = new TreeMap<>();
+    private final Map<E, Double> rawMap = new LinkedHashMap<>();
     private transient final Random random;
     @Getter
     private final long randomSeed;
     @Getter
     @Setter
-    private double total = 0;
+    private transient double total = 0;
 
     /**
      * Used to initialize the class using a new instance of random
@@ -63,7 +61,7 @@ public class RandomCollection<E> {
         if (weight <= 0) return this;
         total += weight;
         map.put(total, result);
-        LuaMessageUtils.verboseMessage("New total weight value: " + total);
+        rawMap.put(result, weight);
         return this;
     }
 
@@ -84,18 +82,8 @@ public class RandomCollection<E> {
         for (E result : results.keySet()) {
             total += results.get(result);
             map.put(total, result);
+            rawMap.put(result, results.get(result));
         }
-    }
-
-    /**
-     * Used for setting the collection map with another existing map already formatted with the correct weights
-     * Mainly used for deserialization
-     * @param map The correctly formatted weight map
-     */
-    public void setAll(Map<Double, E> map) {
-        this.map.clear();
-        this.map.putAll(map);
-        this.total = map.keySet().toArray().length > 0 ? map.keySet().toArray(new Double[0])[map.size() - 1] : 0;
     }
 
     /**
@@ -115,6 +103,7 @@ public class RandomCollection<E> {
         for (double weight : map.keySet()) {
             E entity = map.get(weight);
             map.put(weight, function.apply(entity));
+            rawMap.put(function.apply(entity), rawMap.get(entity));
         }
     }
 
@@ -126,10 +115,20 @@ public class RandomCollection<E> {
      * @param <T> The element Type of the new collection
      */
     public <T> RandomCollection<T> cloneTo(Class<T> elementType, Function<E, T> function) {
+        return cloneTo(function);
+    }
+
+    /**
+     * Used for cloning a collection instance to another type and doing the required entry manipulation
+     * @param function The required data manipulation to make the conversion work
+     * @return The cloned and altered instance
+     * @param <T> The element Type of the new collection
+     */
+    public <T> RandomCollection<T> cloneTo(Function<E, T> function) {
         RandomCollection<T> newCollection = new RandomCollection<>();
-        for (Map.Entry<Double, E> entry : map.entrySet()) {
+        for (NavigableMap.Entry<Double, E> entry : map.entrySet()) {
             T newEntry = function.apply(entry.getValue());
-            newCollection.add(entry.getKey(), newEntry);
+            newCollection.add(rawMap.get(entry.getValue()), newEntry);
         }
         return newCollection;
     }
