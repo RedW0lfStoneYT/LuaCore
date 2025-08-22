@@ -9,6 +9,7 @@ import dev.selena.luacore.utils.nbt.NBTUtils;
 import dev.selena.luacore.utils.text.ComponentUtils;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
+import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -44,38 +45,47 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public class ItemBuilder {
 
+    @Getter
     private Material type;
+    @Getter
     private String title;
+    @Getter
     private Color itemColor;
+    @Getter
     private int amount;
+    @Getter
     private String[] lore;
+    @Getter
     private Map<String, Integer> enchants;
+    @Getter
     private boolean stackable = true;
+    @Getter
     private boolean usable = true;
+    @Getter
     private boolean glowing;
+    @Getter
     private Map<String, String> stringNBT;
+    @Getter
     private Map<String, Integer> intNBT;
+    @Getter
     private Map<String, Boolean> booleanNBT;
+    @Getter
     private Map<String, Float> floatNBT;
+    @Getter
     private Map<String, Object> customNBT;
+    @Getter
     private ArmorTrim trim;
+    @Getter
     private SkullProfile skullProfile;
+    @Getter
     private Player placeholderPlayer;
+    @Getter
     private int maxStackSize = -1;
+    @Getter
     private Map<String, AttributeModifier> attributeModifiers;
 
 
-    public static class SkullProfile {
-
-        private final String textureUrl;
-        private final UUID textureUUID;
-        private final String textureName;
-
-        public SkullProfile(String textureUrl, UUID textureUUID, String textureName) {
-            this.textureUrl = textureUrl;
-            this.textureUUID = textureUUID;
-            this.textureName = textureName;
-        }
+    public record SkullProfile(String textureUrl, UUID textureUUID, String textureName) {
 
     }
 

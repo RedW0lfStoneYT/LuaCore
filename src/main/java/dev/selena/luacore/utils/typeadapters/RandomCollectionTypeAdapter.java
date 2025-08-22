@@ -27,11 +27,11 @@ public class RandomCollectionTypeAdapter<E> extends TypeAdapter<RandomCollection
     @Override
     public void write(JsonWriter writer, RandomCollection<E> value) throws IOException {
         writer.beginArray();
-        for (Map.Entry<Double, E> entry : value.getMap().entrySet()) {
+        for (Map.Entry<E, Double> entry : value.getRawMap().entrySet()) {
             writer.beginObject();
             writer.name("element");
-            elementAdapter.write(writer, entry.getValue());
-            writer.name("weight").value(entry.getKey());
+            elementAdapter.write(writer, entry.getKey());
+            writer.name("weight").value(entry.getValue());
             writer.endObject();
         }
         writer.endArray();
