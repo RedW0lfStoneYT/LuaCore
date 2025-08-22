@@ -14,6 +14,7 @@ import dev.selena.luacore.utils.items.ItemBuilder;
 import dev.selena.luacore.utils.items.ItemUtils;
 import dev.selena.luacore.utils.nbt.NBTUtils;
 import dev.selena.luacore.utils.text.ComponentUtils;
+import lombok.SneakyThrows;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -25,6 +26,7 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -756,6 +758,7 @@ public class EntityBuilder {
      * @return The entity that has just been spawned
      * @see EntityBuilder#spawn(Location)
      */
+    @SneakyThrows
     public Entity spawn(Location location, World world) {
 
         if (entityType == null || entityType.getEntityClass() == null)
@@ -837,7 +840,15 @@ public class EntityBuilder {
             compound.setBoolean("LuaCoreEntity", true);
             for (String nameSpace : customNBTData.keySet()) {
                 TypedObject content = customNBTData.get(nameSpace);
-                NBTUtils.storeEntityNBTContent(compound, content.getValue(), nameSpace, content.getType());
+                try {
+                    Type type = content.getType();
+                    if (type == null) {
+                        NBTUtils.storeEntityNBTContent(compound, content.getValue(), nameSpace);
+                    }
+                    NBTUtils.storeEntityNBTContent(compound, content.getValue(), nameSpace, type);
+                } catch (ClassNotFoundException e) {
+                    NBTUtils.storeEntityNBTContent(compound, content.getValue(), nameSpace);
+                }
             }
             if (!drops.isEmpty())
                 NBTUtils.storeEntityNBTContent(compound, drops, "EntityDrops", TypeToken.getParameterized(RandomCollection.class, ItemBuilder.class).getType());
