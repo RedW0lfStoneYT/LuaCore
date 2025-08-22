@@ -14,6 +14,7 @@ import dev.selena.luacore.utils.items.ItemBuilder;
 import dev.selena.luacore.utils.items.ItemUtils;
 import dev.selena.luacore.utils.nbt.NBTUtils;
 import dev.selena.luacore.utils.text.ComponentUtils;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -36,10 +37,15 @@ import java.util.*;
 @ApiStatus.Experimental
 public class EntityBuilder {
 
+    @Getter
     private Map<String, Float> attributes;
+    @Getter
     private EntityType entityType;
+    @Getter
     private String displayName;
+    @Getter
     private List<PotionEffect> potionEffects;
+    @Getter
     private ItemStack
             helmet,
             chestplate,
@@ -47,13 +53,21 @@ public class EntityBuilder {
             leggings,
             mainHandItem,
             offHandItem;
+    @Getter
     private RandomCollection<ItemBuilder> drops;
+    @Getter
     private Map<String, MetadataValue> metadataValues;
+    @Getter
     private Map<String, TypedObject> customNBTData;
+    @Getter
     private Map<Integer, ICustomGoalWrapper> customPathfinderGoal;
+    @Getter
     private boolean hasAi = true;
+    @Getter
     private boolean silent = false;
+    @Getter
     private boolean vanillaDrops = true;
+    @Getter
     private boolean removeDefaultGoals = false;
 
 

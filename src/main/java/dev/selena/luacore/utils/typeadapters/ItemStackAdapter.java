@@ -35,13 +35,14 @@ public class ItemStackAdapter implements JsonSerializer<ItemStack>, JsonDeserial
             map.remove("meta");
             ItemStack is = ItemStack.deserialize(map);
             is.setItemMeta(deserializedMeta);
+            if (enchants == null || enchants.isEmpty()) {
+                return is;
+            }
             for (String enchantName : enchants.keySet()) {
-                LuaMessageUtils.verboseMessage("Enchant name: " + enchantName);
                 is.addUnsafeEnchantment(Enchantment.getByName(enchantName), Integer.parseInt(String.valueOf(Math.round(enchants.get(enchantName)))));
             }
             return is;
         } else {
-            LuaMessageUtils.verboseMessage("ItemStack without meta: " + map);
             return ItemStack.deserialize(map);
         }
     }
